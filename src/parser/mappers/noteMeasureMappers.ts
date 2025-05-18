@@ -1801,7 +1801,8 @@ export const mapAttributesElement = (element: Element): Attributes => {
   const clefElements = Array.from(element.querySelectorAll("clef"));
   const stavesContent = getTextContent(element, "staves"); // Read content of <staves>
   const partSymbolElement = element.querySelector("part-symbol");
-  const transposeElement = element.querySelector("transpose");
+  const transposeElements = Array.from(element.querySelectorAll("transpose"));
+  const instrumentsContent = getTextContent(element, "instruments");
   const staffDetailsElements = Array.from(
     element.querySelectorAll("staff-details"),
   );
@@ -1844,9 +1845,18 @@ export const mapAttributesElement = (element: Element): Attributes => {
     if (mappedPartSymbol) attributesData.partSymbol = mappedPartSymbol;
   }
 
-  if (transposeElement) {
-    const mappedTranspose = mapTransposeElement(transposeElement);
-    if (mappedTranspose) attributesData.transpose = mappedTranspose;
+  if (transposeElements.length > 0) {
+    const mappedTranspose = transposeElements
+      .map(mapTransposeElement)
+      .filter(Boolean) as Transpose[];
+    if (mappedTranspose.length > 0) attributesData.transpose = mappedTranspose;
+  }
+
+  if (instrumentsContent !== undefined) {
+    const instNum = parseInt(instrumentsContent, 10);
+    if (!isNaN(instNum)) {
+      attributesData.instruments = instNum;
+    }
   }
 
   if (staffDetailsElements.length > 0) {
