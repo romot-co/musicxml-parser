@@ -86,4 +86,58 @@ describe("Direction parsing", () => {
     const direction = mapDirectionElement(el);
     expect(direction.directive).toBe("yes");
   });
+
+  it("parses rehearsal element", () => {
+    const xml = `<direction><direction-type><rehearsal font-weight="bold">A</rehearsal></direction-type></direction>`;
+    const el = createElement(xml);
+    const direction = mapDirectionElement(el);
+    const reh = direction.direction_type[0].rehearsal!;
+    expect(reh.text).toBe("A");
+    expect(reh.formatting?.fontWeight).toBe("bold");
+  });
+
+  it("parses octave-shift element", () => {
+    const xml = `<direction><direction-type><octave-shift type="down" size="8" number="1" dash-length="7.5" space-length="7.5"/></direction-type></direction>`;
+    const el = createElement(xml);
+    const direction = mapDirectionElement(el);
+    const os = direction.direction_type[0].octaveShift!;
+    expect(os.type).toBe("down");
+    expect(os.size).toBe(8);
+    expect(os.number).toBe(1);
+    expect(os.dashLength).toBe(7.5);
+    expect(os.spaceLength).toBe(7.5);
+  });
+
+  it("parses dashes element", () => {
+    const xml = `<direction><direction-type><dashes type="start" number="2" dash-length="3" space-length="1"/></direction-type></direction>`;
+    const el = createElement(xml);
+    const direction = mapDirectionElement(el);
+    const d = direction.direction_type[0].dashes!;
+    expect(d.type).toBe("start");
+    expect(d.number).toBe(2);
+    expect(d.dashLength).toBe(3);
+    expect(d.spaceLength).toBe(1);
+  });
+
+  it("parses bracket element", () => {
+    const xml = `<direction><direction-type><bracket type="start" line-end="down" number="1" line-type="solid"/></direction-type></direction>`;
+    const el = createElement(xml);
+    const direction = mapDirectionElement(el);
+    const b = direction.direction_type[0].bracket!;
+    expect(b.type).toBe("start");
+    expect(b.lineEnd).toBe("down");
+    expect(b.number).toBe(1);
+    expect(b.lineType).toBe("solid");
+  });
+
+  it("parses image element", () => {
+    const xml = `<direction><direction-type><image source="img.png" type="image/png" width="20" height="10"/></direction-type></direction>`;
+    const el = createElement(xml);
+    const direction = mapDirectionElement(el);
+    const img = direction.direction_type[0].image!;
+    expect(img.source).toBe("img.png");
+    expect(img.type).toBe("image/png");
+    expect(img.width).toBe(20);
+    expect(img.height).toBe(10);
+  });
 });
