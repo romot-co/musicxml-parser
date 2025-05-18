@@ -13,17 +13,17 @@ export const NoteSchema = z.object({
   pitch: PitchSchema.optional(),
   /** Rest information. Required if this is not a pitched note. */
   rest: RestSchema.optional(),
-  /** 
-   * Duration is a positive number that represents the note's length 
+  /**
+   * Duration is a positive number that represents the note's length
    * in terms of divisions per quarter note.
    */
   duration: z.number().int().positive(),
-  /** 
-   * Voice is used to distinguish between multiple independent melodic lines 
+  /**
+   * Voice is used to distinguish between multiple independent melodic lines
    * within a single part.
    */
   voice: z.string().optional(),
-  /** 
+  /**
    * Type represents the graphical note type (e.g., "quarter", "eighth").
    */
   type: z.string().optional(),
@@ -38,4 +38,4 @@ export const NoteSchema = z.object({
   message: "Note cannot have both a pitch and a rest component.",
 });
 
-export type Note = z.infer<typeof NoteSchema>; 
+export type Note = z.infer<typeof NoteSchema>;

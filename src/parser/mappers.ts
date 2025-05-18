@@ -277,4 +277,4 @@ export const mapDocumentToScorePartwise = (
     throw new Error('ScorePartwise parsing failed.');
   }
   return result.data;
-}; 
+};

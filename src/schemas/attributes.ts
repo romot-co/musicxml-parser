@@ -11,4 +11,4 @@ export const AttributesSchema = z.object({
   // Placeholder for other attributes like <staves>, <part-symbol>, <transpose>, etc.
 });
 
-export type Attributes = z.infer<typeof AttributesSchema>; 
+export type Attributes = z.infer<typeof AttributesSchema>;

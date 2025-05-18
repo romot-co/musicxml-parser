@@ -7,4 +7,4 @@ export const ClefSchema = z.object({
   number: z.number().int().optional(), // For multi-staff parts, refers to staff number
 });
 
-export type Clef = z.infer<typeof ClefSchema>; 
+export type Clef = z.infer<typeof ClefSchema>;

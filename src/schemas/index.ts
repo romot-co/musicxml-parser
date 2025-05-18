@@ -11,4 +11,4 @@ export * from './key';
 export * from './time';
 export * from './clef';
 export * from './attributes';
-export * from './lyric'; 
+export * from './lyric';

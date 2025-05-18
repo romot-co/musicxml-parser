@@ -18,14 +18,14 @@ const AttributesSchemaPlaceholder = z.object({
  */
 export const MeasureSchema = z.object({
   /** The measure number (e.g., "1", "2", "1a"). Usually a string. */
-  number: z.string(), 
-  /** 
-   * Attributes describe musical information such as key signature, time signature, clef, etc. 
+  number: z.string(),
+  /**
+   * Attributes describe musical information such as key signature, time signature, clef, etc.
    * These often appear at the beginning of a part or when changes occur.
    */
   attributes: z.array(AttributesSchema).optional(), // Attributes can appear in a measure
-  /** 
-   * An array of notes, rests, and potentially other musical elements within the measure. 
+  /**
+   * An array of notes, rests, and potentially other musical elements within the measure.
    * Can be empty for pickup measures or measures with only barlines/directions.
    */
   notes: z.array(NoteSchema).optional().default([]), // notes can be optional, default to empty array
@@ -37,4 +37,4 @@ export const MeasureSchema = z.object({
   // sound: SoundSchema.optional(), // For tempo, dynamics etc. (sometimes within direction)
 }).passthrough(); // Allows other elements not explicitly defined for now, useful for forward compatibility
 
-export type Measure = z.infer<typeof MeasureSchema>; 
+export type Measure = z.infer<typeof MeasureSchema>;

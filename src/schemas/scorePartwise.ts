@@ -14,8 +14,8 @@ const CreditSchemaPlaceholder = z.object({ creditWords: z.string().optional() })
  * It contains metadata about the score and the musical data organized by parts.
  */
 export const ScorePartwiseSchema = z.object({
-  /** 
-   * The version of the MusicXML format (e.g., "3.1", "4.0"). 
+  /**
+   * The version of the MusicXML format (e.g., "3.1", "4.0").
    * While optional in the DTD, it's good practice to include it.
    */
   version: z.string().optional(),
@@ -30,18 +30,18 @@ export const ScorePartwiseSchema = z.object({
   /** Text credits for the score. */
   credit: z.array(CreditSchemaPlaceholder).optional(), // <credit> can appear multiple times, array itself is optional
 
-  /** 
-   * The <part-list> contains the list of all parts in the score, 
+  /**
+   * The <part-list> contains the list of all parts in the score,
    * along with their names and IDs.
    * This is a required element.
    */
   partList: PartListSchema, // <part-list>
-  /** 
-   * An array of <part> elements, each containing the musical data (measures and notes) 
+  /**
+   * An array of <part> elements, each containing the musical data (measures and notes)
    * for a specific part defined in the <part-list>.
    * This is a required element and must contain at least one part.
    */
   parts: z.array(PartSchema).min(1), // <part>
 }).passthrough(); // Allows other top-level elements not explicitly defined
 
-export type ScorePartwise = z.infer<typeof ScorePartwiseSchema>; 
+export type ScorePartwise = z.infer<typeof ScorePartwiseSchema>;

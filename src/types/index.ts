@@ -11,4 +11,4 @@ export type { Time } from '../schemas/time';
 export type { Clef } from '../schemas/clef';
 export type { Attributes } from '../schemas/attributes';
 export type { Lyric } from '../schemas/lyric';
-// Add other inferred types from Zod schemas here as they are created. 
+// Add other inferred types from Zod schemas here as they are created.

@@ -5,8 +5,8 @@ import { z } from 'zod';
  * It includes identification, naming, and potentially instrument information for the part.
  */
 export const ScorePartSchema = z.object({
-  /** 
-   * A unique identifier for this part, which corresponds to the id attribute 
+  /**
+   * A unique identifier for this part, which corresponds to the id attribute
    * of a <part> element in the main body of the score.
    */
   id: z.string(),
@@ -20,4 +20,4 @@ export const ScorePartSchema = z.object({
   // midiInstrument: MidiInstrumentSchema.optional(), // <midi-instrument> - Requires MidiInstrumentSchema
 }).passthrough(); // Allows other elements/attributes not explicitly defined
 
-export type ScorePart = z.infer<typeof ScorePartSchema>; 
+export type ScorePart = z.infer<typeof ScorePartSchema>;
