@@ -9,8 +9,7 @@ import { TextFormattingSchema } from './credit'; // Assuming TextFormattingSchem
  */
 export const WordsSchema = z.object({
   text: z.string(),
-  formatting: TextFormattingSchema.optional(), // Added formatting
-  // TODO: Add other attributes like font, color, etc.
+  formatting: TextFormattingSchema.optional(), // Includes font and color attributes
 });
 export type Words = z.infer<typeof WordsSchema>;
 
@@ -22,7 +21,7 @@ export type MetronomeBeatUnit = z.infer<typeof MetronomeBeatUnitSchema>;
 
 export const MetronomePerMinuteSchema = z.object({
   'per-minute': z.string(), // Number as string, e.g., "120"
-  // TODO: Add other attributes like font, etc.
+  formatting: TextFormattingSchema.optional(),
 });
 export type MetronomePerMinute = z.infer<typeof MetronomePerMinuteSchema>;
 
@@ -34,13 +33,43 @@ export const MetronomeSchema = z.object({
 });
 export type Metronome = z.infer<typeof MetronomeSchema>;
 
+/** Simple representation of a <dynamics> element. */
+export const DynamicsSchema = z.object({
+  value: z.string(),
+  formatting: TextFormattingSchema.optional(),
+});
+export type Dynamics = z.infer<typeof DynamicsSchema>;
+
+/** Basic pedal marking. */
+export const PedalSchema = z.object({
+  type: z.enum(['start', 'stop', 'change', 'continue']).optional(),
+});
+export type Pedal = z.infer<typeof PedalSchema>;
+
+/** Crescendo/diminuendo wedge. */
+export const WedgeSchema = z.object({
+  type: z.enum(['crescendo', 'diminuendo', 'stop', 'continue']).optional(),
+  spread: z.number().optional(),
+});
+export type Wedge = z.infer<typeof WedgeSchema>;
+
+export const SegnoSchema = z.object({});
+export type Segno = z.infer<typeof SegnoSchema>;
+
+export const CodaSchema = z.object({});
+export type Coda = z.infer<typeof CodaSchema>;
+
 /**
  * Represents the <direction-type> element, which contains the actual content of a direction.
  */
 export const DirectionTypeSchema = z.object({
   words: WordsSchema.optional(),
   metronome: MetronomeSchema.optional(),
-  // TODO: Add other direction types like <dynamics>, <pedal>, <wedge>, <segno>, <coda>, etc.
+  dynamics: DynamicsSchema.optional(),
+  pedal: PedalSchema.optional(),
+  wedge: WedgeSchema.optional(),
+  segno: SegnoSchema.optional(),
+  coda: CodaSchema.optional(),
 });
 export type DirectionType = z.infer<typeof DirectionTypeSchema>;
 
