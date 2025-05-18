@@ -1,5 +1,7 @@
 import { z } from "zod";
 import { FontSchema } from "./common"; // Assuming ColorSchema might be added here later
+import { LinkSchema } from "./link";
+import { BookmarkSchema } from "./bookmark";
 
 // Placeholder for text formatting attributes (simplified)
 export const TextFormattingSchema = z
@@ -49,7 +51,8 @@ export const CreditImageSchema = z.object({
 export const CreditSchema = z.object({
   page: z.string().optional(), // NMTOKEN, usually number
   creditTypes: z.array(CreditTypeSchema).optional(),
-  // link and bookmark are complex, skipping for now
+  links: z.array(LinkSchema).optional(),
+  bookmarks: z.array(BookmarkSchema).optional(),
   creditWords: z.array(CreditWordsSchema).optional(), // Simplified: only allowing multiple words
   creditSymbols: z.array(CreditSymbolSchema).optional(), // Simplified
   creditImage: CreditImageSchema.optional(), // Simplified: only one image

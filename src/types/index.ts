@@ -121,6 +121,8 @@ export type {
   TextFormatting,
   SymbolFormatting,
 } from "../schemas/credit";
+export type { Link } from "../schemas/link";
+export type { Bookmark } from "../schemas/bookmark";
 export type { Harmony } from "../schemas/harmony";
 export type { Print } from "../schemas/print";
 export type { Sound } from "../schemas/sound";
