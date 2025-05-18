@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { TextFormattingSchema, CreditImageSchema } from "./credit"; // Assuming TextFormattingSchema includes font attributes
 import { YesNoEnum } from "./common";
+import { SoundSchema } from "./sound";
 
 // Placeholder for MetronomeBeatUnitDotSchema if needed later
 // export const MetronomeBeatUnitDotSchema = z.object({});
@@ -179,5 +180,9 @@ export const DirectionSchema = z.object({
    */
   staff: z.number().int().optional(),
   directive: YesNoEnum.optional(),
+  /** Offset in divisions from the start of the current measure or note */
+  offset: z.number().optional(),
+  /** Playback information attached to the direction */
+  sound: SoundSchema.optional(),
 });
 export type Direction = z.infer<typeof DirectionSchema>;
