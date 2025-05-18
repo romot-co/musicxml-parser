@@ -10,6 +10,7 @@ import { BeamSchema } from "./beam";
 import { GraceSchema } from "./grace";
 import { CueSchema } from "./cue";
 import { UnpitchedSchema } from "./unpitched";
+import { TimeModificationSchema } from "./timeModification";
 
 /**
  * Represents a single musical note or rest.
@@ -26,6 +27,7 @@ export const NoteSchema = z
     unpitched: UnpitchedSchema.optional(),
     rest: RestSchema.optional(),
     duration: z.number().int().optional(),
+    timeModification: TimeModificationSchema.optional(),
     ties: z.array(TieSchema).max(2).optional(),
     type: z.string().optional(),
     dots: z.array(z.object({})).optional(),

@@ -69,6 +69,7 @@ import type {
   Grace,
   Cue,
   Unpitched,
+  TimeModification,
   Font,
   Scaling,
   LyricFont,
@@ -167,6 +168,7 @@ import {
   GraceSchema,
   CueSchema,
   UnpitchedSchema,
+  TimeModificationSchema,
   FontSchema,
   ScalingSchema,
   LyricFontSchema,
@@ -325,6 +327,29 @@ export const mapLyricElement = (element: Element): Lyric => {
   return LyricSchema.parse(lyricData);
 };
 
+// Helper function to map a <time-modification> element
+export const mapTimeModificationElement = (
+  element: Element,
+): TimeModification => {
+  const actualNotes = parseNumberContent(element, "actual-notes");
+  const normalNotes = parseNumberContent(element, "normal-notes");
+  if (actualNotes === undefined || normalNotes === undefined) {
+    throw new Error("<time-modification> requires actual-notes and normal-notes");
+  }
+  const normalType = getTextContent(element, "normal-type");
+  const normalDotElements = Array.from(element.querySelectorAll("normal-dot"));
+
+  const tmData: Partial<TimeModification> = {
+    actualNotes,
+    normalNotes,
+  };
+  if (normalType) tmData.normalType = normalType;
+  if (normalDotElements.length > 0) {
+    tmData.normalDots = normalDotElements.map(() => ({}));
+  }
+  return TimeModificationSchema.parse(tmData);
+};
+
 // Mapper for <note> element
 export const mapNoteElement = (element: Element): Note => {
   const graceElement = element.querySelector("grace");
@@ -341,6 +366,7 @@ export const mapNoteElement = (element: Element): Note => {
   const notationsElement = element.querySelector("notations");
   const lyricElements = Array.from(element.querySelectorAll("lyric"));
   const tieElements = Array.from(element.querySelectorAll("tie"));
+  const timeModElement = element.querySelector("time-modification");
 
   const noteData: Partial<Note> = {
     _type: "note",
@@ -391,6 +417,9 @@ export const mapNoteElement = (element: Element): Note => {
   const duration = parseNumberContent(element, "duration");
   if (duration !== undefined) {
     noteData.duration = duration;
+  }
+  if (timeModElement) {
+    noteData.timeModification = mapTimeModificationElement(timeModElement);
   }
 
   if (tieElements.length > 0) {
