@@ -275,6 +275,12 @@ export const mapAccidentalElement = (element: Element): Accidental => {
     | "yes"
     | "no"
     | undefined;
+  const parentheses = getAttribute(element, "parentheses") as
+    | "yes"
+    | "no"
+    | undefined;
+  const bracket = getAttribute(element, "bracket") as "yes" | "no" | undefined;
+  const size = getAttribute(element, "size") || undefined;
 
   if (!value) {
     throw new Error(
@@ -286,6 +292,9 @@ export const mapAccidentalElement = (element: Element): Accidental => {
     value: value,
     cautionary: cautionary,
     editorial: editorial,
+    parentheses: parentheses,
+    bracket: bracket,
+    size: size,
   };
   return AccidentalSchema.parse(accidentalData);
 };

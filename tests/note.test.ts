@@ -156,6 +156,19 @@ describe("Note Schema Tests (note.mod)", () => {
       expect(note.pitch?.alter).toBe(1);
     });
 
+    it("parses accidental attributes parentheses, bracket and size", () => {
+      const xml =
+        '<note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration><accidental parentheses="yes" bracket="no" size="cue">natural</accidental></note>';
+      const element = createElement(xml);
+      const note = mapNoteElement(element);
+      expect(note.accidental).toBeDefined();
+      const acc = note.accidental!;
+      expect(acc.value).toBe("natural");
+      expect(acc.parentheses).toBe("yes");
+      expect(acc.bracket).toBe("no");
+      expect(acc.size).toBe("cue");
+    });
+
     it("should parse a <note> with <dot>", () => {
       const xml =
         "<note><pitch><step>G</step><octave>4</octave></pitch><duration>3</duration><type>eighth</type><dot/></note>";
