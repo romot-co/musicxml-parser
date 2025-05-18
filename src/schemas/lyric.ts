@@ -1,7 +1,7 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 export const ExtendSchema = z.object({
-  type: z.enum(['start', 'stop', 'continue']).optional(),
+  type: z.enum(["start", "stop", "continue"]).optional(),
 });
 export type Extend = z.infer<typeof ExtendSchema>;
 

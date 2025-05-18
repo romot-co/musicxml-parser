@@ -1,7 +1,7 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 export const SoundSchema = z.object({
-  _type: z.literal('sound'),
+  _type: z.literal("sound"),
   tempo: z.number().optional(),
   dynamics: z.number().optional(),
 });

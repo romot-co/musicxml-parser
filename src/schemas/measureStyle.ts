@@ -1,5 +1,5 @@
-import { z } from 'zod';
-import { YesNoEnum } from './common';
+import { z } from "zod";
+import { YesNoEnum } from "./common";
 
 /**
  * The multiple-rest element is used to indicate a multi-measure rest.
@@ -12,12 +12,12 @@ export const MultipleRestSchema = z.object({
 
 export const MeasureRepeatSchema = z.object({
   value: z.number().int(), // PCDATA is the number of measures
-  type: z.enum(['start', 'stop']),
+  type: z.enum(["start", "stop"]),
   slashes: z.number().int().optional(),
 });
 
 export const BeatRepeatSchema = z.object({
-  type: z.enum(['start', 'stop']),
+  type: z.enum(["start", "stop"]),
   slashes: z.number().int().optional(),
   useDots: YesNoEnum.optional(),
   slashType: z.string().optional(), // Placeholder
@@ -26,7 +26,7 @@ export const BeatRepeatSchema = z.object({
 });
 
 export const SlashSchema = z.object({
-  type: z.enum(['start', 'stop']),
+  type: z.enum(["start", "stop"]),
   useDots: YesNoEnum.optional(),
   useStems: YesNoEnum.optional(),
   slashType: z.string().optional(), // Placeholder
@@ -38,25 +38,35 @@ export const SlashSchema = z.object({
  * The measure-style element is used to style measures, for example,
  * to indicate a multi-measure rest or repeat.
  */
-export const MeasureStyleSchema = z.object({
-  multipleRest: MultipleRestSchema.optional(),
-  measureRepeat: MeasureRepeatSchema.optional(),
-  beatRepeat: BeatRepeatSchema.optional(),
-  slash: SlashSchema.optional(),
-  number: z.number().int().optional(), // attribute
-  // font: FontSchema.optional(), // Placeholder for later
-  // color: ColorSchema.optional(), // Placeholder for later
-  // id: z.string().optional(), // for %optional-unique-id; - Placeholder for later
-}).refine(
-  (data) => {
-    const styles = [data.multipleRest, data.measureRepeat, data.beatRepeat, data.slash];
-    return styles.filter(style => style !== undefined).length === 1;
-  },
-  { message: "MeasureStyle must have exactly one of multipleRest, measureRepeat, beatRepeat, or slash" }
-);
+export const MeasureStyleSchema = z
+  .object({
+    multipleRest: MultipleRestSchema.optional(),
+    measureRepeat: MeasureRepeatSchema.optional(),
+    beatRepeat: BeatRepeatSchema.optional(),
+    slash: SlashSchema.optional(),
+    number: z.number().int().optional(), // attribute
+    // font: FontSchema.optional(), // Placeholder for later
+    // color: ColorSchema.optional(), // Placeholder for later
+    // id: z.string().optional(), // for %optional-unique-id; - Placeholder for later
+  })
+  .refine(
+    (data) => {
+      const styles = [
+        data.multipleRest,
+        data.measureRepeat,
+        data.beatRepeat,
+        data.slash,
+      ];
+      return styles.filter((style) => style !== undefined).length === 1;
+    },
+    {
+      message:
+        "MeasureStyle must have exactly one of multipleRest, measureRepeat, beatRepeat, or slash",
+    },
+  );
 
 export type MeasureStyle = z.infer<typeof MeasureStyleSchema>;
 export type MultipleRest = z.infer<typeof MultipleRestSchema>;
 export type MeasureRepeat = z.infer<typeof MeasureRepeatSchema>;
 export type BeatRepeat = z.infer<typeof BeatRepeatSchema>;
-export type Slash = z.infer<typeof SlashSchema>; 
+export type Slash = z.infer<typeof SlashSchema>;

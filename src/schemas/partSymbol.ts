@@ -1,11 +1,15 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 /**
  * The group-symbol-value type indicates how a line is displayed in relation to a part group.
  * Standard values are none, brace, line, bracket, and square.
  */
 export const GroupSymbolValueEnum = z.enum([
-  'none', 'brace', 'line', 'bracket', 'square'
+  "none",
+  "brace",
+  "line",
+  "bracket",
+  "square",
 ]);
 export type GroupSymbolValue = z.infer<typeof GroupSymbolValueEnum>;
 
@@ -54,4 +58,4 @@ export const PartSymbolSchema = z.object({
   color: z.string().optional(), // Assuming color is a string like #RRGGBB
 });
 
-export type PartSymbol = z.infer<typeof PartSymbolSchema>; 
+export type PartSymbol = z.infer<typeof PartSymbolSchema>;

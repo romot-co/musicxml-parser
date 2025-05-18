@@ -9,7 +9,7 @@
 export function parseMusicXmlString(xmlString: string): Document | null {
   if (typeof DOMParser === "undefined") {
     throw new Error(
-      "DOMParser is not available in this environment. For Node.js, consider using a library like jsdom."
+      "DOMParser is not available in this environment. For Node.js, consider using a library like jsdom.",
     );
   }
 
