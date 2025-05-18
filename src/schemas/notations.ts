@@ -4,6 +4,13 @@ import { YesNoEnum } from "./common";
 import { WavyLineSchema } from "./wavyLine";
 import { AccidentalSchema } from "./accidental";
 
+// Additional enums used by arpeggiate and non-arpeggiate elements
+export const UpDownEnum = z.enum(["up", "down"]);
+export type UpDown = z.infer<typeof UpDownEnum>;
+
+export const TopBottomEnum = z.enum(["top", "bottom"]);
+export type TopBottom = z.infer<typeof TopBottomEnum>;
+
 /**
  * The slur element is used to represent slurs. Slurs can be nested.
  */
@@ -242,6 +249,25 @@ export const OtherNotationSchema = z.object({
 export type OtherNotation = z.infer<typeof OtherNotationSchema>;
 
 /**
+ * Indicates that this note is part of an arpeggiated chord.
+ */
+export const ArpeggiateSchema = z.object({
+  number: z.number().int().optional(),
+  direction: UpDownEnum.optional(),
+  unbroken: YesNoEnum.optional(),
+});
+export type Arpeggiate = z.infer<typeof ArpeggiateSchema>;
+
+/**
+ * Indicates the top or bottom note of a non-arpeggiate bracket.
+ */
+export const NonArpeggiateSchema = z.object({
+  type: TopBottomEnum,
+  number: z.number().int().optional(),
+});
+export type NonArpeggiate = z.infer<typeof NonArpeggiateSchema>;
+
+/**
  * The articulations element groups multiple articulation marks.
  */
 export const ArticulationsSchema = z.object({
@@ -269,6 +295,8 @@ export const NotationsSchema = z.object({
   glissandos: z.array(GlissandoSchema).optional(),
   slides: z.array(SlideSchema).optional(),
   tremolos: z.array(TremoloSchema).optional(),
+  arpeggiates: z.array(ArpeggiateSchema).optional(),
+  nonArpeggiates: z.array(NonArpeggiateSchema).optional(),
   otherNotations: z.array(OtherNotationSchema).optional(),
 });
 export type Notations = z.infer<typeof NotationsSchema>;
