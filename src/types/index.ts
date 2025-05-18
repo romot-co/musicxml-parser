@@ -38,6 +38,10 @@ export type {
   Creator,
   Rights,
   Encoding,
+  Supports,
+  Relation,
+  Miscellaneous,
+  MiscellaneousField,
   EncodingSoftwareSchema as EncodingSoftware,
   EncodingDateSchema as EncodingDate,
   EncoderSchema as Encoder

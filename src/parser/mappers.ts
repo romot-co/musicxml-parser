@@ -76,6 +76,10 @@ import type {
   Margins,
   LineWidth,
   Appearance,
+  Supports,
+  Relation,
+  Miscellaneous,
+  MiscellaneousField,
 } from '../types';
 import {
   PitchSchema,
@@ -158,6 +162,10 @@ import {
   ForwardSchema,
   PrintSchema,
   SoundSchema,
+  SupportsSchema,
+  RelationSchema,
+  MiscellaneousSchema,
+  MiscellaneousFieldSchema,
 } from '../schemas';
 
 // Helper function to get text content of a child element
@@ -671,11 +679,73 @@ const mapRightsElement = (element: Element): Rights => {
   return RightsSchema.parse(rightsData);
 };
 
+const mapSupportsElement = (element: Element): Supports | undefined => {
+  const typeAttr = getAttribute(element, 'type') as 'yes' | 'no' | undefined;
+  const el = getAttribute(element, 'element');
+  if (!typeAttr || !el) return undefined;
+  const data: Partial<Supports> = {
+    type: typeAttr,
+    element: el,
+    attribute: getAttribute(element, 'attribute') || undefined,
+    value: getAttribute(element, 'value') || undefined,
+  };
+  try {
+    return SupportsSchema.parse(data);
+  } catch {
+    return undefined;
+  }
+};
+
+const mapRelationElement = (element: Element): Relation | undefined => {
+  const text = element.textContent?.trim();
+  if (!text) return undefined;
+  const data = {
+    text,
+    type: getAttribute(element, 'type') || undefined,
+  };
+  try {
+    return RelationSchema.parse(data);
+  } catch {
+    return undefined;
+  }
+};
+
+const mapMiscellaneousFieldElement = (
+  element: Element,
+): MiscellaneousField | undefined => {
+  const name = getAttribute(element, 'name');
+  const text = element.textContent?.trim();
+  if (!name || text === undefined) return undefined;
+  try {
+    return MiscellaneousFieldSchema.parse({ name, text });
+  } catch {
+    return undefined;
+  }
+};
+
+const mapMiscellaneousElement = (
+  element: Element,
+): Miscellaneous | undefined => {
+  const fieldElements = Array.from(
+    element.querySelectorAll('miscellaneous-field'),
+  );
+  const fields = fieldElements
+    .map(mapMiscellaneousFieldElement)
+    .filter(Boolean) as MiscellaneousField[];
+  if (fields.length === 0) return undefined;
+  try {
+    return MiscellaneousSchema.parse({ fields });
+  } catch {
+    return undefined;
+  }
+};
+
 // Helper function to map an <encoding> element (within <identification>)
 const mapEncodingElement = (element: Element): Encoding => {
   const softwareElements = Array.from(element.querySelectorAll('software'));
   const encodingDateElements = Array.from(element.querySelectorAll('encoding-date'));
   const encoderElements = Array.from(element.querySelectorAll('encoder'));
+  const supportsElements = Array.from(element.querySelectorAll('supports'));
 
   const encodingData: Partial<Encoding> = {};
   if (softwareElements.length > 0) {
@@ -687,6 +757,10 @@ const mapEncodingElement = (element: Element): Encoding => {
   if (encoderElements.length > 0) {
     encodingData.encoder = encoderElements.map(el => el.textContent?.trim() ?? '');
   }
+  if (supportsElements.length > 0) {
+    const mappedSupports = supportsElements.map(mapSupportsElement).filter(Boolean) as Supports[];
+    if (mappedSupports.length > 0) encodingData.supports = mappedSupports;
+  }
   return EncodingSchema.parse(encodingData);
 };
 
@@ -695,6 +769,8 @@ const mapIdentificationElement = (element: Element): Identification => {
   const creatorElements = Array.from(element.querySelectorAll('creator'));
   const rightsElements = Array.from(element.querySelectorAll('rights'));
   const encodingElement = element.querySelector('encoding');
+  const relationElements = Array.from(element.querySelectorAll('relation'));
+  const miscellaneousElement = element.querySelector('miscellaneous');
   const source = getTextContent(element, 'source');
 
   const identificationData: Partial<Identification> = {
@@ -709,6 +785,14 @@ const mapIdentificationElement = (element: Element): Identification => {
   }
   if (encodingElement) {
     identificationData.encoding = mapEncodingElement(encodingElement);
+  }
+  if (relationElements.length > 0) {
+    const mappedRelations = relationElements.map(mapRelationElement).filter(Boolean) as Relation[];
+    if (mappedRelations.length > 0) identificationData.relations = mappedRelations;
+  }
+  if (miscellaneousElement) {
+    const mappedMisc = mapMiscellaneousElement(miscellaneousElement);
+    if (mappedMisc) identificationData.miscellaneous = mappedMisc;
   }
   return IdentificationSchema.parse(identificationData);
 };
