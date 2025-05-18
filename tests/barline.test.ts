@@ -120,6 +120,20 @@ describe("Barline Schema Tests", () => {
       expect(wavy.number).toBe(2);
     });
 
+    it("parses wavy-line attributes", () => {
+      const xml = `<barline><wavy-line type="start" accelerate="yes" beats="3" second-beats="2" last-beat="4" placement="above" color="#123456"/></barline>`;
+      const element = createElement(xml);
+      const barline = mapBarlineElement(element);
+      const wavy = barline.wavyLine as WavyLine;
+      expect(wavy.type).toBe("start");
+      expect(wavy.accelerate).toBe("yes");
+      expect(wavy.beats).toBe(3);
+      expect(wavy.secondBeats).toBe(2);
+      expect(wavy.lastBeat).toBe(4);
+      expect(wavy.placement).toBe("above");
+      expect(wavy.color).toBe("#123456");
+    });
+
     it("should parse footnote and level elements", () => {
       const xml = `<barline><footnote>ref</footnote><level reference="yes" parentheses="yes">ed</level></barline>`;
       const element = createElement(xml);
