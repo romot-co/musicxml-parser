@@ -802,6 +802,49 @@ const mapDirectionTypeElement = (element: Element): DirectionType => {
       const sp = parseFloat(spread);
       if (!isNaN(sp)) wedgeData.spread = sp;
     }
+    const numberAttr = getAttribute(wedgeElement, "number");
+    if (numberAttr) {
+      const num = parseOptionalInt(numberAttr);
+      if (num !== undefined) wedgeData.number = num;
+    }
+    const nienteAttr = getAttribute(wedgeElement, "niente");
+    if (nienteAttr === "yes" || nienteAttr === "no") wedgeData.niente = nienteAttr;
+    const lineTypeAttr = getAttribute(wedgeElement, "line-type");
+    if (lineTypeAttr) wedgeData.lineType = lineTypeAttr;
+    const dashLenAttr = getAttribute(wedgeElement, "dash-length");
+    if (dashLenAttr) {
+      const dl = parseOptionalFloat(dashLenAttr);
+      if (dl !== undefined) wedgeData.dashLength = dl;
+    }
+    const spaceLenAttr = getAttribute(wedgeElement, "space-length");
+    if (spaceLenAttr) {
+      const sl = parseOptionalFloat(spaceLenAttr);
+      if (sl !== undefined) wedgeData.spaceLength = sl;
+    }
+    const defaultXAttr = getAttribute(wedgeElement, "default-x");
+    if (defaultXAttr) {
+      const dx = parseOptionalFloat(defaultXAttr);
+      if (dx !== undefined) wedgeData.defaultX = dx;
+    }
+    const defaultYAttr = getAttribute(wedgeElement, "default-y");
+    if (defaultYAttr) {
+      const dy = parseOptionalFloat(defaultYAttr);
+      if (dy !== undefined) wedgeData.defaultY = dy;
+    }
+    const relativeXAttr = getAttribute(wedgeElement, "relative-x");
+    if (relativeXAttr) {
+      const rx = parseOptionalFloat(relativeXAttr);
+      if (rx !== undefined) wedgeData.relativeX = rx;
+    }
+    const relativeYAttr = getAttribute(wedgeElement, "relative-y");
+    if (relativeYAttr) {
+      const ry = parseOptionalFloat(relativeYAttr);
+      if (ry !== undefined) wedgeData.relativeY = ry;
+    }
+    const colorAttr = getAttribute(wedgeElement, "color");
+    if (colorAttr) wedgeData.color = colorAttr;
+    const idAttr = getAttribute(wedgeElement, "id");
+    if (idAttr) wedgeData.id = idAttr;
     directionTypeData.wedge = WedgeSchema.parse(wedgeData);
   }
   if (segnoElement) {
