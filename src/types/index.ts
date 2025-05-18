@@ -23,6 +23,8 @@ export type {
   Metronome,
   MetronomeBeatUnit,
   MetronomePerMinute,
+  MetronomeNote,
+  MetronomeRelation,
   Dynamics,
   Pedal,
   Wedge,

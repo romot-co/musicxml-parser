@@ -18,6 +18,8 @@ import type {
   Metronome,
   MetronomeBeatUnit,
   MetronomePerMinute,
+  MetronomeNote,
+  MetronomeRelation,
   // Dynamics,
   Wedge,
   // Segno,
@@ -130,6 +132,7 @@ import {
   MetronomeSchema,
   MetronomeBeatUnitSchema,
   MetronomePerMinuteSchema,
+  MetronomeNoteSchema,
   TransposeSchema,
   // DiatonicSchema,
   // ChromaticSchema,
@@ -834,10 +837,24 @@ const mapMetronomePerMinuteElement = (element: Element): MetronomePerMinute => {
   return MetronomePerMinuteSchema.parse(perMinuteData);
 };
 
+// Helper to map <metronome-note>
+const mapMetronomeNoteElement = (element: Element): MetronomeNote => {
+  const typeElement = element.querySelector("metronome-type");
+  const dotElements = Array.from(element.querySelectorAll("metronome-dot"));
+  const noteData: Partial<MetronomeNote> = {};
+  if (typeElement) noteData["metronome-type"] = typeElement.textContent?.trim() ?? "";
+  if (dotElements.length > 0) noteData["metronome-dot"] = dotElements.map(() => ({}));
+  return MetronomeNoteSchema.parse(noteData);
+};
+
 // Helper function to map a <metronome> element (within <direction-type>)
 const mapMetronomeElement = (element: Element): Metronome => {
   const beatUnitElement = element.querySelector("beat-unit");
   const perMinuteElement = element.querySelector("per-minute");
+  const metronomeNoteElements = Array.from(
+    element.querySelectorAll("metronome-note"),
+  );
+  const relationElement = element.querySelector("metronome-relation");
   const metronomeData: Partial<Metronome> = {};
   if (beatUnitElement) {
     metronomeData["beat-unit"] = mapMetronomeBeatUnitElement(beatUnitElement);
@@ -845,6 +862,14 @@ const mapMetronomeElement = (element: Element): Metronome => {
   if (perMinuteElement) {
     metronomeData["per-minute"] =
       mapMetronomePerMinuteElement(perMinuteElement);
+  }
+  if (metronomeNoteElements.length > 0) {
+    metronomeData["metronome-note"] = metronomeNoteElements.map(
+      mapMetronomeNoteElement,
+    );
+  }
+  if (relationElement) {
+    metronomeData["metronome-relation"] = relationElement.textContent?.trim() ?? "";
   }
   return MetronomeSchema.parse(metronomeData);
 };
@@ -971,11 +996,16 @@ export const mapDirectionElement = (element: Element): Direction => {
     | "between"
     | undefined;
   const staff = parseOptionalNumberAttribute(element, "staff");
+  const directiveAttr = getAttribute(element, "directive") as
+    | "yes"
+    | "no"
+    | undefined;
   const directionData: Partial<Direction> = {
     _type: "direction",
     direction_type: directionTypeElements.map(mapDirectionTypeElement),
     placement: placement,
     staff: staff,
+    directive: directiveAttr,
   };
   return DirectionSchema.parse(directionData);
 };
