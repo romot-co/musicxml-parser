@@ -32,4 +32,12 @@ export const LineWidthSchema = z.object({
 });
 export type LineWidth = z.infer<typeof LineWidthSchema>;
 
+/** Boolean yes/no or numeric value. Used for pedal playback levels. */
+export const YesNoNumberSchema = z.union([YesNoEnum, z.number()]);
+export type YesNoNumber = z.infer<typeof YesNoNumberSchema>;
+
+/** Rotation degrees from -180 to 180, used for pan and elevation. */
+export const RotationDegreesSchema = z.number().min(-180).max(180);
+export type RotationDegrees = z.infer<typeof RotationDegreesSchema>;
+
 // export {}; // Ensures this is treated as a module - can be removed if other exports exist

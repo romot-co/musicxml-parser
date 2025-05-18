@@ -1635,6 +1635,22 @@ export const mapSoundElement = (element: Element): Sound => {
   const soundData: Partial<Sound> = { _type: "sound" };
   const tempoAttr = getAttribute(element, "tempo");
   const dynamicsAttr = getAttribute(element, "dynamics");
+  const dacapoAttr = getAttribute(element, "dacapo");
+  const segnoAttr = getAttribute(element, "segno");
+  const dalsegnoAttr = getAttribute(element, "dalsegno");
+  const codaAttr = getAttribute(element, "coda");
+  const tocodaAttr = getAttribute(element, "tocoda");
+  const divisionsAttr = getAttribute(element, "divisions");
+  const forwardRepeatAttr = getAttribute(element, "forward-repeat");
+  const fineAttr = getAttribute(element, "fine");
+  const timeOnlyAttr = getAttribute(element, "time-only");
+  const pizzicatoAttr = getAttribute(element, "pizzicato");
+  const panAttr = getAttribute(element, "pan");
+  const elevationAttr = getAttribute(element, "elevation");
+  const damperPedalAttr = getAttribute(element, "damper-pedal");
+  const softPedalAttr = getAttribute(element, "soft-pedal");
+  const sostenutoPedalAttr = getAttribute(element, "sostenuto-pedal");
+  const idAttr = getAttribute(element, "id");
 
   if (tempoAttr) {
     const tempo = parseFloat(tempoAttr);
@@ -1644,6 +1660,64 @@ export const mapSoundElement = (element: Element): Sound => {
     const dyn = parseFloat(dynamicsAttr);
     if (!isNaN(dyn)) soundData.dynamics = dyn;
   }
+  if (dacapoAttr === "yes" || dacapoAttr === "no") {
+    soundData.dacapo = dacapoAttr;
+  }
+  if (segnoAttr) soundData.segno = segnoAttr;
+  if (dalsegnoAttr) soundData.dalsegno = dalsegnoAttr;
+  if (codaAttr) soundData.coda = codaAttr;
+  if (tocodaAttr) soundData.tocoda = tocodaAttr;
+  if (divisionsAttr) {
+    const div = parseFloat(divisionsAttr);
+    if (!isNaN(div)) soundData.divisions = div;
+  }
+  if (forwardRepeatAttr === "yes" || forwardRepeatAttr === "no") {
+    soundData.forwardRepeat = forwardRepeatAttr;
+  }
+  if (fineAttr) soundData.fine = fineAttr;
+  if (timeOnlyAttr) soundData.timeOnly = timeOnlyAttr;
+  if (pizzicatoAttr === "yes" || pizzicatoAttr === "no") {
+    soundData.pizzicato = pizzicatoAttr;
+  }
+  if (panAttr) {
+    const pan = parseFloat(panAttr);
+    if (!isNaN(pan)) soundData.pan = pan;
+  }
+  if (elevationAttr) {
+    const elevation = parseFloat(elevationAttr);
+    if (!isNaN(elevation)) soundData.elevation = elevation;
+  }
+  if (damperPedalAttr) {
+    const val = damperPedalAttr === "yes" || damperPedalAttr === "no"
+      ? damperPedalAttr
+      : parseFloat(damperPedalAttr);
+    if (val === "yes" || val === "no") {
+      soundData.damperPedal = val;
+    } else if (!isNaN(val as number)) {
+      soundData.damperPedal = val as number;
+    }
+  }
+  if (softPedalAttr) {
+    const val = softPedalAttr === "yes" || softPedalAttr === "no"
+      ? softPedalAttr
+      : parseFloat(softPedalAttr);
+    if (val === "yes" || val === "no") {
+      soundData.softPedal = val;
+    } else if (!isNaN(val as number)) {
+      soundData.softPedal = val as number;
+    }
+  }
+  if (sostenutoPedalAttr) {
+    const val = sostenutoPedalAttr === "yes" || sostenutoPedalAttr === "no"
+      ? sostenutoPedalAttr
+      : parseFloat(sostenutoPedalAttr);
+    if (val === "yes" || val === "no") {
+      soundData.sostenutoPedal = val;
+    } else if (!isNaN(val as number)) {
+      soundData.sostenutoPedal = val as number;
+    }
+  }
+  if (idAttr) soundData.id = idAttr;
 
   return SoundSchema.parse(soundData);
 };
