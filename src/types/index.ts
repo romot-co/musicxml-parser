@@ -29,10 +29,6 @@ export type {
   Segno,
   Coda,
 } from '../schemas/direction';
-export type { Transpose, Diatonic, Chromatic, OctaveChange, Double } from '../schemas/transpose';
-export type { StaffDetails, StaffTuning, LineDetail } from '../schemas/staffDetails';
-export type { MeasureStyle, MultipleRest, MeasureRepeat, BeatRepeat, Slash } from '../schemas/measureStyle';
-export type { Accidental, AccidentalValue } from '../schemas/accidental';
 export type {
   Transpose,
   Diatonic,
