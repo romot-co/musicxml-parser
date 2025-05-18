@@ -7,7 +7,7 @@ describe("DOMParser fallback", () => {
   it("uses jsdom when DOMParser is undefined", async () => {
     const original = (globalThis as any).DOMParser;
     // simulate environment without DOMParser
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     delete (globalThis as any).DOMParser;
 
     const doc = await parseMusicXmlString(simpleXml);

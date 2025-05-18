@@ -15,9 +15,7 @@ async function extractMusicXmlEntry(filePath: string): Promise<Buffer> {
     const extraLen = buf.readUInt16LE(ptr + 30);
     const commentLen = buf.readUInt16LE(ptr + 32);
     const localOffset = buf.readUInt32LE(ptr + 42);
-    const name = buf
-      .slice(ptr + 46, ptr + 46 + fileNameLen)
-      .toString("utf8");
+    const name = buf.slice(ptr + 46, ptr + 46 + fileNameLen).toString("utf8");
     ptr += 46 + fileNameLen + extraLen + commentLen;
     if (name.toLowerCase().endsWith(".musicxml")) {
       if (buf.readUInt32LE(localOffset) !== 0x04034b50) {
