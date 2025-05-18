@@ -122,13 +122,15 @@ export type {
   CreditImage,
   TextFormatting,
   SymbolFormatting,
-} from "../schemas/credit";
-export type { Harmony } from "../schemas/harmony";
-export type { Print } from "../schemas/print";
-export type { Sound } from "../schemas/sound";
-export type { MeasureContent } from "../schemas/measure";
-export type { Backup } from "../schemas/backup";
-export type { Forward } from "../schemas/forward";
+} from '../schemas/credit';
+export type { Harmony } from '../schemas/harmony';
+export type { Print } from '../schemas/print';
+export type { Sound } from '../schemas/sound';
+export type { MeasureContent } from '../schemas/measure';
+export type { Backup } from '../schemas/backup';
+export type { Forward } from '../schemas/forward';
+export type { WavyLine } from '../schemas/wavyLine';
+export type { Footnote, Level } from '../schemas/editorial';
 // Add other inferred types from Zod schemas here as they are created.
 
 export type ParsedMusicXml = Record<string, unknown>;

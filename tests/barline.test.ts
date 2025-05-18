@@ -1,7 +1,8 @@
-import { describe, it, expect } from "vitest";
-import { mapBarlineElement } from "../src/parser/mappers";
-import type { Barline, Repeat, Ending, Fermata } from "../src/types";
-import { JSDOM } from "jsdom";
+import { describe, it, expect } from 'vitest';
+import { mapBarlineElement } from '../src/parser/mappers';
+import type { Barline, Repeat, Ending, Fermata } from '../src/types';
+import type { WavyLine, Footnote, Level } from '../src/types';
+import { JSDOM } from 'jsdom';
 
 // Helper to create an Element from an XML string snippet
 function createElement(xmlString: string): Element {
@@ -99,7 +100,30 @@ describe("Barline Schema Tests", () => {
       expect(fermatas[1].type).toBe("inverted");
     });
 
-    it("should parse barline attributes segno, coda and divisions", () => {
+    it('should parse a wavy-line element', () => {
+      const xml = `<barline><wavy-line type="continue" number="2"/></barline>`;
+      const element = createElement(xml);
+      const barline = mapBarlineElement(element);
+      expect(barline.wavyLine).toBeDefined();
+      const wavy = barline.wavyLine as WavyLine;
+      expect(wavy.type).toBe('continue');
+      expect(wavy.number).toBe(2);
+    });
+
+    it('should parse footnote and level elements', () => {
+      const xml = `<barline><footnote>ref</footnote><level reference="yes" parentheses="yes">ed</level></barline>`;
+      const element = createElement(xml);
+      const barline = mapBarlineElement(element);
+      expect(barline.footnote).toBeDefined();
+      expect((barline.footnote as Footnote).value).toBe('ref');
+      expect(barline.level).toBeDefined();
+      const level = barline.level as Level;
+      expect(level.reference).toBe('yes');
+      expect(level.parentheses).toBe('yes');
+      expect(level.value).toBe('ed');
+    });
+
+    it('should parse barline attributes segno, coda and divisions', () => {
       const xml = `<barline segno="S1" coda="C1" divisions="480" id="b1"/>`;
       const element = createElement(xml);
       const barline = mapBarlineElement(element);

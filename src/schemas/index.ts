@@ -39,3 +39,5 @@ export * from './forward';
 export * from './print';
 export * from './sound';
 export * from './fermata';
+export * from './wavyLine';
+export * from './editorial';

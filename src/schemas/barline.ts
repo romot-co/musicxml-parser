@@ -1,5 +1,7 @@
-import { z } from "zod";
-import { FermataSchema } from "./fermata";
+import { z } from 'zod';
+import { FermataSchema } from './fermata';
+import { WavyLineSchema } from './wavyLine';
+import { FootnoteSchema, LevelSchema } from './editorial';
 
 /**
  * The bar-style simple type represents the graphic appearance of a barline.
@@ -80,6 +82,12 @@ export const BarlineSchema = z.object({
    * This is an empty element in MusicXML.
    */
   segno: z.object({}).optional(),
+  /** Editorial footnote information. */
+  footnote: FootnoteSchema.optional(),
+  /** Editorial level information. */
+  level: LevelSchema.optional(),
+  /** Optional wavy-line element used for trills or vibrato marks. */
+  wavyLine: WavyLineSchema.optional(),
   /**
    * Optional fermata markings that appear with the barline. Up to two are allowed.
    */
