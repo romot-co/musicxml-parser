@@ -91,7 +91,7 @@ if (doc) {
     *   `schemas/`: Zod schema definitions for MusicXML elements.
     *   `types/`: TypeScript type definitions (largely inferred from Zod schemas).
     *   `index.ts`: Main entry point экспортирующий public API.
-*   `tests/`: Unit tests (using Jest).
+*   `tests/`: Unit tests (using Vitest).
 *   `dist/`: Compiled JavaScript output.
 
 ## Development
@@ -108,7 +108,7 @@ if (doc) {
 *   `npm run build`: Compile TypeScript to JavaScript.
 *   `npm run lint`: Lint the codebase using ESLint.
 *   `npm run format`: Format code using Prettier.
-*   `npm run test`: Run unit tests with Jest.
+*   `npm run test`: Run unit tests with Vitest.
 *   `npm run test:watch`: Run unit tests in watch mode.
 
 ## Future
