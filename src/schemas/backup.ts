@@ -1,7 +1,7 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 export const BackupSchema = z.object({
-  _type: z.literal('backup'),
+  _type: z.literal("backup"),
   duration: z.number().int(),
 });
 

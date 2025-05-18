@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 /**
  * The transpose type represents harmony elements that are a transposition of written chord symbols.
@@ -8,7 +8,7 @@ export const DiatonicSchema = z.number().int();
 export const ChromaticSchema = z.number();
 export const OctaveChangeSchema = z.number().int();
 export const DoubleSchema = z.object({
-  above: z.enum(['yes', 'no']).optional(),
+  above: z.enum(["yes", "no"]).optional(),
 });
 
 export const TransposeSchema = z.object({
@@ -40,4 +40,4 @@ export type Transpose = z.infer<typeof TransposeSchema>;
 export type Diatonic = z.infer<typeof DiatonicSchema>;
 export type Chromatic = z.infer<typeof ChromaticSchema>;
 export type OctaveChange = z.infer<typeof OctaveChangeSchema>;
-export type Double = z.infer<typeof DoubleSchema>; 
+export type Double = z.infer<typeof DoubleSchema>;

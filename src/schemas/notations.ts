@@ -1,13 +1,13 @@
-import { z } from 'zod';
-import { TieSchema } from './tie';
+import { z } from "zod";
+import { TieSchema } from "./tie";
 
 /**
  * The slur element is used to represent slurs. Slurs can be nested.
  */
 export const SlurSchema = z.object({
-  type: z.enum(['start', 'stop', 'continue']),
+  type: z.enum(["start", "stop", "continue"]),
   number: z.number().int().optional(), // For nested slurs, default is 1
-  placement: z.enum(['above', 'below']).optional(),
+  placement: z.enum(["above", "below"]).optional(),
   // TODO: Add other attributes like orientation, color, line-type, bezier-x/y, etc.
 });
 export type Slur = z.infer<typeof SlurSchema>;
@@ -52,7 +52,7 @@ export type StrongAccent = z.infer<typeof StrongAccentSchema>;
  * The tuplet element represents tuplet notation.
  */
 export const TupletSchema = z.object({
-  type: z.enum(['start', 'stop']),
+  type: z.enum(["start", "stop"]),
   number: z.number().int().optional(),
 });
 export type Tuplet = z.infer<typeof TupletSchema>;
@@ -79,7 +79,7 @@ export const ArticulationsSchema = z.object({
   spiccato: SpiccatoSchema.optional(),
   staccatissimo: StaccatissimoSchema.optional(),
   strongAccent: StrongAccentSchema.optional(),
-  placement: z.enum(['above', 'below']).optional(), // placement for the group
+  placement: z.enum(["above", "below"]).optional(), // placement for the group
 });
 export type Articulations = z.infer<typeof ArticulationsSchema>;
 
@@ -95,4 +95,4 @@ export const NotationsSchema = z.object({
   ornaments: z.array(OrnamentsSchema).optional(),
   technical: z.array(TechnicalSchema).optional(),
 });
-export type Notations = z.infer<typeof NotationsSchema>; 
+export type Notations = z.infer<typeof NotationsSchema>;

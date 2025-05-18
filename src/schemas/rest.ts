@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 /**
  * Represents a rest.
@@ -12,7 +12,6 @@ export const RestSchema = z.object({
    * For now, we'll keep it simple and can extend later if needed for <forward>/<backup>.
    */
   // measure: z.boolean().optional(), // Example: if it were a boolean attribute 'measure="yes"'
-
   /** Specifies the visual placement of the rest. Not parsed for now. */
   // 'display-step': z.string().optional(),
   // 'display-octave': z.number().int().optional(),

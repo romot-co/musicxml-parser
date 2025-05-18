@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 /**
  * The creator element is used to name the creator of a work.
@@ -28,7 +28,7 @@ export const EncodingDateSchema = z.string(); // Date in YYYY-MM-DD format or si
 export const EncoderSchema = z.string(); // Person or organization doing the encoding
 
 export const SupportsSchema = z.object({
-  type: z.enum(['yes', 'no']),
+  type: z.enum(["yes", "no"]),
   element: z.string(),
   attribute: z.string().optional(),
   value: z.string().optional(),
@@ -54,7 +54,7 @@ export type Miscellaneous = z.infer<typeof MiscellaneousSchema>;
 
 export const EncodingSchema = z.object({
   software: z.array(EncodingSoftwareSchema).optional(), // Can have multiple <software> tags
-  'encoding-date': z.array(EncodingDateSchema).optional(), // Can have multiple <encoding-date> tags
+  "encoding-date": z.array(EncodingDateSchema).optional(), // Can have multiple <encoding-date> tags
   encoder: z.array(EncoderSchema).optional(), // Can have multiple <encoder> tags
   supports: z.array(SupportsSchema).optional(),
 });
@@ -76,4 +76,3 @@ export const IdentificationSchema = z.object({
   miscellaneous: MiscellaneousSchema.optional(),
 });
 export type Identification = z.infer<typeof IdentificationSchema>;
-

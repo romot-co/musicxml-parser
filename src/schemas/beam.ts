@@ -1,10 +1,14 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 /**
  * Beam values indicate the type of beam.
  */
 export const BeamValueEnum = z.enum([
-  'begin', 'continue', 'end', 'forward hook', 'backward hook'
+  "begin",
+  "continue",
+  "end",
+  "forward hook",
+  "backward hook",
 ]);
 export type BeamValue = z.infer<typeof BeamValueEnum>;
 
@@ -25,11 +29,11 @@ export const BeamSchema = z.object({
   /**
    * MusicXML 4.0: The repeater attribute is used for tremolos that are shown with beams.
    */
-  repeater: z.enum(['yes', 'no']).optional(),
+  repeater: z.enum(["yes", "no"]).optional(),
   /**
    * MusicXML 4.0: The fan attribute is used for fanned beams.
    */
-  fan: z.enum(['accel', 'rit', 'none']).optional(),
+  fan: z.enum(["accel", "rit", "none"]).optional(),
   // TODO: Add color attribute if needed
 });
-export type Beam = z.infer<typeof BeamSchema>; 
+export type Beam = z.infer<typeof BeamSchema>;
