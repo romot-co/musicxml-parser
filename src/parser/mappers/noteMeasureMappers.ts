@@ -1376,6 +1376,7 @@ const mapBeamElement = (element: Element): Beam | undefined => {
     number: parseOptionalNumberAttribute(element, "number") ?? 1,
     repeater: getAttribute(element, "repeater") as "yes" | "no" | undefined,
     fan: getAttribute(element, "fan") as "accel" | "rit" | "none" | undefined,
+    color: getAttribute(element, "color") || undefined,
   };
   return BeamSchema.parse(beamData);
 };

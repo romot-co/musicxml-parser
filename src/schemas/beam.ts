@@ -34,6 +34,9 @@ export const BeamSchema = z.object({
    * MusicXML 4.0: The fan attribute is used for fanned beams.
    */
   fan: z.enum(["accel", "rit", "none"]).optional(),
-  // TODO: Add color attribute if needed
+  /**
+   * Optional color attribute for coloring beams.
+   */
+  color: z.string().optional(),
 });
 export type Beam = z.infer<typeof BeamSchema>;
