@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { FermataSchema } from './fermata';
 
 /**
  * The bar-style simple type represents the graphic appearance of a barline.
@@ -68,7 +69,17 @@ export const BarlineSchema = z.object({
    * This is an empty element in MusicXML.
    */
   segno: z.object({}).optional(),
-  // TODO: Add other barline children like <fermata>, <divisions> (for swing section changes)
-  // TODO: Add attributes like `implicit`
+  /**
+   * Optional fermata markings that appear with the barline. Up to two are allowed.
+   */
+  fermata: z.array(FermataSchema).optional(),
+  /** Segno attribute for playback when a segno child is present. */
+  segnoAttr: z.string().optional(),
+  /** Coda attribute for playback when a coda child is present. */
+  codaAttr: z.string().optional(),
+  /** Divisions attribute used with segno or coda jumps. */
+  divisions: z.number().optional(),
+  /** Optional unique ID value. */
+  id: z.string().optional(),
 });
 export type Barline = z.infer<typeof BarlineSchema>; 

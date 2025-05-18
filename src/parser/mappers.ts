@@ -42,6 +42,7 @@ import type {
   BarStyle,
   Repeat,
   Ending,
+  Fermata,
   Work,
   Identification,
   Creator,
@@ -117,6 +118,7 @@ import {
   BarlineSchema,
   RepeatSchema,
   EndingSchema,
+  FermataSchema,
   WorkSchema,
   IdentificationSchema,
   CreatorSchema,
@@ -432,6 +434,15 @@ const mapSlurElement = (element: Element): Slur => {
   return SlurSchema.parse(slurData);
 };
 
+const mapFermataElement = (element: Element) => {
+  const fermataData: Partial<Fermata> = {};
+  const text = element.textContent?.trim();
+  if (text) fermataData.value = text as any;
+  const typeAttr = getAttribute(element, 'type');
+  if (typeAttr) fermataData.type = typeAttr as 'upright' | 'inverted';
+  return FermataSchema.parse(fermataData);
+};
+
 // Helper function to map an <articulations> element
 const mapArticulationsElement = (element: Element): Articulations => {
   const staccatoElement = element.querySelector('staccato');
@@ -618,6 +629,7 @@ export const mapBarlineElement = (element: Element): Barline => {
   const endingElement = element.querySelector('ending');
   const codaElement = element.querySelector('coda');
   const segnoElement = element.querySelector('segno');
+  const fermataElements = Array.from(element.querySelectorAll('fermata'));
 
   const barlineData: Partial<Barline> = {
     _type: 'barline',
@@ -639,6 +651,18 @@ export const mapBarlineElement = (element: Element): Barline => {
   if (segnoElement) {
     barlineData.segno = {};
   }
+  if (fermataElements.length > 0) {
+    barlineData.fermata = fermataElements.map(mapFermataElement);
+  }
+  barlineData.segnoAttr = getAttribute(element, 'segno');
+  barlineData.codaAttr = getAttribute(element, 'coda');
+  const divisionsAttr = getAttribute(element, 'divisions');
+  if (divisionsAttr) {
+    const val = parseInt(divisionsAttr, 10);
+    if (!isNaN(val)) barlineData.divisions = val;
+  }
+  const idAttr = getAttribute(element, 'id');
+  if (idAttr) barlineData.id = idAttr;
   // TODO: Parse other barline children and attributes
 
   return BarlineSchema.parse(barlineData);

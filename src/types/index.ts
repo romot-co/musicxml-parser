@@ -32,6 +32,7 @@ export type {
   Accent,
 } from '../schemas/notations';
 export type { Barline, BarStyle, Repeat, Ending } from '../schemas/barline';
+export type { Fermata, FermataShape } from '../schemas/fermata';
 export type { Work } from '../schemas/work';
 export type {
   Identification,
