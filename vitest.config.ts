@@ -11,7 +11,7 @@ export default defineConfig({
       all: true, // プロジェクト内のすべてのファイルをカバレッジ対象とするか (テストされていないファイルも含む)
       include: ['src/**/*.ts'], // カバレッジ計測の対象ファイル
       exclude: [ // カバレッジ計測の対象外ファイル
-        'src/index.ts', 
+        'src/index.ts',
         'src/types/**/*.ts',
         '**/*.test.ts',
         '**/*.config.ts',
@@ -20,7 +20,7 @@ export default defineConfig({
     alias: {
       // tsconfig.jsonのpathsと同期させるか、ここで明示的に設定
       // Vitestは通常tsconfig.jsonのpathsを自動で読み込む
-      // '@/': new URL('./src/', import.meta.url).pathname, 
+      // '@/': new URL('./src/', import.meta.url).pathname,
     },
   },
-}); 
+});

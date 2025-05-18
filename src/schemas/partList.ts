@@ -7,7 +7,7 @@ import { ScorePartSchema } from './scorePart';
  * It can also contain <part-group> elements for grouping parts.
  */
 export const PartListSchema = z.object({
-  /** 
+  /**
    * An array of <score-part> elements. Each defines a part in the score.
    * A score must have at least one part listed.
    */
@@ -15,4 +15,4 @@ export const PartListSchema = z.object({
   // partGroups: z.array(PartGroupSchema).optional(), // <part-group> - Requires PartGroupSchema
 }).passthrough(); // Allows other elements/attributes not explicitly defined
 
-export type PartList = z.infer<typeof PartListSchema>; 
+export type PartList = z.infer<typeof PartListSchema>;

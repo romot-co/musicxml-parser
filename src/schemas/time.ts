@@ -6,4 +6,4 @@ export const TimeSchema = z.object({
   symbol: z.string().optional(),
 });
 
-export type Time = z.infer<typeof TimeSchema>; 
+export type Time = z.infer<typeof TimeSchema>;

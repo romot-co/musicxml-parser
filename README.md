@@ -133,7 +133,7 @@ if (doc) {
 
 ## Contributing
 
-Contributions are welcome! Please feel free to open an issue or submit a pull request. 
+Contributions are welcome! Please feel free to open an issue or submit a pull request.
 (Further contribution guidelines to be added).
 
 ## License

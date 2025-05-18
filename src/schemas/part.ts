@@ -6,12 +6,12 @@ import { MeasureSchema } from './measure';
  * Each part contains a sequence of measures.
  */
 export const PartSchema = z.object({
-  /** 
-   * A unique identifier for this part. This ID should correspond to an ID 
+  /**
+   * A unique identifier for this part. This ID should correspond to an ID
    * found in the <part-list> section of the score.
    */
   id: z.string(),
-  /** 
+  /**
    * An array of measures that make up this part.
    * MusicXML requires at least one measure per part.
    */
@@ -21,4 +21,4 @@ export const PartSchema = z.object({
   // besides <measure>.
 }).passthrough(); // Allows other attributes not explicitly defined
 
-export type Part = z.infer<typeof PartSchema>; 
+export type Part = z.infer<typeof PartSchema>;

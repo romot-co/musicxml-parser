@@ -145,7 +145,7 @@ describe('MusicXML Parser', () => {
     expect(note2.lyric).toBeDefined();
     expect(note2.lyric?.text).toBe('lo');
     expect(note2.lyric?.syllabic).toBe('begin');
-    
+
     // Note 3 (E4 with lyric "World!")
     const note3 = measure.notes[2];
     expect(note3.pitch?.step).toBe('E');
@@ -164,4 +164,4 @@ describe('MusicXML Parser', () => {
     expect(note4.type).toBe('quarter');
     expect(note4.lyric).toBeUndefined(); // No lyric for rest
   });
-}); 
+});

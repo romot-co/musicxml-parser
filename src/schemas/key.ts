@@ -5,4 +5,4 @@ export const KeySchema = z.object({
   mode: z.string().optional(),
 });
 
-export type Key = z.infer<typeof KeySchema>; 
+export type Key = z.infer<typeof KeySchema>;
