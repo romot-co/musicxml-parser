@@ -66,6 +66,8 @@ import type {
   TextFormatting,
   SymbolFormatting,
   Harmony,
+  Backup,
+  Forward,
   MeasureContent,
   PageLayout,
   SystemLayout,
@@ -150,6 +152,8 @@ import {
   LineWidthSchema,
   AppearanceSchema,
   SystemLayoutSchema,
+  BackupSchema,
+  ForwardSchema,
 } from '../schemas';
 
 // Helper function to get text content of a child element
@@ -949,6 +953,34 @@ const mapSlashElement = (element: Element): Slash | undefined => {
   }
 };
 
+export const mapBackupElement = (element: Element): Backup => {
+  const duration = parseNumberContent(element, 'duration');
+  if (duration === undefined) {
+    throw new Error('<backup> element requires <duration>');
+  }
+  const data: Backup = {
+    _type: 'backup',
+    duration,
+  };
+  return BackupSchema.parse(data);
+};
+
+export const mapForwardElement = (element: Element): Forward => {
+  const duration = parseNumberContent(element, 'duration');
+  if (duration === undefined) {
+    throw new Error('<forward> element requires <duration>');
+  }
+  const forwardData: Partial<Forward> = {
+    _type: 'forward',
+    duration,
+  };
+  const voice = getTextContent(element, 'voice');
+  if (voice) forwardData.voice = voice;
+  const staff = parseNumberContent(element, 'staff');
+  if (staff !== undefined) forwardData.staff = staff;
+  return ForwardSchema.parse(forwardData);
+};
+
 export const mapMeasureStyleElement = (element: Element): MeasureStyle | undefined => {
   if (!element) return undefined;
 
@@ -1093,12 +1125,12 @@ export function mapMeasureElement(measureElement: Element): Measure {
         case 'harmony':
           mappedElement = mapHarmonyElement(childElement);
           break;
-        // case 'backup': // Example for future elements
-        //   mappedElement = mapBackupElement(childElement);
-        //   break;
-        // case 'forward':
-        //   mappedElement = mapForwardElement(childElement);
-        //   break;
+        case 'backup':
+          mappedElement = mapBackupElement(childElement);
+          break;
+        case 'forward':
+          mappedElement = mapForwardElement(childElement);
+          break;
         // case 'print':
         //   mappedElement = mapPrintElement(childElement);
         //   break;

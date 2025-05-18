@@ -73,6 +73,8 @@ export type {
 } from '../schemas/credit';
 export type { Harmony } from '../schemas/harmony';
 export type { MeasureContent } from '../schemas/measure';
+export type { Backup } from '../schemas/backup';
+export type { Forward } from '../schemas/forward';
 // Add other inferred types from Zod schemas here as they are created.
 
 export interface ParsedMusicXml {
