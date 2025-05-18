@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { YesNoEnum } from "./common";
+import { NoteTypeValueEnum } from "./noteType";
 
 /**
  * The multiple-rest element is used to indicate a multi-measure rest.
@@ -16,12 +17,14 @@ export const MeasureRepeatSchema = z.object({
   slashes: z.number().int().optional(),
 });
 
+export const SlashDotSchema = z.object({});
+
 export const BeatRepeatSchema = z.object({
   type: z.enum(["start", "stop"]),
   slashes: z.number().int().optional(),
   useDots: YesNoEnum.optional(),
-  slashType: z.string().optional(), // Placeholder
-  slashDot: z.array(z.object({})).optional(), // Placeholder for empty <slash-dot/>
+  slashType: NoteTypeValueEnum.optional(),
+  slashDot: z.array(SlashDotSchema).optional(),
   exceptVoice: z.array(z.string()).optional(), // PCDATA
 });
 
@@ -29,8 +32,8 @@ export const SlashSchema = z.object({
   type: z.enum(["start", "stop"]),
   useDots: YesNoEnum.optional(),
   useStems: YesNoEnum.optional(),
-  slashType: z.string().optional(), // Placeholder
-  slashDot: z.array(z.object({})).optional(), // Placeholder for empty <slash-dot/>
+  slashType: NoteTypeValueEnum.optional(),
+  slashDot: z.array(SlashDotSchema).optional(),
   exceptVoice: z.array(z.string()).optional(), // PCDATA
 });
 

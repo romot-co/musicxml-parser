@@ -1860,8 +1860,16 @@ const mapBeatRepeatElement = (element: Element): BeatRepeat | undefined => {
     slashes: parseOptionalNumberAttribute(element, "slashes"),
     useDots: getAttribute(element, "use-dots") as "yes" | "no" | undefined,
     slashType: getTextContent(element, "slash-type"),
-    // slashDot: ...
-    // exceptVoice: ...
+    slashDot:
+      element.querySelectorAll("slash-dot").length > 0
+        ? Array.from(element.querySelectorAll("slash-dot")).map(() => ({}))
+        : undefined,
+    exceptVoice:
+      element.querySelectorAll("except-voice").length > 0
+        ? Array.from(element.querySelectorAll("except-voice"))
+            .map((el) => el.textContent?.trim())
+            .filter((v): v is string => !!v)
+        : undefined,
   };
   try {
     return BeatRepeatSchema.parse(data);
@@ -1884,8 +1892,16 @@ const mapSlashElement = (element: Element): Slash | undefined => {
     useDots: getAttribute(element, "use-dots") as "yes" | "no" | undefined,
     useStems: getAttribute(element, "use-stems") as "yes" | "no" | undefined,
     slashType: getTextContent(element, "slash-type"),
-    // slashDot: ...
-    // exceptVoice: ...
+    slashDot:
+      element.querySelectorAll("slash-dot").length > 0
+        ? Array.from(element.querySelectorAll("slash-dot")).map(() => ({}))
+        : undefined,
+    exceptVoice:
+      element.querySelectorAll("except-voice").length > 0
+        ? Array.from(element.querySelectorAll("except-voice"))
+            .map((el) => el.textContent?.trim())
+            .filter((v): v is string => !!v)
+        : undefined,
   };
   try {
     return SlashSchema.parse(data);

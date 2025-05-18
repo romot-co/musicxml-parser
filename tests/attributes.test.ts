@@ -211,6 +211,26 @@ describe("Attributes Schema Tests", () => {
       expect(sl.slashType).toBe("eighth");
     });
 
+    it("should parse beat-repeat with slash-dot elements", () => {
+      const xml = `<attributes><measure-style><beat-repeat type="start"><slash-type>quarter</slash-type><slash-dot/><slash-dot/></beat-repeat></measure-style></attributes>`;
+      const element = createElement(xml);
+      const attributes = mapAttributesElement(element);
+      const br = (attributes.measureStyle?.[0] as MeasureStyle).beatRepeat as BeatRepeat;
+      expect(br.slashType).toBe("quarter");
+      expect(br.slashDot).toBeDefined();
+      expect(br.slashDot?.length).toBe(2);
+    });
+
+    it("should parse slash style with slash-dot elements", () => {
+      const xml = `<attributes><measure-style><slash type="stop"><slash-type>eighth</slash-type><slash-dot/></slash></measure-style></attributes>`;
+      const element = createElement(xml);
+      const attributes = mapAttributesElement(element);
+      const sl = (attributes.measureStyle?.[0] as MeasureStyle).slash as Slash;
+      expect(sl.slashType).toBe("eighth");
+      expect(sl.slashDot).toBeDefined();
+      expect(sl.slashDot?.length).toBe(1);
+    });
+
     it("should ignore invalid <measure-style> with no style child", () => {
       const xml = `<attributes><measure-style number="1"></measure-style></attributes>`;
       const element = createElement(xml);

@@ -35,6 +35,7 @@ export * from "./midiInstrument";
 export * from "./grace";
 export * from "./cue";
 export * from "./unpitched";
+export * from "./noteType";
 export * from "./defaults";
 export * from "./credit";
 export * from "./link";

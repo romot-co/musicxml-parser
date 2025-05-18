@@ -93,6 +93,7 @@ export type {
   DisplayStep,
   DisplayOctave,
 } from "../schemas/unpitched";
+export type { NoteTypeValue } from "../schemas/noteType";
 export type {
   YesNo,
   Font,
