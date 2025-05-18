@@ -120,7 +120,12 @@ describe("Attributes Schema Tests", () => {
       expect(ps.topStaff).toBe(3);
     });
 
-    // TODO: Add tests for instruments when schema is available
+    it("should parse <attributes> with <instruments>", () => {
+      const xml = `<attributes><instruments>2</instruments></attributes>`;
+      const element = createElement(xml);
+      const attributes = mapAttributesElement(element);
+      expect(attributes.instruments).toBe(2);
+    });
 
     it("should parse <staff-details> with <line-detail>", () => {
       const xml = `<attributes><staff-details><staff-lines>5</staff-lines><line-detail line="1" width="0.5" color="#ff0" line-type="dashed" print-object="no"/></staff-details></attributes>`;
