@@ -1329,6 +1329,8 @@ export const mapDirectionElement = (element: Element): Direction => {
     | "yes"
     | "no"
     | undefined;
+  const offsetVal = parseFloatContent(element, "offset");
+  const soundEl = element.querySelector("sound");
   const directionData: Partial<Direction> = {
     _type: "direction",
     direction_type: directionTypeElements.map(mapDirectionTypeElement),
@@ -1336,6 +1338,8 @@ export const mapDirectionElement = (element: Element): Direction => {
     staff: staff,
     directive: directiveAttr,
   };
+  if (offsetVal !== undefined) directionData.offset = offsetVal;
+  if (soundEl) directionData.sound = mapSoundElement(soundEl);
   return DirectionSchema.parse(directionData);
 };
 
@@ -1910,7 +1914,7 @@ export const mapPrintElement = (element: Element): Print => {
 };
 
 // Function to map a <sound> element
-export const mapSoundElement = (element: Element): Sound => {
+export function mapSoundElement(element: Element): Sound {
   const soundData: Partial<Sound> = { _type: "sound" };
   const tempoAttr = getAttribute(element, "tempo");
   const dynamicsAttr = getAttribute(element, "dynamics");
@@ -2002,7 +2006,7 @@ export const mapSoundElement = (element: Element): Sound => {
   if (idAttr) soundData.id = idAttr;
 
   return SoundSchema.parse(soundData);
-};
+}
 
 const mapFigureElement = (element: Element): Figure => {
   const data: Partial<Figure> = {
