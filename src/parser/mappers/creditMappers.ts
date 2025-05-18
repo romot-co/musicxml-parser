@@ -77,6 +77,8 @@ import type {
   CreditWords,
   CreditSymbol,
   CreditImage,
+  Link,
+  Bookmark,
   Credit,
   TextFormatting,
   SymbolFormatting, // Added
@@ -175,6 +177,8 @@ import {
   CreditWordsSchema,
   CreditSymbolSchema, // Added
   CreditImageSchema,
+  LinkSchema,
+  BookmarkSchema,
   CreditSchema,
   // TextFormattingSchema,
   // SymbolFormattingSchema,
@@ -217,6 +221,60 @@ import {
   getAttribute,
   parseOptionalNumberAttribute,
 } from "./utils";
+
+export const mapLinkElement = (element: Element): Link | undefined => {
+  const href =
+    getAttribute(element, "xlink:href") || getAttribute(element, "href");
+  if (!href) return undefined;
+
+  const data: Partial<Link> = { href };
+  const typeAttr =
+    getAttribute(element, "xlink:type") || getAttribute(element, "type");
+  if (typeAttr) data.type = typeAttr;
+  const role =
+    getAttribute(element, "xlink:role") || getAttribute(element, "role");
+  if (role) data.role = role;
+  const title =
+    getAttribute(element, "xlink:title") || getAttribute(element, "title");
+  if (title) data.title = title;
+  const show =
+    getAttribute(element, "xlink:show") || getAttribute(element, "show");
+  if (show) data.show = show;
+  const actuate =
+    getAttribute(element, "xlink:actuate") || getAttribute(element, "actuate");
+  if (actuate) data.actuate = actuate;
+  const name = getAttribute(element, "name");
+  if (name) data.name = name;
+  const elementAttr = getAttribute(element, "element");
+  if (elementAttr) data.element = elementAttr;
+  const position = parseOptionalNumberAttribute(element, "position");
+  if (position !== undefined) data.position = position;
+
+  try {
+    return LinkSchema.parse(data);
+  } catch {
+    return undefined;
+  }
+};
+
+export const mapBookmarkElement = (element: Element): Bookmark | undefined => {
+  const id = getAttribute(element, "id");
+  if (!id) return undefined;
+
+  const data: Partial<Bookmark> = { id };
+  const name = getAttribute(element, "name");
+  if (name) data.name = name;
+  const elementAttr = getAttribute(element, "element");
+  if (elementAttr) data.element = elementAttr;
+  const position = parseOptionalNumberAttribute(element, "position");
+  if (position !== undefined) data.position = position;
+
+  try {
+    return BookmarkSchema.parse(data);
+  } catch {
+    return undefined;
+  }
+};
 export const mapCreditWordsElement = (
   element: Element,
 ): CreditWords | undefined => {
@@ -386,6 +444,8 @@ export const mapCreditElement = (element: Element): Credit | undefined => {
   const creditTypes = Array.from(element.querySelectorAll("credit-type"))
     .map((el) => el.textContent?.trim())
     .filter(Boolean) as string[];
+  const linkElements = Array.from(element.querySelectorAll("link"));
+  const bookmarkElements = Array.from(element.querySelectorAll("bookmark"));
   const creditWordsElements = Array.from(
     element.querySelectorAll("credit-words"),
   );
@@ -403,10 +463,16 @@ export const mapCreditElement = (element: Element): Credit | undefined => {
   const creditImage = creditImageEl
     ? mapCreditImageElement(creditImageEl)
     : undefined;
+  const links = linkElements.map(mapLinkElement).filter(Boolean) as Link[];
+  const bookmarks = bookmarkElements
+    .map(mapBookmarkElement)
+    .filter(Boolean) as Bookmark[];
 
   const data: Partial<Credit> = {};
   if (page) data.page = page;
   if (creditTypes.length > 0) data.creditTypes = creditTypes;
+  if (links.length > 0) data.links = links;
+  if (bookmarks.length > 0) data.bookmarks = bookmarks;
 
   if (creditWords.length > 0) data.creditWords = creditWords;
   // MusicXML DTD implies credit-words, credit-symbol, credit-image are choices,
@@ -424,7 +490,9 @@ export const mapCreditElement = (element: Element): Credit | undefined => {
       creditWords.length === 0 &&
       creditSymbols.length === 0 &&
       !creditImage &&
-      creditTypes.length === 0
+      creditTypes.length === 0 &&
+      links.length === 0 &&
+      bookmarks.length === 0
     ) {
       // console.warn("Credit element is empty or only has page number, returning undefined.", element.outerHTML);
       return undefined;

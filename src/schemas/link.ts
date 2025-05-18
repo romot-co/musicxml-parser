@@ -1,12 +1,16 @@
 import { z } from "zod";
 
+/**
+ * Simplified representation of the <link> element.
+ * Only a subset of the XLink attributes are captured.
+ */
 export const LinkSchema = z.object({
-  _type: z.literal("link"),
-  href: z.string(),
-  role: z.string().optional(),
-  title: z.string().optional(),
-  show: z.string().optional(),
-  actuate: z.string().optional(),
+  href: z.string(), // xlink:href
+  type: z.string().optional(), // xlink:type, usually "simple"
+  role: z.string().optional(), // xlink:role
+  title: z.string().optional(), // xlink:title
+  show: z.string().optional(), // xlink:show
+  actuate: z.string().optional(), // xlink:actuate
   name: z.string().optional(),
   element: z.string().optional(),
   position: z.number().int().optional(),
