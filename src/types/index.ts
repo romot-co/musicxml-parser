@@ -10,7 +10,7 @@ export type { Key } from '../schemas/key';
 export type { Time } from '../schemas/time';
 export type { Clef } from '../schemas/clef';
 export type { Attributes } from '../schemas/attributes';
-export type { Lyric } from '../schemas/lyric';
+export type { Lyric, Extend, Elision } from '../schemas/lyric';
 export type { Tie } from '../schemas/tie';
 export type {
   Direction,
