@@ -8,7 +8,15 @@ export const SlurSchema = z.object({
   type: z.enum(["start", "stop", "continue"]),
   number: z.number().int().optional(), // For nested slurs, default is 1
   placement: z.enum(["above", "below"]).optional(),
-  // TODO: Add other attributes like orientation, color, line-type, bezier-x/y, etc.
+  orientation: z.enum(["over", "under"]).optional(),
+  color: z.string().optional(),
+  lineType: z.string().optional(),
+  bezierX: z.number().optional(),
+  bezierY: z.number().optional(),
+  bezierX2: z.number().optional(),
+  bezierY2: z.number().optional(),
+  bezierOffset: z.number().optional(),
+  bezierOffset2: z.number().optional(),
 });
 export type Slur = z.infer<typeof SlurSchema>;
 
