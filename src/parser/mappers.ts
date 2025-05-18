@@ -18,6 +18,11 @@ import type {
   Metronome,
   MetronomeBeatUnit,
   MetronomePerMinute,
+  Dynamics,
+  Pedal,
+  Wedge,
+  Segno,
+  Coda,
   Transpose,
   Diatonic,
   Chromatic,
@@ -170,6 +175,11 @@ import {
   TextFormattingSchema,
   SymbolFormattingSchema,
   HarmonySchema,
+  DynamicsSchema,
+  PedalSchema,
+  WedgeSchema,
+  SegnoSchema,
+  CodaSchema,
   GroupSymbolValueEnum,
   RootSchema,
   KindSchema,
@@ -607,19 +617,21 @@ const mapTechnicalElement = (_element: Element): Technical => {
 const mapWordsElement = (element: Element): Words => {
   const text = element.textContent?.trim() ?? "";
   const formatting: Partial<TextFormatting> = {};
-  const fontFamily = getAttribute(element, "font-family");
-  const fontStyleAttr = getAttribute(element, "font-style");
-  const fontSize = getAttribute(element, "font-size");
-  const fontWeightAttr = getAttribute(element, "font-weight");
-  const justifyAttr = getAttribute(element, "justify");
-  const defaultX = parseOptionalNumberAttribute(element, "default-x");
-  const defaultY = parseOptionalNumberAttribute(element, "default-y");
-  const valignAttr = getAttribute(element, "valign");
+  const fontFamily = getAttribute(element, 'font-family');
+  const fontStyleAttr = getAttribute(element, 'font-style');
+  const fontSize = getAttribute(element, 'font-size');
+  const fontWeightAttr = getAttribute(element, 'font-weight');
+  const justifyAttr = getAttribute(element, 'justify');
+  const defaultX = parseOptionalNumberAttribute(element, 'default-x');
+  const defaultY = parseOptionalNumberAttribute(element, 'default-y');
+  const valignAttr = getAttribute(element, 'valign');
+  const colorAttr = getAttribute(element, 'color');
 
   if (fontFamily) formatting.fontFamily = fontFamily;
   if (fontSize) formatting.fontSize = fontSize;
   if (defaultX !== undefined) formatting.defaultX = defaultX;
   if (defaultY !== undefined) formatting.defaultY = defaultY;
+  if (colorAttr) formatting.color = colorAttr;
 
   if (fontStyleAttr === "normal" || fontStyleAttr === "italic") {
     formatting.fontStyle = fontStyleAttr;
@@ -679,9 +691,29 @@ const mapMetronomeBeatUnitElement = (element: Element): MetronomeBeatUnit => {
 
 // Helper function to map a <per-minute> element (within <metronome>)
 const mapMetronomePerMinuteElement = (element: Element): MetronomePerMinute => {
-  const perMinuteData = {
-    "per-minute": element.textContent?.trim() ?? "",
+  const formatting: Partial<TextFormatting> = {};
+  const fontFamily = getAttribute(element, 'font-family');
+  const fontStyleAttr = getAttribute(element, 'font-style');
+  const fontSize = getAttribute(element, 'font-size');
+  const fontWeightAttr = getAttribute(element, 'font-weight');
+  const colorAttr = getAttribute(element, 'color');
+
+  if (fontFamily) formatting.fontFamily = fontFamily;
+  if (fontSize) formatting.fontSize = fontSize;
+  if (colorAttr) formatting.color = colorAttr;
+  if (fontStyleAttr === 'normal' || fontStyleAttr === 'italic') {
+    formatting.fontStyle = fontStyleAttr;
+  }
+  if (fontWeightAttr === 'normal' || fontWeightAttr === 'bold') {
+    formatting.fontWeight = fontWeightAttr;
+  }
+
+  const perMinuteData: Partial<MetronomePerMinute> = {
+    'per-minute': element.textContent?.trim() ?? '',
   };
+  if (Object.keys(formatting).length > 0) {
+    perMinuteData.formatting = formatting as TextFormatting;
+  }
   return MetronomePerMinuteSchema.parse(perMinuteData);
 };
 
@@ -702,14 +734,51 @@ const mapMetronomeElement = (element: Element): Metronome => {
 
 // Helper function to map a <direction-type> element (within <direction>)
 const mapDirectionTypeElement = (element: Element): DirectionType => {
-  const wordsElement = element.querySelector("words");
-  const metronomeElement = element.querySelector("metronome");
+  const wordsElement = element.querySelector('words');
+  const metronomeElement = element.querySelector('metronome');
+  const dynamicsElement = element.querySelector('dynamics');
+  const pedalElement = element.querySelector('pedal');
+  const wedgeElement = element.querySelector('wedge');
+  const segnoElement = element.querySelector('segno');
+  const codaElement = element.querySelector('coda');
   const directionTypeData: Partial<DirectionType> = {};
   if (wordsElement) {
     directionTypeData.words = mapWordsElement(wordsElement);
   }
   if (metronomeElement) {
     directionTypeData.metronome = mapMetronomeElement(metronomeElement);
+  }
+  if (dynamicsElement) {
+    const dynChild = dynamicsElement.firstElementChild;
+    const dynValue = dynChild ? dynChild.tagName : dynamicsElement.textContent?.trim() ?? '';
+    const formatting: Partial<TextFormatting> = {};
+    const colorAttr = getAttribute(dynamicsElement, 'color');
+    if (colorAttr) formatting.color = colorAttr;
+    if (Object.keys(formatting).length > 0) {
+      directionTypeData.dynamics = DynamicsSchema.parse({ value: dynValue, formatting: formatting as TextFormatting });
+    } else {
+      directionTypeData.dynamics = DynamicsSchema.parse({ value: dynValue });
+    }
+  }
+  if (pedalElement) {
+    directionTypeData.pedal = PedalSchema.parse({ type: getAttribute(pedalElement, 'type') as any });
+  }
+  if (wedgeElement) {
+    const wedgeData: Partial<Wedge> = {
+      type: getAttribute(wedgeElement, 'type') as any,
+    };
+    const spread = getAttribute(wedgeElement, 'spread');
+    if (spread) {
+      const sp = parseFloat(spread);
+      if (!isNaN(sp)) wedgeData.spread = sp;
+    }
+    directionTypeData.wedge = WedgeSchema.parse(wedgeData);
+  }
+  if (segnoElement) {
+    directionTypeData.segno = SegnoSchema.parse({});
+  }
+  if (codaElement) {
+    directionTypeData.coda = CodaSchema.parse({});
   }
   return DirectionTypeSchema.parse(directionTypeData);
 };
