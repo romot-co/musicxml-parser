@@ -116,6 +116,23 @@ describe("Note Schema Tests (note.mod)", () => {
       expect(slur.placement).toBe("above");
     });
 
+    it("parses slur with orientation, color, line-type, and bezier attributes", () => {
+      const xml =
+        '<note><pitch><step>E</step><octave>4</octave></pitch><duration>4</duration><notations><slur type="start" orientation="over" color="red" line-type="dashed" bezier-x="1" bezier-y="2" bezier-x2="3" bezier-y2="4" bezier-offset="5" bezier-offset2="6"/></notations></note>';
+      const el = createElement(xml);
+      const note = mapNoteElement(el);
+      const slur = note.notations?.slurs?.[0] as Slur;
+      expect(slur.orientation).toBe("over");
+      expect(slur.color).toBe("red");
+      expect(slur.lineType).toBe("dashed");
+      expect(slur.bezierX).toBe(1);
+      expect(slur.bezierY).toBe(2);
+      expect(slur.bezierX2).toBe(3);
+      expect(slur.bezierY2).toBe(4);
+      expect(slur.bezierOffset).toBe(5);
+      expect(slur.bezierOffset2).toBe(6);
+    });
+
     it("should parse a <note> with <accidental>", () => {
       const xml =
         "<note><pitch><step>F</step><alter>1</alter><octave>4</octave></pitch><duration>4</duration><accidental>sharp</accidental></note>";

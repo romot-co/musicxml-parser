@@ -520,15 +520,44 @@ const mapClefElement = (element: Element): Clef => {
 
 // Helper function to map a <slur> element
 const mapSlurElement = (element: Element): Slur => {
-  const slurData = {
+  const slurData: Partial<Slur> = {
     type: getAttribute(element, "type") as "start" | "stop" | "continue",
     number: parseOptionalNumberAttribute(element, "number"),
     placement: getAttribute(element, "placement") as
       | "above"
       | "below"
       | undefined,
-    // TODO: Map other slur attributes
   };
+
+  const orientation = getAttribute(element, "orientation");
+  if (orientation === "over" || orientation === "under")
+    slurData.orientation = orientation;
+
+  const colorAttr = getAttribute(element, "color");
+  if (colorAttr) slurData.color = colorAttr;
+
+  const lineTypeAttr = getAttribute(element, "line-type");
+  if (lineTypeAttr) slurData.lineType = lineTypeAttr;
+
+  const bezierXAttr = getAttribute(element, "bezier-x");
+  if (bezierXAttr) slurData.bezierX = parseOptionalFloat(bezierXAttr);
+
+  const bezierYAttr = getAttribute(element, "bezier-y");
+  if (bezierYAttr) slurData.bezierY = parseOptionalFloat(bezierYAttr);
+
+  const bezierX2Attr = getAttribute(element, "bezier-x2");
+  if (bezierX2Attr) slurData.bezierX2 = parseOptionalFloat(bezierX2Attr);
+
+  const bezierY2Attr = getAttribute(element, "bezier-y2");
+  if (bezierY2Attr) slurData.bezierY2 = parseOptionalFloat(bezierY2Attr);
+
+  const bezierOffsetAttr = getAttribute(element, "bezier-offset");
+  if (bezierOffsetAttr)
+    slurData.bezierOffset = parseOptionalFloat(bezierOffsetAttr);
+
+  const bezierOffset2Attr = getAttribute(element, "bezier-offset2");
+  if (bezierOffset2Attr)
+    slurData.bezierOffset2 = parseOptionalFloat(bezierOffset2Attr);
   // Validate that type is one of the expected values before parsing
   if (!["start", "stop", "continue"].includes(slurData.type)) {
     throw new Error(`Invalid slur type: ${slurData.type}`);
