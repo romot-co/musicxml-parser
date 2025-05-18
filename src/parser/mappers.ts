@@ -828,6 +828,69 @@ export const mapTransposeElement = (element: Element): Transpose | undefined => 
   }
 };
 
+// Helper to map a <line-detail> element
+const mapLineDetailElement = (element: Element): LineDetail | undefined => {
+  const lineAttr = getAttribute(element, 'line');
+  if (!lineAttr) return undefined;
+  const line = parseInt(lineAttr, 10);
+  if (isNaN(line)) return undefined;
+
+  const data: Partial<LineDetail> = {
+    line,
+  };
+
+  const widthAttr = getAttribute(element, 'width');
+  if (widthAttr !== undefined) {
+    const w = parseFloat(widthAttr);
+    if (!isNaN(w)) data.width = w;
+  }
+
+  const colorAttr = getAttribute(element, 'color');
+  if (colorAttr) data.color = colorAttr;
+
+  const lineTypeAttr = getAttribute(element, 'line-type');
+  if (lineTypeAttr) data.lineType = lineTypeAttr;
+
+  const printObjAttr = getAttribute(element, 'print-object');
+  if (printObjAttr === 'yes' || printObjAttr === 'no') data.printObject = printObjAttr;
+
+  const cleaned = Object.fromEntries(
+    Object.entries(data).filter(([, v]) => v !== undefined)
+  );
+
+  try {
+    return LineDetailSchema.parse(cleaned);
+  } catch {
+    return undefined;
+  }
+};
+
+// Helper to map a <staff-tuning> element
+const mapStaffTuningElement = (element: Element): StaffTuning | undefined => {
+  const lineAttr = getAttribute(element, 'line');
+  const step = getTextContent(element, 'tuning-step');
+  const octave = parseNumberContent(element, 'tuning-octave');
+  if (!lineAttr || !step || octave === undefined) return undefined;
+
+  const line = parseInt(lineAttr, 10);
+  if (isNaN(line)) return undefined;
+
+  const data: Partial<StaffTuning> = {
+    line,
+    tuningStep: step as any,
+    tuningOctave: octave,
+  };
+
+  const alter = parseFloatContent(element, 'tuning-alter');
+  if (alter !== undefined) data.tuningAlter = alter;
+
+  try {
+    return StaffTuningSchema.parse(data);
+  } catch {
+    return undefined;
+  }
+};
+
 // Function to map a <staff-details> element
 export const mapStaffDetailsElement = (element: Element): StaffDetails | undefined => {
   if (!element) return undefined;
@@ -835,14 +898,26 @@ export const mapStaffDetailsElement = (element: Element): StaffDetails | undefin
   const staffDetailsData: Partial<StaffDetails> = {
     staffType: getTextContent(element, 'staff-type'),
     staffLines: parseNumberContent(element, 'staff-lines'),
-    // lineDetail: // TODO: map line-detail elements
-    // staffTuning: // TODO: map staff-tuning elements
     capo: parseNumberContent(element, 'capo'),
     number: parseOptionalNumberAttribute(element, 'number'),
     showFrets: getAttribute(element, 'show-frets') as 'numbers' | 'letters' | undefined,
     printObject: getAttribute(element, 'print-object') as 'yes' | 'no' | undefined,
     printSpacing: getAttribute(element, 'print-spacing') as 'yes' | 'no' | undefined,
   };
+
+  const lineDetailEls = Array.from(element.querySelectorAll('line-detail'));
+  if (lineDetailEls.length > 0) {
+    staffDetailsData.lineDetail = lineDetailEls
+      .map(mapLineDetailElement)
+      .filter(Boolean) as LineDetail[];
+  }
+
+  const tuningEls = Array.from(element.querySelectorAll('staff-tuning'));
+  if (tuningEls.length > 0) {
+    staffDetailsData.staffTuning = tuningEls
+      .map(mapStaffTuningElement)
+      .filter(Boolean) as StaffTuning[];
+  }
 
   const staffSizeElement = element.querySelector('staff-size');
   if (staffSizeElement) {

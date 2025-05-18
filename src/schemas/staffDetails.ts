@@ -6,9 +6,23 @@ import { YesNoEnum } from './common';
  * This includes the number of staff lines and other details.
  */
 
-// Placeholder for complex types that might need their own schemas
-export const StaffTuningSchema = z.object({}); // Define later if needed
-export const LineDetailSchema = z.object({}); // Define later if needed
+// Schema for <line-detail> element
+// Only a subset of attributes are modeled for now.
+export const LineDetailSchema = z.object({
+  line: z.number().int(),
+  width: z.number().optional(),
+  color: z.string().optional(),
+  lineType: z.string().optional(),
+  printObject: YesNoEnum.optional(),
+});
+
+// Schema for <staff-tuning> element
+export const StaffTuningSchema = z.object({
+  tuningStep: z.enum(['A', 'B', 'C', 'D', 'E', 'F', 'G']),
+  tuningAlter: z.number().optional(),
+  tuningOctave: z.number().int(),
+  line: z.number().int(),
+});
 
 export const StaffDetailsSchema = z.object({
   /**
