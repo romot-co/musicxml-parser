@@ -221,6 +221,9 @@ import {
   MiscellaneousFieldSchema,
   FermataShapeEnum,
   PedalSchema,
+  ScoreInstrumentSchema,
+  MidiDeviceSchema,
+  MidiInstrumentSchema,
 } from "../../schemas";
 
 // Re-exported mappers from other modules
@@ -2224,13 +2227,89 @@ export const mapTimewiseMeasureElement = (
   return TimewiseMeasureSchema.parse(measureData);
 };
 
+// Map a <score-instrument> element
+export const mapScoreInstrumentElement = (element: Element): ScoreInstrument => {
+  const data: Partial<ScoreInstrument> = {
+    id: getAttribute(element, "id") ?? "",
+    instrumentName: getTextContent(element, "instrument-name") ?? "",
+  };
+  const abbr = getTextContent(element, "instrument-abbreviation");
+  if (abbr) data.instrumentAbbreviation = abbr;
+  const sound = getTextContent(element, "instrument-sound");
+  if (sound) data.instrumentSound = sound;
+  if (element.querySelector("solo")) data.solo = true;
+  const ensemble = element.querySelector("ensemble");
+  if (ensemble) {
+    const size = parseInt(ensemble.textContent ?? "", 10);
+    if (!isNaN(size)) data.ensemble = size;
+  }
+  const midiInstr = element.querySelector("midi-instrument");
+  if (midiInstr) data.midiInstrument = mapMidiInstrumentElement(midiInstr);
+  return ScoreInstrumentSchema.parse(data);
+};
+
+// Map a <midi-device> element
+export const mapMidiDeviceElement = (element: Element): MidiDevice => {
+  const data: Partial<MidiDevice> = {
+    value: element.textContent?.trim() ?? "",
+    port: parseOptionalNumberAttribute(element, "port"),
+  };
+  const id = getAttribute(element, "id");
+  if (id) data.id = id;
+  return MidiDeviceSchema.parse(data);
+};
+
+// Map a <midi-instrument> element
+export const mapMidiInstrumentElement = (
+  element: Element,
+): MidiInstrument => {
+  const data: Partial<MidiInstrument> = {
+    id: getAttribute(element, "id") ?? "",
+    midiChannel: parseNumberContent(element, "midi-channel"),
+    midiName: getTextContent(element, "midi-name"),
+    midiBank: parseNumberContent(element, "midi-bank"),
+    midiProgram: parseNumberContent(element, "midi-program"),
+    midiUnpitched: parseNumberContent(element, "midi-unpitched"),
+    volume: parseFloatContent(element, "volume"),
+    pan: parseFloatContent(element, "pan"),
+    elevation: parseFloatContent(element, "elevation"),
+  };
+  return MidiInstrumentSchema.parse(data);
+};
+
 // Mapper for <score-part> element (from <part-list>)
 export const mapScorePartElement = (element: Element): ScorePart => {
-  const scorePartData = {
+  const scoreInstrumentElements = Array.from(
+    element.querySelectorAll("score-instrument"),
+  );
+  const midiDeviceElements = Array.from(
+    element.querySelectorAll("midi-device"),
+  );
+  const midiInstrumentElements = Array.from(
+    element.querySelectorAll("midi-instrument"),
+  );
+
+  const scorePartData: Partial<ScorePart> = {
     id: getAttribute(element, "id") ?? "",
-    partName: getTextContent(element, "part-name") ?? "",
-    // Add other <score-part> children like <part-abbreviation>, <score-instrument>, <midi-device>, etc.
+    partName: getTextContent(element, "part-name") ?? undefined,
   };
+
+  const partAbbrev = getTextContent(element, "part-abbreviation");
+  if (partAbbrev) scorePartData.partAbbreviation = partAbbrev;
+  if (scoreInstrumentElements.length > 0) {
+    scorePartData.scoreInstruments = scoreInstrumentElements.map(
+      mapScoreInstrumentElement,
+    );
+  }
+  if (midiDeviceElements.length > 0) {
+    scorePartData.midiDevices = midiDeviceElements.map(mapMidiDeviceElement);
+  }
+  if (midiInstrumentElements.length > 0) {
+    scorePartData.midiInstruments = midiInstrumentElements.map(
+      mapMidiInstrumentElement,
+    );
+  }
+
   return ScorePartSchema.parse(scorePartData);
 };
 

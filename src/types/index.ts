@@ -137,6 +137,9 @@ export type {
   Tremolo,
   OtherNotation,
 } from "../schemas/notations";
+export type { ScoreInstrument } from "../schemas/scoreInstrument";
+export type { MidiDevice } from "../schemas/midiDevice";
+export type { MidiInstrument } from "../schemas/midiInstrument";
 export type { TimeModification } from "../schemas/timeModification";
 // Add other inferred types from Zod schemas here as they are created.
 
