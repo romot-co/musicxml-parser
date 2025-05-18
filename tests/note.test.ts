@@ -102,6 +102,19 @@ describe("Note Schema Tests (note.mod)", () => {
       expect(beam2.value).toBe("begin");
     });
 
+    it('parses a <beam> with color attribute', () => {
+      const xml =
+        '<note><pitch><step>A</step><octave>4</octave></pitch><duration>1</duration><type>16th</type><beam number="1" color="red">begin</beam></note>';
+      const element = createElement(xml);
+      const note = mapNoteElement(element);
+      expect(note.beams).toBeDefined();
+      expect(note.beams).toHaveLength(1);
+      const beam = note.beams?.[0] as Beam;
+      expect(beam.number).toBe(1);
+      expect(beam.value).toBe("begin");
+      expect(beam.color).toBe("red");
+    });
+
     it("should parse a <note> with <notations> and <slur>", () => {
       const xml =
         '<note><pitch><step>D</step><octave>5</octave></pitch><duration>2</duration><notations><slur type="start" number="1" placement="above"/></notations></note>';
