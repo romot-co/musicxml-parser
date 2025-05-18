@@ -10,6 +10,8 @@ import type {
   Note,
   Attributes,
   Direction,
+  Creator,
+  Credit,
 } from "../src/types";
 import { NoteSchema, AttributesSchema, DirectionSchema } from "../src/schemas";
 
@@ -87,11 +89,13 @@ describe("Echigo-Jishi.musicxml Parser Test", () => {
     expect(id?.creators).toBeDefined();
     expect(id?.creators).toHaveLength(2);
     expect(
-      id?.creators?.find((c) => c.type === "arranger" && c.name === "Y. Nagai"),
+      id?.creators?.find(
+        (c: Creator) => c.type === "arranger" && c.name === "Y. Nagai",
+      ),
     ).toBeDefined();
     expect(
       id?.creators?.find(
-        (c) => c.type === "arranger" && c.name === "K. Kobatake",
+        (c: Creator) => c.type === "arranger" && c.name === "K. Kobatake",
       ),
     ).toBeDefined();
     expect(id?.rights).toBeDefined();
@@ -177,7 +181,7 @@ describe("Echigo-Jishi.musicxml Parser Test", () => {
     expect(scorePartwise.credit?.length).toBeGreaterThanOrEqual(5); // There are 5 credit elements in the sample
 
     const titleCredit = scorePartwise.credit?.find(
-      (c) =>
+      (c: Credit) =>
         c.creditTypes?.includes("title") &&
         c.creditWords?.[0]?.text === "越後獅子",
     );
@@ -195,7 +199,7 @@ describe("Echigo-Jishi.musicxml Parser Test", () => {
     // xml:lang is not directly in CreditWordsSchema.textFormatting, but on credit-words element itself.
     // Our current schema/mapper for credit-words doesn't capture xml:lang on credit-words directly.
 
-    const arrangerCredit = scorePartwise.credit?.find((c) =>
+    const arrangerCredit = scorePartwise.credit?.find((c: Credit) =>
       c.creditTypes?.includes("arranger"),
     );
     expect(arrangerCredit).toBeDefined();
@@ -205,7 +209,7 @@ describe("Echigo-Jishi.musicxml Parser Test", () => {
     expect(arrangerCredit?.creditWords?.[0].formatting?.defaultX).toBe(1124);
     expect(arrangerCredit?.creditWords?.[0].formatting?.justify).toBe("right");
 
-    const rightsCredit = scorePartwise.credit?.find((c) =>
+    const rightsCredit = scorePartwise.credit?.find((c: Credit) =>
       c.creditTypes?.includes("rights"),
     );
     expect(rightsCredit).toBeDefined();
@@ -230,7 +234,7 @@ describe("Echigo-Jishi.musicxml Parser Test", () => {
     expect(scorePartwise.parts).toHaveLength(1);
     const part = scorePartwise.parts[0];
     expect(part.measures).toBeDefined();
-    const measure1 = part.measures.find((m) => m.number === "1");
+    const measure1 = part.measures.find((m: Measure) => m.number === "1");
     expect(measure1).toBeDefined();
     if (!measure1) return;
 
@@ -284,7 +288,7 @@ describe("Echigo-Jishi.musicxml Parser Test", () => {
   it("should parse lyrics in Measure 11", () => {
     if (!scorePartwise) throw new Error("scorePartwise is null");
     const measure11 = scorePartwise.parts[0].measures.find(
-      (m) => m.number === "11",
+      (m: Measure) => m.number === "11",
     );
     expect(measure11).toBeDefined();
     if (!measure11) return;

@@ -61,8 +61,10 @@ describe("Specific feature checks from samples", () => {
     const score = mapDocumentToScorePartwise(xmlDoc);
     const part = score.parts[0];
     const noteWithSlur = part.measures
-      .flatMap((m) => getNotesFromContent(m.content))
-      .find((n) => n.notations?.slurs?.some((s) => s.type === "start"));
+      .flatMap((m: Measure) => getNotesFromContent(m.content))
+      .find((n: Note) =>
+        n.notations?.slurs?.some((s: any) => s.type === "start"),
+      );
     expect(noteWithSlur).toBeDefined();
   });
 
@@ -74,8 +76,8 @@ describe("Specific feature checks from samples", () => {
     const xmlDoc = await parseMusicXmlString(xmlString);
     if (!xmlDoc) throw new Error("MozartTrio.musicxml failed to parse");
     const score = mapDocumentToScorePartwise(xmlDoc);
-    const measureWithTranspose = score.parts[0].measures.find((m) =>
-      getAttributesFromContent(m.content).some((a) => a.transpose),
+    const measureWithTranspose = score.parts[0].measures.find((m: Measure) =>
+      getAttributesFromContent(m.content).some((a: Attributes) => a.transpose),
     );
     expect(measureWithTranspose).toBeDefined();
     const transpose = getAttributesFromContent(
@@ -93,8 +95,10 @@ describe("Specific feature checks from samples", () => {
     if (!xmlDoc) throw new Error("DebuMandSample.musicxml failed to parse");
     const score = mapDocumentToScorePartwise(xmlDoc);
     const noteWithStaccato = score.parts[0].measures
-      .flatMap((m) => getNotesFromContent(m.content))
-      .find((n) => n.notations?.articulations?.some((a) => a.staccato));
+      .flatMap((m: Measure) => getNotesFromContent(m.content))
+      .find((n: Note) =>
+        n.notations?.articulations?.some((a: any) => a.staccato),
+      );
     expect(noteWithStaccato).toBeDefined();
   });
 

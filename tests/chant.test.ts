@@ -142,7 +142,7 @@ describe("Chant.musicxml Parser Test", () => {
     expect(scorePartwise.parts).toHaveLength(1);
     const part = scorePartwise.parts[0];
     expect(part.measures).toBeDefined();
-    const measure1 = part.measures.find((m) => m.number === "1");
+    const measure1 = part.measures.find((m: Measure) => m.number === "1");
     expect(measure1).toBeDefined();
     if (!measure1) return;
 
@@ -201,7 +201,7 @@ describe("Chant.musicxml Parser Test", () => {
     // Based on Chant.xml, the barline is a direct child, not in a 'content' array per se in the typical sense.
     // It will be mapped as a MeasureContent item with _type: 'barline'.
     const barlineElement = measure1.content?.find(
-      (item) => (item as any)._type === "barline",
+      (item: any) => (item as any)._type === "barline",
     );
     expect(barlineElement).toBeDefined();
     // @ts-ignore
@@ -214,7 +214,7 @@ describe("Chant.musicxml Parser Test", () => {
   it("should parse slurs in Measure 1", () => {
     if (!scorePartwise) throw new Error("scorePartwise is null");
     const measure1 = scorePartwise.parts[0].measures.find(
-      (m) => m.number === "1",
+      (m: Measure) => m.number === "1",
     );
     if (!measure1) throw new Error("Measure 1 not found");
     const notesInMeasure1 = getNotesFromContent(measure1.content);

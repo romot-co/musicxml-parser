@@ -4,7 +4,6 @@ export type { Note } from "../schemas/note";
 export type { Measure } from "../schemas/measure";
 export type { Part } from "../schemas/part";
 export type { ScorePart } from "../schemas/scorePart";
-export type { PartGroup } from "../schemas/partGroup";
 export type { PartList } from "../schemas/partList";
 export type { ScorePartwise } from "../schemas/scorePartwise";
 export type { ScoreTimewise } from "../schemas/scoreTimewise";
@@ -30,6 +29,7 @@ export type {
   Segno,
   Coda,
 } from "../schemas/direction";
+
 export type {
   Transpose,
   Diatonic,
@@ -63,10 +63,6 @@ export type {
   Tuplet,
   Ornaments,
   Technical,
-  Glissando,
-  Slide,
-  Tremolo,
-  OtherNotation,
 } from "../schemas/notations";
 export type { Barline, BarStyle, Repeat, Ending } from "../schemas/barline";
 export type { Fermata, FermataShape } from "../schemas/fermata";
@@ -107,7 +103,6 @@ export type {
   Scaling,
   PageLayout,
   SystemLayout,
-  SystemDividers,
   StaffLayout,
   Appearance,
   ConcertScore,
@@ -115,6 +110,7 @@ export type {
   WordFont,
   LyricFont,
   LyricLanguage,
+  SystemDividers,
 } from "../schemas/defaults";
 export type {
   Credit,
@@ -128,12 +124,20 @@ export type {
 export type { Harmony } from "../schemas/harmony";
 export type { Print } from "../schemas/print";
 export type { Sound } from "../schemas/sound";
-export type { TimeModification } from "../schemas/timeModification";
 export type { MeasureContent } from "../schemas/measure";
 export type { Backup } from "../schemas/backup";
 export type { Forward } from "../schemas/forward";
 export type { WavyLine } from "../schemas/wavyLine";
 export type { Footnote, Level } from "../schemas/editorial";
+export type { GroupSymbolValue } from "../schemas/partSymbol";
+export type { PartGroup } from "../schemas/partGroup";
+export type {
+  Glissando,
+  Slide,
+  Tremolo,
+  OtherNotation,
+} from "../schemas/notations";
+export type { TimeModification } from "../schemas/timeModification";
 // Add other inferred types from Zod schemas here as they are created.
 
 export type ParsedMusicXml = Record<string, unknown>;

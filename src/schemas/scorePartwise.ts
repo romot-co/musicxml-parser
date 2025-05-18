@@ -19,7 +19,8 @@ import { CreditSchema } from "./credit";
  * Represents the <score-partwise> element, the root element for a partwise MusicXML score.
  * It contains metadata about the score and the musical data organized by parts.
  */
-export const ScorePartwiseSchema = z
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const ScorePartwiseSchema: z.ZodType<any> = z
   .object({
     /**
      * The version of the MusicXML format (e.g., "3.1", "4.0").

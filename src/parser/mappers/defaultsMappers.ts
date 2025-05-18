@@ -245,7 +245,9 @@ const mapMarginsElement = (element: Element): Margins | undefined => {
 };
 
 // Helper to parse <page-layout> element
-export const mapPageLayoutElement = (element: Element): PageLayout | undefined => {
+export const mapPageLayoutElement = (
+  element: Element,
+): PageLayout | undefined => {
   if (!element) return undefined;
   const pageLayoutData: Partial<PageLayout> = {
     pageHeight: parseFloatContent(element, "page-height"),

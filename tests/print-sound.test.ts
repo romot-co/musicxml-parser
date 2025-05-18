@@ -71,7 +71,7 @@ describe("Measure print and sound parsing", () => {
     expect(print.systemLayout?.systemDistance).toBe(120);
     expect(print.staffLayout?.[0].number).toBe(1);
     expect(print.staffLayout?.[0].staffDistance).toBe(70);
-  )};
+  });
 
   it("parses additional <sound> attributes", () => {
     const xml =

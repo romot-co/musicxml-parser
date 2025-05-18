@@ -202,10 +202,10 @@ describe("Note Schema Tests (note.mod)", () => {
       expect(note.notations?.tremolos?.[0].value).toBe(3);
       expect(note.notations?.otherNotations?.[0].type).toBe("single");
     });
-  
+
     it("parses tuplets via <time-modification>", () => {
       const xml =
-        '<note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration><time-modification><actual-notes>3</actual-notes><normal-notes>2</normal-notes><normal-type>eighth</normal-type><normal-dot/></time-modification></note>';
+        "<note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration><time-modification><actual-notes>3</actual-notes><normal-notes>2</normal-notes><normal-type>eighth</normal-type><normal-dot/></time-modification></note>";
       const element = createElement(xml);
       const note = mapNoteElement(element);
       expect(note.timeModification).toBeDefined();

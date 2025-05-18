@@ -1,9 +1,5 @@
 import { z } from "zod";
-import {
-  YesNoEnum,
-  YesNoNumberSchema,
-  RotationDegreesSchema,
-} from "./common";
+import { YesNoEnum, YesNoNumberSchema, RotationDegreesSchema } from "./common";
 
 export const SoundSchema = z.object({
   _type: z.literal("sound"),

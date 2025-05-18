@@ -350,7 +350,9 @@ export const mapTimeModificationElement = (
   const actualNotes = parseNumberContent(element, "actual-notes");
   const normalNotes = parseNumberContent(element, "normal-notes");
   if (actualNotes === undefined || normalNotes === undefined) {
-    throw new Error("<time-modification> requires actual-notes and normal-notes");
+    throw new Error(
+      "<time-modification> requires actual-notes and normal-notes",
+    );
   }
   const normalType = getTextContent(element, "normal-type");
   const normalDotElements = Array.from(element.querySelectorAll("normal-dot"));
@@ -909,7 +911,8 @@ const mapDirectionTypeElement = (element: Element): DirectionType => {
       if (num !== undefined) wedgeData.number = num;
     }
     const nienteAttr = getAttribute(wedgeElement, "niente");
-    if (nienteAttr === "yes" || nienteAttr === "no") wedgeData.niente = nienteAttr;
+    if (nienteAttr === "yes" || nienteAttr === "no")
+      wedgeData.niente = nienteAttr;
     const lineTypeAttr = getAttribute(wedgeElement, "line-type");
     if (lineTypeAttr) wedgeData.lineType = lineTypeAttr;
     const dashLenAttr = getAttribute(wedgeElement, "dash-length");
@@ -1866,7 +1869,9 @@ export const mapPrintElement = (element: Element): Print => {
     const mappedSystemLayout = mapSystemLayoutElement(systemLayoutElement);
     if (mappedSystemLayout) printData.systemLayout = mappedSystemLayout;
   }
-  const staffLayoutElements = Array.from(element.querySelectorAll("staff-layout"));
+  const staffLayoutElements = Array.from(
+    element.querySelectorAll("staff-layout"),
+  );
   if (staffLayoutElements.length > 0) {
     const mapped = staffLayoutElements
       .map(mapStaffLayoutElement)
@@ -1876,7 +1881,8 @@ export const mapPrintElement = (element: Element): Print => {
 
   Object.keys(printData).forEach(
     (key) =>
-      printData[key as keyof Print] === undefined && delete printData[key as keyof Print],
+      printData[key as keyof Print] === undefined &&
+      delete printData[key as keyof Print],
   );
 
   return PrintSchema.parse(printData);
@@ -1940,9 +1946,10 @@ export const mapSoundElement = (element: Element): Sound => {
     if (!isNaN(elevation)) soundData.elevation = elevation;
   }
   if (damperPedalAttr) {
-    const val = damperPedalAttr === "yes" || damperPedalAttr === "no"
-      ? damperPedalAttr
-      : parseFloat(damperPedalAttr);
+    const val =
+      damperPedalAttr === "yes" || damperPedalAttr === "no"
+        ? damperPedalAttr
+        : parseFloat(damperPedalAttr);
     if (val === "yes" || val === "no") {
       soundData.damperPedal = val;
     } else if (!isNaN(val as number)) {
@@ -1950,9 +1957,10 @@ export const mapSoundElement = (element: Element): Sound => {
     }
   }
   if (softPedalAttr) {
-    const val = softPedalAttr === "yes" || softPedalAttr === "no"
-      ? softPedalAttr
-      : parseFloat(softPedalAttr);
+    const val =
+      softPedalAttr === "yes" || softPedalAttr === "no"
+        ? softPedalAttr
+        : parseFloat(softPedalAttr);
     if (val === "yes" || val === "no") {
       soundData.softPedal = val;
     } else if (!isNaN(val as number)) {
@@ -1960,9 +1968,10 @@ export const mapSoundElement = (element: Element): Sound => {
     }
   }
   if (sostenutoPedalAttr) {
-    const val = sostenutoPedalAttr === "yes" || sostenutoPedalAttr === "no"
-      ? sostenutoPedalAttr
-      : parseFloat(sostenutoPedalAttr);
+    const val =
+      sostenutoPedalAttr === "yes" || sostenutoPedalAttr === "no"
+        ? sostenutoPedalAttr
+        : parseFloat(sostenutoPedalAttr);
     if (val === "yes" || val === "no") {
       soundData.sostenutoPedal = val;
     } else if (!isNaN(val as number)) {
