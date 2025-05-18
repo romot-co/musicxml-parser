@@ -1,6 +1,9 @@
 import { z } from "zod";
 import { RotationDegreesSchema } from "./common";
 
+/**
+ * MIDI playback configuration for an instrument.
+ */
 export const MidiInstrumentSchema = z
   .object({
     id: z.string(),

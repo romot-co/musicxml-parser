@@ -138,6 +138,8 @@ export type { WavyLine } from "../schemas/wavyLine";
 export type { Footnote, Level } from "../schemas/editorial";
 export type { GroupSymbolValue } from "../schemas/partSymbol";
 export type { PartGroup } from "../schemas/partGroup";
+export type { ScoreInstrument } from "../schemas/scoreInstrument";
+export type { MidiInstrument } from "../schemas/midiInstrument";
 export type { FiguredBass, Figure } from "../schemas/figuredBass";
 export type { Grouping, Feature } from "../schemas/grouping";
 export type { Link } from "../schemas/link";

@@ -18,6 +18,7 @@ export const ScorePartSchema = z
     partName: z.string().optional(), // <part-name>
     /** An abbreviated name for the part. Optional. */
     partAbbreviation: z.string().optional(), // <part-abbreviation>
+    /** Initial MIDI instrument assignments */
     scoreInstruments: z.array(ScoreInstrumentSchema).optional(),
     midiDevices: z.array(MidiDeviceSchema).optional(),
     midiInstruments: z.array(MidiInstrumentSchema).optional(),

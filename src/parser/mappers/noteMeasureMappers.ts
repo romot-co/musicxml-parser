@@ -109,7 +109,9 @@ import type {
   Relation,
   Miscellaneous,
   MiscellaneousField,
-  FermataShape, // FermataShape を追加
+  FermataShape,
+  ScoreInstrument,
+  MidiInstrument,
   FiguredBass,
   Figure,
   Grouping,
@@ -232,6 +234,7 @@ import {
   MiscellaneousFieldSchema,
   FermataShapeEnum,
   PedalSchema,
+  ScoreInstrumentSchema,
   FiguredBassSchema,
   FigureSchema,
   GroupingSchema,
@@ -1508,6 +1511,49 @@ const parseOptionalFloat = (
   return isNaN(num) ? undefined : num;
 };
 
+export const mapMidiInstrumentElement = (
+  element: Element,
+): MidiInstrument => {
+  const data: Partial<MidiInstrument> = {
+    id: getAttribute(element, "id") ?? "",
+    midiChannel: parseOptionalInt(getTextContent(element, "midi-channel")),
+    midiName: getTextContent(element, "midi-name"),
+    midiBank: parseOptionalInt(getTextContent(element, "midi-bank")),
+    midiProgram: parseOptionalInt(getTextContent(element, "midi-program")),
+    midiUnpitched: parseOptionalInt(getTextContent(element, "midi-unpitched")),
+    volume: parseOptionalFloat(getTextContent(element, "volume")),
+    pan: parseOptionalFloat(getTextContent(element, "pan")),
+    elevation: parseOptionalFloat(getTextContent(element, "elevation")),
+  };
+  return MidiInstrumentSchema.parse(data);
+};
+
+export const mapScoreInstrumentElement = (
+  element: Element,
+): ScoreInstrument => {
+  const scoreInstData: Partial<ScoreInstrument> = {
+    id: getAttribute(element, "id") ?? "",
+    instrumentName: getTextContent(element, "instrument-name") ?? "",
+  };
+  const abbrev = getTextContent(element, "instrument-abbreviation");
+  if (abbrev) scoreInstData.instrumentAbbreviation = abbrev;
+  const sound = getTextContent(element, "instrument-sound");
+  if (sound) scoreInstData.instrumentSound = sound;
+  if (element.querySelector("solo")) scoreInstData.solo = true;
+  const ensembleText = getTextContent(element, "ensemble");
+  if (ensembleText) {
+    const num = parseInt(ensembleText, 10);
+    if (!isNaN(num)) scoreInstData.ensemble = num;
+  }
+  const vlib = getTextContent(element, "virtual-library");
+  if (vlib) scoreInstData.virtualLibrary = vlib;
+  const vname = getTextContent(element, "virtual-name");
+  if (vname) scoreInstData.virtualName = vname;
+  const midiElement = element.querySelector("midi-instrument");
+  if (midiElement) scoreInstData.midiInstrument = mapMidiInstrumentElement(midiElement);
+  return ScoreInstrumentSchema.parse(scoreInstData);
+};
+
 export function mapPartSymbolElement(element: Element): PartSymbol | undefined {
   if (!element) return undefined;
   const value = element.textContent?.trim();
@@ -2484,6 +2530,25 @@ export const mapMidiInstrumentElement = (
 
 // Mapper for <score-part> element (from <part-list>)
 export const mapScorePartElement = (element: Element): ScorePart => {
+  const scorePartData: Partial<ScorePart> = {
+    id: getAttribute(element, "id") ?? "",
+  };
+  const name = getTextContent(element, "part-name");
+  if (name) scorePartData.partName = name;
+  const abbr = getTextContent(element, "part-abbreviation");
+  if (abbr) scorePartData.partAbbreviation = abbr;
+  const scoreInstrumentEls = Array.from(
+    element.querySelectorAll(":scope > score-instrument"),
+  );
+  if (scoreInstrumentEls.length > 0) {
+    scorePartData.scoreInstruments = scoreInstrumentEls.map(mapScoreInstrumentElement);
+  }
+  const midiInstrumentEls = Array.from(
+    element.querySelectorAll(":scope > midi-instrument"),
+  );
+  if (midiInstrumentEls.length > 0) {
+    scorePartData.midiInstruments = midiInstrumentEls.map(mapMidiInstrumentElement);
+  }
   const scoreInstrumentElements = Array.from(
     element.querySelectorAll("score-instrument"),
   );

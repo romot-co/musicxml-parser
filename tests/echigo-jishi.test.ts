@@ -226,7 +226,19 @@ describe("Echigo-Jishi.musicxml Parser Test", () => {
     const scorePart = scorePartwise.partList.scoreParts[0];
     expect(scorePart.id).toBe("P1");
     // expect(scorePart.partName).toBe('MusicXML Part'); // print-object="no"
-    // TODO: Add checks for score-instrument, midi-instrument when their schemas are more complete
+    expect(scorePart.scoreInstruments).toBeDefined();
+    expect(scorePart.scoreInstruments?.length).toBe(1);
+    const instrument = scorePart.scoreInstruments?.[0];
+    expect(instrument?.id).toBe("P1-I2");
+    expect(instrument?.instrumentName).toBe("Koto");
+    expect(scorePart.midiInstruments).toBeDefined();
+    expect(scorePart.midiInstruments?.length).toBe(1);
+    const midi = scorePart.midiInstruments?.[0];
+    expect(midi?.id).toBe("P1-I2");
+    expect(midi?.midiChannel).toBe(1);
+    expect(midi?.midiProgram).toBe(108);
+    expect(midi?.volume).toBe(80);
+    expect(midi?.pan).toBe(0);
   });
 
   it("should parse a specific measure and its contents (Measure 1)", () => {

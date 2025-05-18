@@ -30,6 +30,8 @@ export * from "./stem";
 export * from "./beam";
 export * from "./partSymbol";
 export * from "./partGroup";
+export * from "./scoreInstrument";
+export * from "./midiInstrument";
 export * from "./grace";
 export * from "./cue";
 export * from "./unpitched";
