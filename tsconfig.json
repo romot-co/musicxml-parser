@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",                       /* ECMAScript のターゲットバージョンを指定します */
+    "module": "commonjs",                     /* 使用するモジュールシステムを指定します */
+    // "rootDir": "./src", // Temporarily commenting out or removing to avoid issues with files outside src
+    "outDir": "./dist",                       /* 出力ディレクトリの場所を指定します */
+    "esModuleInterop": true,                  /* CommonJSとESモジュールの相互運用を可能にします */
+    "forceConsistentCasingInFileNames": true, /* ファイル名の大文字・小文字を強制します */
+    "strict": true,                           /* すべての厳格な型チェックオプションを有効にします */
+    "skipLibCheck": true,                     /* すべての宣言ファイル (*.d.ts) の型チェックをスキップします */
+    "declaration": true,                      /* 対応する '.d.ts' ファイルを生成します */
+    "sourceMap": true,                        /* ソースマップファイル (.map) を生成します */
+    "baseUrl": ".",                           /* モジュール解決のベースディレクトリを指定します */
+    "paths": {                                /* モジュール名のエイリアス設定 */
+      "@/*": ["src/*"]
+    },
+    "types": ["vitest/globals", "node"]
+  },
+  "include": ["src/**/*", "tests/**/*", "vitest.config.ts"],
+  "exclude": ["node_modules", "dist"]
+} 
