@@ -8,7 +8,8 @@ export const TextFormattingSchema = z.object({
   defaultX: z.number().optional(),
   defaultY: z.number().optional(),
   valign: z.enum(['top', 'middle', 'bottom', 'baseline']).optional(),
-  // ... other attributes like Smufl, color, text-decoration etc.
+  // ... other attributes like Smufl, text-decoration etc.
+  color: z.string().optional(),
 }).merge(FontSchema); // Include font attributes
 
 // Placeholder for symbol formatting attributes (simplified)

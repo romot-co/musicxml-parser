@@ -20,6 +20,11 @@ export type {
   Metronome,
   MetronomeBeatUnit,
   MetronomePerMinute,
+  Dynamics,
+  Pedal,
+  Wedge,
+  Segno,
+  Coda,
 } from '../schemas/direction';
 export type { Transpose, Diatonic, Chromatic, OctaveChange, Double } from '../schemas/transpose';
 export type { StaffDetails, StaffTuning, LineDetail } from '../schemas/staffDetails';
