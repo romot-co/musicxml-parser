@@ -76,6 +76,20 @@ describe('Barline Schema Tests', () => {
       expect(barline.location).toBe('middle');
       expect(barline.barStyle).toBe('dotted');
     });
+
+    it('should parse coda mark in <barline>', () => {
+      const xml = `<barline><coda/></barline>`;
+      const element = createElement(xml);
+      const barline = mapBarlineElement(element);
+      expect(barline.coda).toBeDefined();
+    });
+
+    it('should parse segno mark in <barline>', () => {
+      const xml = `<barline><segno/></barline>`;
+      const element = createElement(xml);
+      const barline = mapBarlineElement(element);
+      expect(barline.segno).toBeDefined();
+    });
     
     // TODO: Add tests for coda, segno, fermata within barline if applicable via mapBarlineElement
   });

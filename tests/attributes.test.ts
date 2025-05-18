@@ -92,6 +92,44 @@ describe('Attributes Schema Tests', () => {
       expect(attributes.staves).toBe(2);
     });
 
+    it('should parse <part-symbol> within attributes', () => {
+      const xml = `<attributes><part-symbol group-symbol="brace" top-staff="1" bottom-staff="2">brace</part-symbol></attributes>`;
+      const element = createElement(xml);
+      const attributes = mapAttributesElement(element);
+      expect(attributes.partSymbol).toBeDefined();
+      expect(attributes.partSymbol?.value).toBe('brace');
+      expect(attributes.partSymbol?.groupSymbol).toBe('brace');
+      expect(attributes.partSymbol?.topStaff).toBe(1);
+      expect(attributes.partSymbol?.bottomStaff).toBe(2);
+    });
+
+    it('should parse <transpose> within attributes', () => {
+      const xml = `<attributes><transpose number="1"><chromatic>-3</chromatic><diatonic>-2</diatonic><octave-change>-1</octave-change></transpose></attributes>`;
+      const element = createElement(xml);
+      const attributes = mapAttributesElement(element);
+      expect(attributes.transpose).toBeDefined();
+      const transpose = attributes.transpose!;
+      expect(transpose.chromatic).toBe(-3);
+      expect(transpose.diatonic).toBe(-2);
+      expect(transpose.octaveChange).toBe(-1);
+      expect(transpose.number).toBe(1);
+    });
+
+    it('should parse <staff-details> within attributes', () => {
+      const xml = `<attributes><staff-details number="1" print-object="yes"><staff-lines>5</staff-lines><capo>2</capo><staff-size scaling="1.2">100</staff-size></staff-details></attributes>`;
+      const element = createElement(xml);
+      const attributes = mapAttributesElement(element);
+      expect(attributes.staffDetails).toBeDefined();
+      expect(attributes.staffDetails).toHaveLength(1);
+      const sd = attributes.staffDetails![0];
+      expect(sd.number).toBe(1);
+      expect(sd.staffLines).toBe(5);
+      expect(sd.capo).toBe(2);
+      expect(sd.staffSize?.value).toBe(100);
+      expect(sd.staffSize?.scaling).toBe(1.2);
+      expect(sd.printObject).toBe('yes');
+    });
+
     // TODO: Add tests for part-symbol, instruments, staff-details, transpose, measure-style
 
     it('should parse <measure-style> with <multiple-rest>', () => {

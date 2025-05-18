@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { mapNoteElement } from '../src/parser/mappers';
-import type { Note, Pitch, Rest, Lyric, Beam, Slur } from '../src/types'; // Added more types as needed
+import type { Note, Pitch, Rest, Lyric, Beam, Slur, Ornaments } from '../src/types';
 import { JSDOM } from 'jsdom';
 
 // Helper to create an Element from an XML string snippet
@@ -133,6 +133,27 @@ describe('Note Schema Tests (note.mod)', () => {
       const element = createElement(xml);
       const note = mapNoteElement(element);
       expect(note.printLeger).toBe('no');
+    });
+
+    it('should parse <tie> elements on a note', () => {
+      const xml = '<note><pitch><step>A</step><octave>4</octave></pitch><duration>4</duration><tie type="start"/><tie type="stop"/></note>';
+      const element = createElement(xml);
+      const note = mapNoteElement(element);
+      expect(note.ties).toBeDefined();
+      expect(note.ties).toHaveLength(2);
+      expect(note.ties?.[0].type).toBe('start');
+      expect(note.ties?.[1].type).toBe('stop');
+    });
+
+    it('should parse ornaments inside <notations>', () => {
+      const xml = '<note><pitch><step>B</step><octave>4</octave></pitch><duration>2</duration><notations><ornaments><trill-mark placement="above"/><tremolo type="single">3</tremolo></ornaments></notations></note>';
+      const element = createElement(xml);
+      const note = mapNoteElement(element);
+      expect(note.notations?.ornaments).toBeDefined();
+      const ornaments = note.notations?.ornaments as Ornaments;
+      expect(ornaments.trillMark?.[0].placement).toBe('above');
+      expect(ornaments.tremolo?.[0].type).toBe('single');
+      expect(ornaments.tremolo?.[0].value).toBe(3);
     });
 
     // TODO: Add tests for tie, time-modification, notations (articulations, ornaments, technical), etc.

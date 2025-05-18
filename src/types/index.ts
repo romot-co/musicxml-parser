@@ -30,6 +30,9 @@ export type {
   Articulations,
   Staccato,
   Accent,
+  Ornaments,
+  TrillMark,
+  Tremolo,
 } from '../schemas/notations';
 export type { Barline, BarStyle, Repeat, Ending } from '../schemas/barline';
 export type { Work } from '../schemas/work';

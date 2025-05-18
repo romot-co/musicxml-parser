@@ -38,6 +38,9 @@ import type {
   Articulations,
   Staccato,
   Accent,
+  Ornaments,
+  TrillMark,
+  Tremolo,
   Barline,
   BarStyle,
   Repeat,
@@ -114,6 +117,9 @@ import {
   ArticulationsSchema,
   StaccatoSchema,
   AccentSchema,
+  OrnamentsSchema,
+  TrillMarkSchema,
+  TremoloSchema,
   BarlineSchema,
   RepeatSchema,
   EndingSchema,
@@ -453,6 +459,31 @@ const mapArticulationsElement = (element: Element): Articulations => {
   return ArticulationsSchema.parse(articulationsData);
 };
 
+const mapOrnamentsElement = (element: Element): Ornaments => {
+  const trillMarkElements = Array.from(element.querySelectorAll('trill-mark'));
+  const tremoloElements = Array.from(element.querySelectorAll('tremolo'));
+
+  const ornamentsData: Partial<Ornaments> = {};
+
+  if (trillMarkElements.length > 0) {
+    ornamentsData.trillMark = trillMarkElements.map(el => {
+      const placement = getAttribute(el, 'placement') as 'above' | 'below' | undefined;
+      return TrillMarkSchema.parse({ placement });
+    });
+  }
+
+  if (tremoloElements.length > 0) {
+    ornamentsData.tremolo = tremoloElements.map(el => {
+      const type = getAttribute(el, 'type') as 'single' | 'start' | 'stop' | undefined;
+      const valueText = el.textContent?.trim();
+      const valueNum = valueText ? parseInt(valueText, 10) : undefined;
+      return TremoloSchema.parse({ type, value: isNaN(Number(valueNum)) ? undefined : valueNum });
+    });
+  }
+
+  return OrnamentsSchema.parse(ornamentsData);
+};
+
 // Helper function to map a <words> element (within <direction-type>)
 const mapWordsElement = (element: Element): Words => {
   const text = element.textContent?.trim() ?? '';
@@ -567,6 +598,7 @@ export const mapDirectionElement = (element: Element): Direction => {
 const mapNotationsElement = (element: Element): Notations => {
   const slurElements = Array.from(element.querySelectorAll('slur'));
   const articulationsElements = Array.from(element.querySelectorAll('articulations'));
+  const ornamentsElement = element.querySelector('ornaments');
   // TODO: Query for other notation types like <tied>, <tuplet>, <ornaments>, <technical>
 
   const notationsData: Partial<Notations> = {};
@@ -576,6 +608,9 @@ const mapNotationsElement = (element: Element): Notations => {
   }
   if (articulationsElements.length > 0) {
     notationsData.articulations = articulationsElements.map(mapArticulationsElement);
+  }
+  if (ornamentsElement) {
+    notationsData.ornaments = mapOrnamentsElement(ornamentsElement);
   }
 
   return NotationsSchema.parse(notationsData);
