@@ -9,7 +9,7 @@ The primary goal is to provide a robust foundation for applications that need to
 This project is currently in **Phase 1: Core Parsing Functionality**.
 
 **Implemented Features:**
-*   Parses MusicXML strings into a DOM Document (primarily for browser environments, with `jsdom` for Node.js testing).
+*   Parses MusicXML strings into a DOM Document. In Node.js, the parser dynamically loads `jsdom` if `DOMParser` is missing.
 *   Defines Zod schemas for core MusicXML elements:
     *   `<pitch>`
     *   `<rest>`
@@ -24,7 +24,7 @@ This project is currently in **Phase 1: Core Parsing Functionality**.
 *   Basic unit tests for the core parsing and mapping logic.
 
 **Design Choices:**
-*   **DOM-based Parsing:** Utilizes `DOMParser` (or `jsdom` in Node.js) to build a Document Object Model from the MusicXML string. This approach was chosen for its suitability for both transformation and potential future editing capabilities, offering easier random access and manipulation of the XML structure compared to SAX-based parsing.
+*   **DOM-based Parsing:** Utilizes `DOMParser` in browsers and loads `jsdom` on demand in Node.js to build a Document Object Model from the MusicXML string. This approach was chosen for its suitability for both transformation and potential future editing capabilities, offering easier random access and manipulation of the XML structure compared to SAX-based parsing.
 *   **Zod for Schema Definition and Validation:** Zod provides strong type safety by inferring TypeScript types directly from schemas and enabling robust runtime validation. This ensures data integrity and improves developer experience.
 *   **Structured Intermediate Representation:** The parser outputs a JavaScript object that closely mirrors the MusicXML `<score-partwise>` structure, making it intuitive to work with.
 
@@ -33,6 +33,8 @@ This project is currently in **Phase 1: Core Parsing Functionality**.
 ```bash
 npm install your-musicxml-parser-package-name # Replace with actual package name once published
 ```
+
+For Node.js environments, install `jsdom` (or another DOM implementation) so that `parseMusicXmlString` can create a `DOMParser` when one is not provided by the runtime.
 
 ## Usage
 
