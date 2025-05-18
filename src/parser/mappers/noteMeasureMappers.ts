@@ -904,7 +904,7 @@ const mapEndingElement = (element: Element): Ending => {
       '<ending> element requires "number" and "type" attributes.',
     );
   }
-  const endingData = {
+  const endingData: Partial<Ending> = {
     number: number,
     type: type,
     text: element.textContent?.trim() || undefined,
@@ -913,6 +913,64 @@ const mapEndingElement = (element: Element): Ending => {
       | "no"
       | undefined,
   };
+
+  const defaultXAttr = getAttribute(element, "default-x");
+  const defaultYAttr = getAttribute(element, "default-y");
+  const relativeXAttr = getAttribute(element, "relative-x");
+  const relativeYAttr = getAttribute(element, "relative-y");
+  const fontFamily = getAttribute(element, "font-family");
+  const fontStyleAttr = getAttribute(element, "font-style");
+  const fontSize = getAttribute(element, "font-size");
+  const fontWeightAttr = getAttribute(element, "font-weight");
+  const colorAttr = getAttribute(element, "color");
+  const systemAttr = getAttribute(element, "system") as
+    | "none"
+    | "only-top"
+    | "also-top"
+    | undefined;
+  const endLengthAttr = getAttribute(element, "end-length");
+  const textXAttr = getAttribute(element, "text-x");
+  const textYAttr = getAttribute(element, "text-y");
+
+  if (defaultXAttr) {
+    const val = parseFloat(defaultXAttr);
+    if (!isNaN(val)) endingData.defaultX = val;
+  }
+  if (defaultYAttr) {
+    const val = parseFloat(defaultYAttr);
+    if (!isNaN(val)) endingData.defaultY = val;
+  }
+  if (relativeXAttr) {
+    const val = parseFloat(relativeXAttr);
+    if (!isNaN(val)) endingData.relativeX = val;
+  }
+  if (relativeYAttr) {
+    const val = parseFloat(relativeYAttr);
+    if (!isNaN(val)) endingData.relativeY = val;
+  }
+  if (fontFamily) endingData.fontFamily = fontFamily;
+  if (fontSize) endingData.fontSize = fontSize;
+  if (colorAttr) endingData.color = colorAttr;
+  if (fontStyleAttr === "normal" || fontStyleAttr === "italic") {
+    endingData.fontStyle = fontStyleAttr;
+  }
+  if (fontWeightAttr === "normal" || fontWeightAttr === "bold") {
+    endingData.fontWeight = fontWeightAttr;
+  }
+  if (systemAttr) endingData.system = systemAttr;
+  if (endLengthAttr) {
+    const val = parseFloat(endLengthAttr);
+    if (!isNaN(val)) endingData.endLength = val;
+  }
+  if (textXAttr) {
+    const val = parseFloat(textXAttr);
+    if (!isNaN(val)) endingData.textX = val;
+  }
+  if (textYAttr) {
+    const val = parseFloat(textYAttr);
+    if (!isNaN(val)) endingData.textY = val;
+  }
+
   return EndingSchema.parse(endingData);
 };
 

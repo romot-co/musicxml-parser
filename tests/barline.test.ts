@@ -132,5 +132,26 @@ describe("Barline Schema Tests", () => {
       expect(barline.divisions).toBe(480);
       expect(barline.id).toBe("b1");
     });
+
+    it("should parse ending attributes like end-length and system", () => {
+      const xml = `<barline><ending type="start" number="1" end-length="5" text-x="2" text-y="3" system="only-top" default-x="1" default-y="2" relative-x="-1" relative-y="-2" font-family="Arial" font-style="italic" font-size="12" font-weight="bold" color="#111111">1.</ending></barline>`;
+      const element = createElement(xml);
+      const barline = mapBarlineElement(element);
+      expect(barline.ending).toBeDefined();
+      const ending = barline.ending as Ending;
+      expect(ending.endLength).toBe(5);
+      expect(ending.textX).toBe(2);
+      expect(ending.textY).toBe(3);
+      expect(ending.system).toBe("only-top");
+      expect(ending.defaultX).toBe(1);
+      expect(ending.defaultY).toBe(2);
+      expect(ending.relativeX).toBe(-1);
+      expect(ending.relativeY).toBe(-2);
+      expect(ending.fontFamily).toBe("Arial");
+      expect(ending.fontStyle).toBe("italic");
+      expect(ending.fontSize).toBe("12");
+      expect(ending.fontWeight).toBe("bold");
+      expect(ending.color).toBe("#111111");
+    });
   });
 });
