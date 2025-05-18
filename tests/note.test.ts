@@ -1,6 +1,15 @@
 import { describe, it, expect } from "vitest";
 import { mapNoteElement } from "../src/parser/mappers";
-import type { Note, Pitch, Rest, Lyric, Beam, Slur } from "../src/types"; // Added more types as needed
+import type {
+  Note,
+  Pitch,
+  Rest,
+  Lyric,
+  Beam,
+  Slur,
+  Tie,
+  TimeModification,
+} from "../src/types";
 import { JSDOM } from "jsdom";
 
 // Helper to create an Element from an XML string snippet
@@ -258,6 +267,52 @@ describe("Note Schema Tests (note.mod)", () => {
       expect(note.timeModification?.normalDots).toHaveLength(1);
     });
 
-    // TODO: Add tests for tie, time-modification, notations (articulations, ornaments, technical), etc.
+    it("parses tie elements at the note level", () => {
+      const xml =
+        '<note><pitch><step>C</step><octave>4</octave></pitch><duration>4</duration><tie type="start"/><tie type="stop"/></note>';
+      const element = createElement(xml);
+      const note = mapNoteElement(element);
+      expect(note.ties).toBeDefined();
+      expect(note.ties).toHaveLength(2);
+      const [t1, t2] = note.ties as Tie[];
+      expect(t1.type).toBe("start");
+      expect(t2.type).toBe("stop");
+    });
+
+    it("parses minimal <time-modification>", () => {
+      const xml =
+        '<note><pitch><step>A</step><octave>4</octave></pitch><duration>2</duration><time-modification><actual-notes>5</actual-notes><normal-notes>4</normal-notes></time-modification></note>';
+      const element = createElement(xml);
+      const note = mapNoteElement(element);
+      const tm = note.timeModification as TimeModification;
+      expect(tm.actualNotes).toBe(5);
+      expect(tm.normalNotes).toBe(4);
+      expect(tm.normalType).toBeUndefined();
+      expect(tm.normalDots).toBeUndefined();
+    });
+
+    it("parses multiple normal-dot elements in <time-modification>", () => {
+      const xml =
+        '<note><pitch><step>B</step><octave>4</octave></pitch><duration>1</duration><time-modification><actual-notes>3</actual-notes><normal-notes>2</normal-notes><normal-dot/><normal-dot/></time-modification></note>';
+      const element = createElement(xml);
+      const note = mapNoteElement(element);
+      expect(note.timeModification?.normalDots).toHaveLength(2);
+    });
+
+    it("parses complex notations with articulations, ornaments and technical", () => {
+      const xml =
+        '<note><pitch><step>E</step><octave>4</octave></pitch><duration>1</duration><notations><articulations placement="below"><accent/><staccato/></articulations><articulations><tenuto/></articulations><ornaments/><technical/></notations></note>';
+      const element = createElement(xml);
+      const note = mapNoteElement(element);
+      expect(note.notations?.articulations).toHaveLength(2);
+      const art1 = note.notations?.articulations?.[0];
+      const art2 = note.notations?.articulations?.[1];
+      expect(art1?.accent).toBeDefined();
+      expect(art1?.staccato).toBeDefined();
+      expect(art1?.placement).toBe("below");
+      expect(art2?.tenuto).toBeDefined();
+      expect(note.notations?.ornaments).toHaveLength(1);
+      expect(note.notations?.technical).toHaveLength(1);
+    });
   });
 });
