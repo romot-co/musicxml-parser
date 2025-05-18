@@ -62,6 +62,10 @@ export type {
   Tuplet,
   Ornaments,
   Technical,
+  Glissando,
+  Slide,
+  Tremolo,
+  OtherNotation,
 } from "../schemas/notations";
 export type { Barline, BarStyle, Repeat, Ending } from "../schemas/barline";
 export type { Fermata, FermataShape } from "../schemas/fermata";

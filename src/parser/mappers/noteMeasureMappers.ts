@@ -48,6 +48,10 @@ import type {
   Tuplet,
   Ornaments,
   Technical,
+  Glissando,
+  Slide,
+  Tremolo,
+  OtherNotation,
   Tie,
   Barline,
   BarStyle,
@@ -148,6 +152,10 @@ import {
   TupletSchema,
   OrnamentsSchema,
   TechnicalSchema,
+  GlissandoSchema,
+  SlideSchema,
+  TremoloSchema,
+  OtherNotationSchema,
   TieSchema,
   BarlineSchema,
   WavyLineSchema,
@@ -627,6 +635,62 @@ const mapTechnicalElement = (_element: Element): Technical => {
   return TechnicalSchema.parse({});
 };
 
+const mapGlissandoElement = (element: Element): Glissando => {
+  const glissandoData: Partial<Glissando> = {
+    value: element.textContent?.trim() || undefined,
+    type: getAttribute(element, "type") as "start" | "stop" | undefined,
+    number: parseOptionalNumberAttribute(element, "number"),
+  };
+  if (!glissandoData.type) {
+    throw new Error('<glissando> element requires a "type" attribute.');
+  }
+  return GlissandoSchema.parse(glissandoData);
+};
+
+const mapSlideElement = (element: Element): Slide => {
+  const slideData: Partial<Slide> = {
+    value: element.textContent?.trim() || undefined,
+    type: getAttribute(element, "type") as "start" | "stop" | undefined,
+    number: parseOptionalNumberAttribute(element, "number"),
+  };
+  if (!slideData.type) {
+    throw new Error('<slide> element requires a "type" attribute.');
+  }
+  return SlideSchema.parse(slideData);
+};
+
+const mapTremoloElement = (element: Element): Tremolo => {
+  const valueText = element.textContent?.trim();
+  const marks = valueText ? parseInt(valueText, 10) : undefined;
+  const tremoloData: Partial<Tremolo> = {
+    value: marks ?? 0,
+  };
+  const typeAttr = getAttribute(element, "type") as
+    | "single"
+    | "start"
+    | "stop"
+    | "unmeasured"
+    | undefined;
+  if (typeAttr) tremoloData.type = typeAttr;
+  return TremoloSchema.parse(tremoloData);
+};
+
+const mapOtherNotationElement = (element: Element): OtherNotation => {
+  const data: Partial<OtherNotation> = {
+    value: element.textContent?.trim() || undefined,
+    type: getAttribute(element, "type") as
+      | "start"
+      | "stop"
+      | "single"
+      | undefined,
+    number: parseOptionalNumberAttribute(element, "number"),
+  };
+  if (!data.type) {
+    throw new Error('<other-notation> element requires a "type" attribute.');
+  }
+  return OtherNotationSchema.parse(data);
+};
+
 // Helper function to map a <words> element (within <direction-type>)
 const mapWordsElement = (element: Element): Words => {
   const text = element.textContent?.trim() ?? "";
@@ -843,6 +907,12 @@ const mapNotationsElement = (element: Element): Notations => {
   const tupletElements = Array.from(element.querySelectorAll("tuplet"));
   const ornamentsElements = Array.from(element.querySelectorAll("ornaments"));
   const technicalElements = Array.from(element.querySelectorAll("technical"));
+  const glissandoElements = Array.from(element.querySelectorAll("glissando"));
+  const slideElements = Array.from(element.querySelectorAll("slide"));
+  const tremoloElements = Array.from(element.querySelectorAll("tremolo"));
+  const otherNotationElements = Array.from(
+    element.querySelectorAll("other-notation"),
+  );
 
   const notationsData: Partial<Notations> = {};
 
@@ -865,6 +935,20 @@ const mapNotationsElement = (element: Element): Notations => {
   }
   if (technicalElements.length > 0) {
     notationsData.technical = technicalElements.map(mapTechnicalElement);
+  }
+  if (glissandoElements.length > 0) {
+    notationsData.glissandos = glissandoElements.map(mapGlissandoElement);
+  }
+  if (slideElements.length > 0) {
+    notationsData.slides = slideElements.map(mapSlideElement);
+  }
+  if (tremoloElements.length > 0) {
+    notationsData.tremolos = tremoloElements.map(mapTremoloElement);
+  }
+  if (otherNotationElements.length > 0) {
+    notationsData.otherNotations = otherNotationElements.map(
+      mapOtherNotationElement,
+    );
   }
 
   return NotationsSchema.parse(notationsData);
