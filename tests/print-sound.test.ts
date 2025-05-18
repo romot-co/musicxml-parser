@@ -31,4 +31,29 @@ describe("Measure print and sound parsing", () => {
     expect(sound._type).toBe("sound");
     expect(sound.tempo).toBe(120);
   });
+
+  it("parses additional <sound> attributes", () => {
+    const xml =
+      `<measure number="1"><sound tempo="90" dacapo="yes" segno="seg1" dalsegno="ds1" ` +
+      `pizzicato="yes" pan="30" elevation="10" damper-pedal="50" soft-pedal="no" ` +
+      `sostenuto-pedal="yes" divisions="2" forward-repeat="no" fine="end" time-only="1,3" id="s1"/></measure>`;
+    const element = createElement(xml);
+    const measure = mapMeasureElement(element);
+    const sound = (measure.content?.[0] as Sound) ?? {};
+    expect(sound.tempo).toBe(90);
+    expect(sound.dacapo).toBe("yes");
+    expect(sound.segno).toBe("seg1");
+    expect(sound.dalsegno).toBe("ds1");
+    expect(sound.pizzicato).toBe("yes");
+    expect(sound.pan).toBe(30);
+    expect(sound.elevation).toBe(10);
+    expect(sound.damperPedal).toBe(50);
+    expect(sound.softPedal).toBe("no");
+    expect(sound.sostenutoPedal).toBe("yes");
+    expect(sound.divisions).toBe(2);
+    expect(sound.forwardRepeat).toBe("no");
+    expect(sound.fine).toBe("end");
+    expect(sound.timeOnly).toBe("1,3");
+    expect(sound.id).toBe("s1");
+  });
 });
