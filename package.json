@@ -1,4 +1,17 @@
 {
+  "name": "musicxml-parser",
+  "version": "0.1.0",
+  "description": "MusicXML parser",
+  "author": "Romot",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/romot-co/musicxml-parser.git"
+  },
+  "bugs": {
+    "url": "https://github.com/romot-co/musicxml-parser/issues"
+  },
+  "homepage": "https://github.com/romot-co/musicxml-parser#readme",
   "devDependencies": {
     "@types/jsdom": "^21.1.7",
     "@types/node": "^22.15.18",
@@ -22,9 +35,11 @@
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix",
     "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\"",
     "test": "vitest run",
     "test:watch": "vitest watch",
     "coverage": "vitest run --coverage",
+    "type-check": "tsc --noEmit",
     "prepare": "npm run build"
   }
 }
