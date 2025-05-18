@@ -86,6 +86,19 @@ if (doc) {
 }
 ```
 
+### Conversion Utilities
+
+Once you have a `ScorePartwise` object you can convert it into other formats:
+
+```typescript
+import { toMusicJson, toYaml, toToneJsSequence, toMidi } from 'your-musicxml-parser-package-name';
+
+const json = toMusicJson(score);
+const yamlString = toYaml(score);
+const toneSeq = toToneJsSequence(score);
+const midi = toMidi(score);
+```
+
 ## Project Structure
 
 *   `src/`: Source code
