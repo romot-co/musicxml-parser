@@ -2,10 +2,11 @@ import { z } from "zod";
 import { FontSchema, MarginsSchema, LineWidthSchema } from "./common";
 
 // Placeholders for complex layout and appearance types
-export const ScalingSchema = z.object({
-  // TODO: Define scaling details (millimeters, tenths)
-  millimeters: z.number().optional(),
-  tenths: z.number().optional(),
+export const ScalingSchema = z.object({ // TODO: Define scaling details (millimeters, tenths)
+  /** Distance in millimeters between one tenth and the next. */
+  millimeters: z.number(),
+  /** Number of tenths per staff space. */
+  tenths: z.number(),
 });
 export const PageLayoutSchema = z.object({
   pageHeight: z.number().optional(),

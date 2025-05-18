@@ -115,6 +115,8 @@ describe("Echigo-Jishi.musicxml Parser Test", () => {
     expect(scorePartwise.defaults?.scaling).toBeDefined();
     expect(scorePartwise.defaults?.scaling?.millimeters).toBe(7.2319);
     expect(scorePartwise.defaults?.scaling?.tenths).toBe(40);
+    expect(typeof scorePartwise.defaults?.scaling?.millimeters).toBe('number');
+    expect(typeof scorePartwise.defaults?.scaling?.tenths).toBe('number');
   });
 
   it("should parse defaults page-layout (basic check)", () => {
