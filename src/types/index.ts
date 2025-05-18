@@ -128,7 +128,7 @@ export type {
   TextFormatting,
   SymbolFormatting,
 } from "../schemas/credit";
-export type { Harmony } from "../schemas/harmony";
+export type { Harmony, Frame, FrameNote, FirstFret } from "../schemas/harmony";
 export type { Print } from "../schemas/print";
 export type { Sound } from "../schemas/sound";
 export type { MeasureContent } from "../schemas/measure";
