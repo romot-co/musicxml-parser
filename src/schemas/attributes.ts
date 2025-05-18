@@ -14,7 +14,6 @@ export const AttributesSchema = z.object({
   time: z.array(TimeSchema).optional(), // <time> can appear multiple times
   clef: z.array(ClefSchema).optional(), // <clef> can appear multiple times
   transpose: z.array(TransposeSchema).optional(),
-  instruments: z.number().int().positive().optional(),
   staves: z.number().int().positive().optional(),
   /** Number of instruments represented in the part */
   instruments: z.number().int().positive().optional(),

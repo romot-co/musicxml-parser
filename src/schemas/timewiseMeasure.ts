@@ -5,7 +5,8 @@ import { TimewisePartSchema } from "./timewisePart";
  * Represents a measure in timewise format. Each measure contains the
  * musical data for all parts occurring at the same time position.
  */
-export const TimewiseMeasureSchema = z
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const TimewiseMeasureSchema: z.ZodType<any> = z
   .object({
     number: z.string(),
     implicit: z.boolean().optional(),

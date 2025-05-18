@@ -68,7 +68,6 @@ export const TupletSchema = z.object({
 });
 export type Tuplet = z.infer<typeof TupletSchema>;
 
-
 /**
  * Represents a glissando notation.
  */
@@ -230,6 +229,7 @@ export const TechnicalSchema = z.object({
   taps: z.array(TapSchema).optional(),
   otherTechnical: z.array(OtherTechnicalSchema).optional(),
 });
+export type Technical = z.infer<typeof TechnicalSchema>;
 
 /**
  * Represents an other-notation element.

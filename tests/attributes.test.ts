@@ -126,7 +126,7 @@ describe("Attributes Schema Tests", () => {
       const attributes = mapAttributesElement(element);
       expect(attributes.instruments).toBe(2);
     });
- 
+
     it("should parse <instruments> count", () => {
       const xml = `<attributes><instruments>5</instruments></attributes>`;
       const element = createElement(xml);

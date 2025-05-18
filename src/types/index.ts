@@ -64,6 +64,11 @@ export type {
   StrongAccent,
   Tuplet,
   Ornaments,
+  TrillMark,
+  Turn,
+  Mordent,
+  Schleifer,
+  OtherOrnament,
   Technical,
 } from "../schemas/notations";
 export type { Barline, BarStyle, Repeat, Ending } from "../schemas/barline";

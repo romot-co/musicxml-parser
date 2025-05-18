@@ -84,9 +84,7 @@ describe("Specific feature checks from samples", () => {
     expect(measureWithTranspose).toBeDefined();
     const transpose = getAttributesFromContent(
       measureWithTranspose!.content,
-    )
-      .find((a) => a.transpose && a.transpose.length > 0)!
-      .transpose?.[0];
+    ).find((a) => a.transpose && a.transpose.length > 0)!.transpose?.[0];
     expect(transpose?.chromatic).toBe(-3);
   });
 

@@ -50,6 +50,11 @@ import type {
   //StrongAccent,
   Tuplet,
   Ornaments,
+  TrillMark, // Add
+  Turn, // Add
+  Mordent, // Add
+  Schleifer, // Add
+  OtherOrnament, // Add
   Technical,
   Glissando,
   Slide,
@@ -813,13 +818,19 @@ const mapOrnamentsElement = (element: Element): Ornaments => {
   const delayedTurns = Array.from(element.querySelectorAll("delayed-turn"));
   if (delayedTurns.length) data.delayedTurns = delayedTurns.map(mapTurnElement);
   const invertedTurns = Array.from(element.querySelectorAll("inverted-turn"));
-  if (invertedTurns.length) data.invertedTurns = invertedTurns.map(mapTurnElement);
-  const delayedInvertedTurns = Array.from(element.querySelectorAll("delayed-inverted-turn"));
+  if (invertedTurns.length)
+    data.invertedTurns = invertedTurns.map(mapTurnElement);
+  const delayedInvertedTurns = Array.from(
+    element.querySelectorAll("delayed-inverted-turn"),
+  );
   if (delayedInvertedTurns.length)
     data.delayedInvertedTurns = delayedInvertedTurns.map(mapTurnElement);
   const verticalTurns = Array.from(element.querySelectorAll("vertical-turn"));
-  if (verticalTurns.length) data.verticalTurns = verticalTurns.map(mapTrillLikeElement);
-  const invertedVerticalTurns = Array.from(element.querySelectorAll("inverted-vertical-turn"));
+  if (verticalTurns.length)
+    data.verticalTurns = verticalTurns.map(mapTrillLikeElement);
+  const invertedVerticalTurns = Array.from(
+    element.querySelectorAll("inverted-vertical-turn"),
+  );
   if (invertedVerticalTurns.length)
     data.invertedVerticalTurns = invertedVerticalTurns.map(mapTrillLikeElement);
   const shakes = Array.from(element.querySelectorAll("shake"));
@@ -828,8 +839,11 @@ const mapOrnamentsElement = (element: Element): Ornaments => {
   if (wavyLines.length) data.wavyLines = wavyLines.map(mapWavyLineElement);
   const mordents = Array.from(element.querySelectorAll("mordent"));
   if (mordents.length) data.mordents = mordents.map(mapMordentElement);
-  const invertedMordents = Array.from(element.querySelectorAll("inverted-mordent"));
-  if (invertedMordents.length) data.invertedMordents = invertedMordents.map(mapMordentElement);
+  const invertedMordents = Array.from(
+    element.querySelectorAll("inverted-mordent"),
+  );
+  if (invertedMordents.length)
+    data.invertedMordents = invertedMordents.map(mapMordentElement);
   const schleifers = Array.from(element.querySelectorAll("schleifer"));
   if (schleifers.length) data.schleifers = schleifers.map(mapSchleiferElement);
   const tremolos = Array.from(element.querySelectorAll("tremolo"));
@@ -837,9 +851,13 @@ const mapOrnamentsElement = (element: Element): Ornaments => {
   const haydns = Array.from(element.querySelectorAll("haydn"));
   if (haydns.length) data.haydns = haydns.map(mapTrillLikeElement);
   const otherOrnaments = Array.from(element.querySelectorAll("other-ornament"));
-  if (otherOrnaments.length) data.otherOrnaments = otherOrnaments.map(mapOtherOrnamentElement);
-  const accidentalMarks = Array.from(element.querySelectorAll("accidental-mark"));
-  if (accidentalMarks.length) data.accidentalMarks = accidentalMarks.map(mapAccidentalMarkElement);
+  if (otherOrnaments.length)
+    data.otherOrnaments = otherOrnaments.map(mapOtherOrnamentElement);
+  const accidentalMarks = Array.from(
+    element.querySelectorAll("accidental-mark"),
+  );
+  if (accidentalMarks.length)
+    data.accidentalMarks = accidentalMarks.map(mapAccidentalMarkElement);
   return OrnamentsSchema.parse(data);
 };
 
@@ -852,17 +870,25 @@ const mapTechnicalElement = (element: Element): Technical => {
   const harmonics = Array.from(element.querySelectorAll("harmonic"));
   if (harmonics.length) data.harmonics = harmonics.map(mapSchleiferElement);
   const openStrings = Array.from(element.querySelectorAll("open-string"));
-  if (openStrings.length) data.openStrings = openStrings.map(mapSchleiferElement);
+  if (openStrings.length)
+    data.openStrings = openStrings.map(mapSchleiferElement);
   const thumbPositions = Array.from(element.querySelectorAll("thumb-position"));
-  if (thumbPositions.length) data.thumbPositions = thumbPositions.map(mapSchleiferElement);
+  if (thumbPositions.length)
+    data.thumbPositions = thumbPositions.map(mapSchleiferElement);
   const fingerings = Array.from(element.querySelectorAll("fingering"));
   if (fingerings.length)
     data.fingerings = fingerings.map((el) =>
       FingeringSchema.parse({
         value: el.textContent?.trim() || undefined,
-        substitution: getAttribute(el, "substitution") as "yes" | "no" | undefined,
+        substitution: getAttribute(el, "substitution") as
+          | "yes"
+          | "no"
+          | undefined,
         alternate: getAttribute(el, "alternate") as "yes" | "no" | undefined,
-        placement: getAttribute(el, "placement") as "above" | "below" | undefined,
+        placement: getAttribute(el, "placement") as
+          | "above"
+          | "below"
+          | undefined,
       }),
     );
   const plucks = Array.from(element.querySelectorAll("pluck"));
@@ -870,7 +896,10 @@ const mapTechnicalElement = (element: Element): Technical => {
     data.plucks = plucks.map((el) =>
       ValuePlacementSchema.parse({
         value: el.textContent?.trim() || undefined,
-        placement: getAttribute(el, "placement") as "above" | "below" | undefined,
+        placement: getAttribute(el, "placement") as
+          | "above"
+          | "below"
+          | undefined,
       }),
     );
   const frets = Array.from(element.querySelectorAll("fret"));
@@ -880,7 +909,10 @@ const mapTechnicalElement = (element: Element): Technical => {
         value:
           parseOptionalNumberAttribute(el, "") ??
           (el.textContent ? parseInt(el.textContent, 10) : undefined),
-        placement: getAttribute(el, "placement") as "above" | "below" | undefined,
+        placement: getAttribute(el, "placement") as
+          | "above"
+          | "below"
+          | undefined,
       }),
     );
   const strings = Array.from(element.querySelectorAll("string"));
@@ -890,7 +922,10 @@ const mapTechnicalElement = (element: Element): Technical => {
         value:
           parseOptionalNumberAttribute(el, "") ??
           (el.textContent ? parseInt(el.textContent, 10) : undefined),
-        placement: getAttribute(el, "placement") as "above" | "below" | undefined,
+        placement: getAttribute(el, "placement") as
+          | "above"
+          | "below"
+          | undefined,
       }),
     );
   const hammerOns = Array.from(element.querySelectorAll("hammer-on"));
@@ -900,7 +935,10 @@ const mapTechnicalElement = (element: Element): Technical => {
         value: el.textContent?.trim() || undefined,
         type: getAttribute(el, "type") as "start" | "stop",
         number: parseOptionalNumberAttribute(el, "number"),
-        placement: getAttribute(el, "placement") as "above" | "below" | undefined,
+        placement: getAttribute(el, "placement") as
+          | "above"
+          | "below"
+          | undefined,
       }),
     );
   const pullOffs = Array.from(element.querySelectorAll("pull-off"));
@@ -910,7 +948,10 @@ const mapTechnicalElement = (element: Element): Technical => {
         value: el.textContent?.trim() || undefined,
         type: getAttribute(el, "type") as "start" | "stop",
         number: parseOptionalNumberAttribute(el, "number"),
-        placement: getAttribute(el, "placement") as "above" | "below" | undefined,
+        placement: getAttribute(el, "placement") as
+          | "above"
+          | "below"
+          | undefined,
       }),
     );
   const bends = Array.from(element.querySelectorAll("bend"));
@@ -919,10 +960,16 @@ const mapTechnicalElement = (element: Element): Technical => {
       BendSchema.parse({
         shape: getAttribute(el, "shape") as "angled" | "curved" | undefined,
         bendAlter:
-          parseOptionalNumberAttribute(el.querySelector("bend-alter") || el, "") || undefined,
+          parseOptionalNumberAttribute(
+            el.querySelector("bend-alter") || el,
+            "",
+          ) || undefined,
         release: el.querySelector("release") ? true : undefined,
         withBar: el.querySelector("with-bar")?.textContent?.trim() || undefined,
-        placement: getAttribute(el, "placement") as "above" | "below" | undefined,
+        placement: getAttribute(el, "placement") as
+          | "above"
+          | "below"
+          | undefined,
       }),
     );
   const taps = Array.from(element.querySelectorAll("tap"));
@@ -931,7 +978,10 @@ const mapTechnicalElement = (element: Element): Technical => {
       TapSchema.parse({
         value: el.textContent?.trim() || undefined,
         hand: getAttribute(el, "hand") as "left" | "right" | undefined,
-        placement: getAttribute(el, "placement") as "above" | "below" | undefined,
+        placement: getAttribute(el, "placement") as
+          | "above"
+          | "below"
+          | undefined,
       }),
     );
   const others = Array.from(element.querySelectorAll("other-technical"));
@@ -940,7 +990,10 @@ const mapTechnicalElement = (element: Element): Technical => {
       OtherTechnicalSchema.parse({
         value: el.textContent?.trim() || undefined,
         smufl: getAttribute(el, "smufl") || undefined,
-        placement: getAttribute(el, "placement") as "above" | "below" | undefined,
+        placement: getAttribute(el, "placement") as
+          | "above"
+          | "below"
+          | undefined,
       }),
     );
   return TechnicalSchema.parse(data);
@@ -2003,7 +2056,6 @@ export const mapAttributesElement = (element: Element): Attributes => {
   const timeElements = Array.from(element.querySelectorAll("time"));
   const clefElements = Array.from(element.querySelectorAll("clef"));
   const stavesContent = getTextContent(element, "staves"); // Read content of <staves>
-  const instrumentsContent = getTextContent(element, "instruments");
   const partSymbolElement = element.querySelector("part-symbol");
   const transposeElements = Array.from(element.querySelectorAll("transpose"));
   const instrumentsContent = getTextContent(element, "instruments");

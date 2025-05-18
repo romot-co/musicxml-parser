@@ -280,7 +280,8 @@ describe("Note Schema Tests (note.mod)", () => {
     });
 
     it("throws on tie without type attribute", () => {
-      const xml = '<note><pitch><step>C</step><octave>4</octave></pitch><duration>4</duration><tie/></note>';
+      const xml =
+        "<note><pitch><step>C</step><octave>4</octave></pitch><duration>4</duration><tie/></note>";
       const element = createElement(xml);
       expect(() => mapNoteElement(element)).toThrow();
     });
