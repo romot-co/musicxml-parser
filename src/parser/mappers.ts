@@ -76,6 +76,9 @@ import type {
   Margins,
   LineWidth,
   Appearance,
+  TimewisePart,
+  TimewiseMeasure,
+  ScoreTimewise,
 } from '../types';
 import {
   PitchSchema,
@@ -85,6 +88,9 @@ import {
   ScorePartSchema,
   PartListSchema,
   ScorePartwiseSchema,
+  ScoreTimewiseSchema,
+  TimewisePartSchema,
+  TimewiseMeasureSchema,
   KeySchema,
   TimeSchema,
   ClefSchema,
@@ -1230,6 +1236,70 @@ export const mapPartElement = (element: Element): Part => {
   return PartSchema.parse(partData);
 };
 
+// Mapper for <part> element inside a timewise <measure>
+export const mapTimewisePartElement = (element: Element): TimewisePart => {
+  const content: MeasureContent[] = [];
+  element.childNodes.forEach(node => {
+    if (node.nodeType === 1) {
+      const child = node as Element;
+      let mapped: MeasureContent | undefined;
+      switch (child.nodeName.toLowerCase()) {
+        case 'note':
+          mapped = mapNoteElement(child);
+          break;
+        case 'attributes':
+          mapped = mapAttributesElement(child);
+          break;
+        case 'direction':
+          mapped = mapDirectionElement(child);
+          break;
+        case 'barline':
+          mapped = mapBarlineElement(child);
+          break;
+        case 'harmony':
+          mapped = mapHarmonyElement(child);
+          break;
+        case 'backup':
+          mapped = mapBackupElement(child);
+          break;
+        case 'forward':
+          mapped = mapForwardElement(child);
+          break;
+        case 'print':
+          mapped = mapPrintElement(child);
+          break;
+        case 'sound':
+          mapped = mapSoundElement(child);
+          break;
+      }
+      if (mapped) content.push(mapped);
+    }
+  });
+
+  const data: Partial<TimewisePart> = {
+    id: getAttribute(element, 'id') ?? '',
+  };
+  if (content.length > 0) data.content = content;
+  return TimewisePartSchema.parse(data);
+};
+
+export const mapTimewiseMeasureElement = (
+  measureElement: Element,
+): TimewiseMeasure => {
+  const partElements = Array.from(measureElement.querySelectorAll('part'));
+  const measureData: Partial<TimewiseMeasure> = {
+    number: measureElement.getAttribute('number') || '',
+    parts: partElements.map(mapTimewisePartElement),
+  };
+  const implicitAttr = measureElement.getAttribute('implicit');
+  if (implicitAttr === 'yes') measureData.implicit = true;
+  const nonControllingAttr = measureElement.getAttribute('non-controlling');
+  if (nonControllingAttr === 'yes') measureData.nonControlling = true;
+  const widthAttr = measureElement.getAttribute('width');
+  if (widthAttr) measureData.width = parseOptionalFloat(widthAttr);
+  return TimewiseMeasureSchema.parse(measureData);
+};
+
 // Mapper for <score-part> element (from <part-list>)
 export const mapScorePartElement = (element: Element): ScorePart => {
   const scorePartData = {
@@ -1907,6 +1977,68 @@ export const mapDocumentToScorePartwise = (
     );
     console.error('Validation Errors:', result.error.flatten());
     throw new Error('ScorePartwise parsing failed.');
+  }
+  return result.data;
+};
+
+export const mapDocumentToScoreTimewise = (
+  doc: XMLDocument,
+): ScoreTimewise => {
+  const rootElement = doc.documentElement;
+  if (rootElement.nodeName !== 'score-timewise') {
+    throw new Error(
+      `Expected root element <score-timewise>, but got <${rootElement.nodeName}>`,
+    );
+  }
+
+  const workElement = rootElement.querySelector('work');
+  const movementTitleElement = rootElement.querySelector('movement-title');
+  const identificationElement = rootElement.querySelector('identification');
+  const defaultsElement = rootElement.querySelector('defaults');
+  const creditElements = Array.from(rootElement.querySelectorAll('credit'));
+  const partListElement = rootElement.querySelector('part-list');
+  const measureElements = Array.from(rootElement.querySelectorAll('measure'));
+
+  if (!partListElement) {
+    throw new Error('<part-list> element not found in <score-timewise>');
+  }
+
+  const scoreTimewiseData: Partial<ScoreTimewise> = {
+    version: getAttribute(rootElement, 'version') || '1.0',
+    partList: mapPartListElement(partListElement),
+    measures: measureElements.map(mapTimewiseMeasureElement),
+  };
+
+  if (workElement) {
+    scoreTimewiseData.work = mapWorkElement(workElement);
+  }
+  if (movementTitleElement) {
+    scoreTimewiseData.movementTitle = movementTitleElement.textContent?.trim();
+  }
+  if (identificationElement) {
+    scoreTimewiseData.identification = mapIdentificationElement(
+      identificationElement,
+    );
+  }
+  if (defaultsElement) {
+    const mappedDefaults = mapDefaultsElement(defaultsElement);
+    if (mappedDefaults) scoreTimewiseData.defaults = mappedDefaults;
+  }
+  if (creditElements.length > 0) {
+    const mappedCredits = creditElements
+      .map(mapCreditElement)
+      .filter(Boolean) as Credit[];
+    if (mappedCredits.length > 0) scoreTimewiseData.credit = mappedCredits;
+  }
+
+  const result = ScoreTimewiseSchema.safeParse(scoreTimewiseData);
+  if (!result.success) {
+    console.error(
+      'Error parsing ScoreTimewise:',
+      JSON.stringify(scoreTimewiseData, null, 2),
+    );
+    console.error('Validation Errors:', result.error.flatten());
+    throw new Error('ScoreTimewise parsing failed.');
   }
   return result.data;
 };
