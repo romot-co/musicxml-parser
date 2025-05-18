@@ -43,3 +43,7 @@ export * from "./timeModification";
 export * from "./fermata";
 export * from "./wavyLine";
 export * from "./editorial";
+export * from "./figuredBass";
+export * from "./grouping";
+export * from "./link";
+export * from "./bookmark";

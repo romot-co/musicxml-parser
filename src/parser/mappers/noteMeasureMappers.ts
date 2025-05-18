@@ -107,6 +107,12 @@ import type {
   Miscellaneous,
   MiscellaneousField,
   FermataShape, // FermataShape を追加
+  FiguredBass,
+  Figure,
+  Grouping,
+  Feature,
+  Link,
+  Bookmark,
 } from "../../types";
 import {
   PitchSchema,
@@ -221,6 +227,12 @@ import {
   MiscellaneousFieldSchema,
   FermataShapeEnum,
   PedalSchema,
+  FiguredBassSchema,
+  FigureSchema,
+  GroupingSchema,
+  FeatureSchema,
+  LinkSchema,
+  BookmarkSchema,
 } from "../../schemas";
 
 // Re-exported mappers from other modules
@@ -1983,6 +1995,81 @@ export const mapSoundElement = (element: Element): Sound => {
   return SoundSchema.parse(soundData);
 };
 
+const mapFigureElement = (element: Element): Figure => {
+  const data: Partial<Figure> = {
+    prefix: getTextContent(element, "prefix"),
+    figureNumber: getTextContent(element, "figure-number"),
+    suffix: getTextContent(element, "suffix"),
+  };
+  return FigureSchema.parse(data);
+};
+
+export const mapFiguredBassElement = (element: Element): FiguredBass => {
+  const figures = Array.from(element.querySelectorAll("figure"))
+    .map(mapFigureElement)
+    .filter(Boolean) as Figure[];
+  const data: Partial<FiguredBass> = {
+    _type: "figured-bass",
+    figures,
+    duration: parseNumberContent(element, "duration"),
+  };
+  const par = getAttribute(element, "parentheses") as "yes" | "no" | undefined;
+  if (par) data.parentheses = par;
+  return FiguredBassSchema.parse(data);
+};
+
+const mapFeatureElement = (element: Element): Feature => {
+  const data: Partial<Feature> = {
+    type: getAttribute(element, "type") || undefined,
+    value: element.textContent?.trim() || "",
+  };
+  return FeatureSchema.parse(data);
+};
+
+export const mapGroupingElement = (element: Element): Grouping => {
+  const features = Array.from(element.querySelectorAll("feature"))
+    .map(mapFeatureElement)
+    .filter(Boolean) as Feature[];
+  const data: Partial<Grouping> = {
+    _type: "grouping",
+    type: getAttribute(element, "type") as
+      | "start"
+      | "stop"
+      | "single"
+      | undefined,
+    number: getAttribute(element, "number") || undefined,
+    memberOf: getAttribute(element, "member-of") || undefined,
+    features: features.length > 0 ? features : undefined,
+  };
+  return GroupingSchema.parse(data);
+};
+
+export const mapBookmarkElement = (element: Element): Bookmark => {
+  const data: Partial<Bookmark> = {
+    _type: "bookmark",
+    id: getAttribute(element, "id") || "",
+    name: getAttribute(element, "name") || undefined,
+    element: getAttribute(element, "element") || undefined,
+    position: parseOptionalNumberAttribute(element, "position"),
+  };
+  return BookmarkSchema.parse(data);
+};
+
+export const mapLinkElement = (element: Element): Link => {
+  const data: Partial<Link> = {
+    _type: "link",
+    href: getAttribute(element, "xlink:href") || "",
+    role: getAttribute(element, "xlink:role") || undefined,
+    title: getAttribute(element, "xlink:title") || undefined,
+    show: getAttribute(element, "xlink:show") || undefined,
+    actuate: getAttribute(element, "xlink:actuate") || undefined,
+    name: getAttribute(element, "name") || undefined,
+    element: getAttribute(element, "element") || undefined,
+    position: parseOptionalNumberAttribute(element, "position"),
+  };
+  return LinkSchema.parse(data);
+};
+
 // Function to map an <attributes> element
 export const mapAttributesElement = (element: Element): Attributes => {
   const divisions = parseNumberContent(element, "divisions");
@@ -2090,6 +2177,18 @@ export function mapMeasureElement(measureElement: Element): Measure {
         case "harmony":
           mappedElement = mapHarmonyElement(childElement);
           break;
+        case "figured-bass":
+          mappedElement = mapFiguredBassElement(childElement);
+          break;
+        case "grouping":
+          mappedElement = mapGroupingElement(childElement);
+          break;
+        case "bookmark":
+          mappedElement = mapBookmarkElement(childElement);
+          break;
+        case "link":
+          mappedElement = mapLinkElement(childElement);
+          break;
         case "backup":
           mappedElement = mapBackupElement(childElement);
           break;
@@ -2182,6 +2281,18 @@ export const mapTimewisePartElement = (element: Element): TimewisePart => {
           break;
         case "harmony":
           mapped = mapHarmonyElement(child);
+          break;
+        case "figured-bass":
+          mapped = mapFiguredBassElement(child);
+          break;
+        case "grouping":
+          mapped = mapGroupingElement(child);
+          break;
+        case "bookmark":
+          mapped = mapBookmarkElement(child);
+          break;
+        case "link":
+          mapped = mapLinkElement(child);
           break;
         case "backup":
           mapped = mapBackupElement(child);
