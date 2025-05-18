@@ -5,6 +5,7 @@ import type {
   Key,
   Time,
   Clef,
+  PartSymbol,
   MeasureStyle,
   MultipleRest,
   MeasureRepeat,
@@ -93,7 +94,33 @@ describe("Attributes Schema Tests", () => {
       expect(attributes.staves).toBe(2);
     });
 
-    // TODO: Add tests for part-symbol and instruments
+    it("should parse <attributes> with <part-symbol>", () => {
+      const xml = `<attributes><part-symbol group-symbol="brace" top-staff="1" bottom-staff="2" default-x="12.5" default-y="-3" color="#00f">bracket</part-symbol></attributes>`;
+      const element = createElement(xml);
+      const attributes = mapAttributesElement(element);
+      expect(attributes.partSymbol).toBeDefined();
+      const ps = attributes.partSymbol as PartSymbol;
+      expect(ps.value).toBe("bracket");
+      expect(ps.groupSymbol).toBe("brace");
+      expect(ps.topStaff).toBe(1);
+      expect(ps.bottomStaff).toBe(2);
+      expect(ps.defaultX).toBeCloseTo(12.5);
+      expect(ps.defaultY).toBeCloseTo(-3);
+      expect(ps.color).toBe("#00f");
+    });
+
+    it("should ignore invalid group-symbol in <part-symbol>", () => {
+      const xml = `<attributes><part-symbol group-symbol="invalid" top-staff="3">square</part-symbol></attributes>`;
+      const element = createElement(xml);
+      const attributes = mapAttributesElement(element);
+      expect(attributes.partSymbol).toBeDefined();
+      const ps = attributes.partSymbol as PartSymbol;
+      expect(ps.value).toBe("square");
+      expect(ps.groupSymbol).toBeUndefined();
+      expect(ps.topStaff).toBe(3);
+    });
+
+    // TODO: Add tests for instruments when schema is available
 
     it("should parse <staff-details> with <line-detail>", () => {
       const xml = `<attributes><staff-details><staff-lines>5</staff-lines><line-detail line="1" width="0.5" color="#ff0" line-type="dashed" print-object="no"/></staff-details></attributes>`;

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { ScoreInstrumentSchema } from "./scoreInstrument";
+import { MidiDeviceSchema } from "./midiDevice";
 import { MidiInstrumentSchema } from "./midiInstrument";
 
 /**
@@ -17,9 +18,9 @@ export const ScorePartSchema = z
     partName: z.string().optional(), // <part-name>
     /** An abbreviated name for the part. Optional. */
     partAbbreviation: z.string().optional(), // <part-abbreviation>
-    /** List of instruments used in this part */
-    scoreInstruments: z.array(ScoreInstrumentSchema).optional(),
     /** Initial MIDI instrument assignments */
+    scoreInstruments: z.array(ScoreInstrumentSchema).optional(),
+    midiDevices: z.array(MidiDeviceSchema).optional(),
     midiInstruments: z.array(MidiInstrumentSchema).optional(),
   })
   .passthrough(); // Allows other elements/attributes not explicitly defined
