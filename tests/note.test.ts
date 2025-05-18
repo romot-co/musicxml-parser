@@ -188,6 +188,33 @@ describe("Note Schema Tests (note.mod)", () => {
       expect(note.notations?.tuplets?.[0].number).toBe(3);
     });
 
+    it("parses glissando, slide, tremolo and other-notation", () => {
+      const xml =
+        '<note><pitch><step>E</step><octave>5</octave></pitch><duration>1</duration><notations><glissando type="start">gliss</glissando><slide type="stop"/><tremolo type="single">3</tremolo><other-notation type="single">x</other-notation></notations></note>';
+      const element = createElement(xml);
+      const note = mapNoteElement(element);
+      expect(note.notations?.glissandos).toHaveLength(1);
+      expect(note.notations?.slides).toHaveLength(1);
+      expect(note.notations?.tremolos).toHaveLength(1);
+      expect(note.notations?.otherNotations).toHaveLength(1);
+      expect(note.notations?.glissandos?.[0].type).toBe("start");
+      expect(note.notations?.slides?.[0].type).toBe("stop");
+      expect(note.notations?.tremolos?.[0].value).toBe(3);
+      expect(note.notations?.otherNotations?.[0].type).toBe("single");
+    });
+  
+    it("parses tuplets via <time-modification>", () => {
+      const xml =
+        '<note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration><time-modification><actual-notes>3</actual-notes><normal-notes>2</normal-notes><normal-type>eighth</normal-type><normal-dot/></time-modification></note>';
+      const element = createElement(xml);
+      const note = mapNoteElement(element);
+      expect(note.timeModification).toBeDefined();
+      expect(note.timeModification?.actualNotes).toBe(3);
+      expect(note.timeModification?.normalNotes).toBe(2);
+      expect(note.timeModification?.normalType).toBe("eighth");
+      expect(note.timeModification?.normalDots).toHaveLength(1);
+    });
+
     // TODO: Add tests for tie, time-modification, notations (articulations, ornaments, technical), etc.
   });
 });

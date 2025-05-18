@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { TextFormattingSchema } from "./credit"; // Assuming TextFormattingSchema includes font attributes
+import { YesNoEnum } from "./common";
 
 // Placeholder for MetronomeBeatUnitDotSchema if needed later
 // export const MetronomeBeatUnitDotSchema = z.object({});
@@ -50,6 +51,17 @@ export type Pedal = z.infer<typeof PedalSchema>;
 export const WedgeSchema = z.object({
   type: z.enum(["crescendo", "diminuendo", "stop", "continue"]).optional(),
   spread: z.number().optional(),
+  number: z.number().int().optional(),
+  niente: YesNoEnum.optional(),
+  lineType: z.string().optional(),
+  dashLength: z.number().optional(),
+  spaceLength: z.number().optional(),
+  defaultX: z.number().optional(),
+  defaultY: z.number().optional(),
+  relativeX: z.number().optional(),
+  relativeY: z.number().optional(),
+  color: z.string().optional(),
+  id: z.string().optional(),
 });
 export type Wedge = z.infer<typeof WedgeSchema>;
 
