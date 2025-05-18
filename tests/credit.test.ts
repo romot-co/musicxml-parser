@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { JSDOM } from "jsdom";
 import { mapCreditElement } from "../src/parser/mappers";
-import type { CreditSymbol, Link, Bookmark } from "../src/types";
+import type { CreditSymbol, Link, Bookmark, CreditImage } from "../src/types";
 
 function createElement(xmlString: string): Element {
   const dom = new JSDOM(xmlString, { contentType: "application/xml" });
@@ -53,5 +53,21 @@ describe("Credit parsing", () => {
     const bm = credit.bookmarks?.[0] as Bookmark;
     expect(bm.id).toBe("b1");
     expect(bm.name).toBe("mark");
+  });
+
+  it("parses credit-image attributes", () => {
+    const xml = `<credit><credit-image source="cover.png" type="image/png" height="25" width="80" default-x="10" default-y="-5" halign="right" valign="bottom"/></credit>`;
+    const element = createElement(xml);
+    const credit = mapCreditElement(element)!;
+    expect(credit.creditImage).toBeDefined();
+    const image = credit.creditImage as CreditImage;
+    expect(image.source).toBe("cover.png");
+    expect(image.type).toBe("image/png");
+    expect(image.height).toBe(25);
+    expect(image.width).toBe(80);
+    expect(image.defaultX).toBe(10);
+    expect(image.defaultY).toBe(-5);
+    expect(image.halign).toBe("right");
+    expect(image.valign).toBe("bottom");
   });
 });
