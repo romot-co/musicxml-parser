@@ -1800,6 +1800,7 @@ export const mapAttributesElement = (element: Element): Attributes => {
   const timeElements = Array.from(element.querySelectorAll("time"));
   const clefElements = Array.from(element.querySelectorAll("clef"));
   const stavesContent = getTextContent(element, "staves"); // Read content of <staves>
+  const instrumentsContent = getTextContent(element, "instruments");
   const partSymbolElement = element.querySelector("part-symbol");
   const transposeElements = Array.from(element.querySelectorAll("transpose"));
   const instrumentsContent = getTextContent(element, "instruments");
@@ -1837,6 +1838,13 @@ export const mapAttributesElement = (element: Element): Attributes => {
     const stavesNum = parseInt(stavesContent, 10);
     if (!isNaN(stavesNum)) {
       attributesData.staves = stavesNum;
+    }
+  }
+
+  if (instrumentsContent !== undefined) {
+    const instrNum = parseInt(instrumentsContent, 10);
+    if (!isNaN(instrNum)) {
+      attributesData.instruments = instrNum;
     }
   }
 

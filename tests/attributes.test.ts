@@ -120,6 +120,13 @@ describe("Attributes Schema Tests", () => {
       expect(ps.topStaff).toBe(3);
     });
 
+    it("should parse <attributes> with <instruments>", () => {
+      const xml = `<attributes><instruments>2</instruments></attributes>`;
+      const element = createElement(xml);
+      const attributes = mapAttributesElement(element);
+      expect(attributes.instruments).toBe(2);
+    });
+ 
     it("should parse <instruments> count", () => {
       const xml = `<attributes><instruments>5</instruments></attributes>`;
       const element = createElement(xml);

@@ -16,6 +16,8 @@ export const AttributesSchema = z.object({
   transpose: z.array(TransposeSchema).optional(),
   instruments: z.number().int().positive().optional(),
   staves: z.number().int().positive().optional(),
+  /** Number of instruments represented in the part */
+  instruments: z.number().int().positive().optional(),
   staffDetails: z.array(StaffDetailsSchema).optional(),
   measureStyle: z.array(MeasureStyleSchema).optional(),
   partSymbol: PartSymbolSchema.optional(),
