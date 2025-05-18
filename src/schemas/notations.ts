@@ -1,5 +1,8 @@
 import { z } from "zod";
 import { TieSchema } from "./tie";
+import { YesNoEnum } from "./common";
+import { WavyLineSchema } from "./wavyLine";
+import { AccidentalSchema } from "./accidental";
 
 /**
  * The slur element is used to represent slurs. Slurs can be nested.
@@ -65,17 +68,6 @@ export const TupletSchema = z.object({
 });
 export type Tuplet = z.infer<typeof TupletSchema>;
 
-/**
- * Placeholder schema for ornaments.
- */
-export const OrnamentsSchema = z.object({});
-export type Ornaments = z.infer<typeof OrnamentsSchema>;
-
-/**
- * Placeholder schema for technical notations.
- */
-export const TechnicalSchema = z.object({});
-export type Technical = z.infer<typeof TechnicalSchema>;
 
 /**
  * Represents a glissando notation.
@@ -105,6 +97,139 @@ export const TremoloSchema = z.object({
   type: z.enum(["single", "start", "stop", "unmeasured"]).optional(),
 });
 export type Tremolo = z.infer<typeof TremoloSchema>;
+
+/** Ornaments **/
+
+const TrillLikeSchema = z.object({
+  placement: z.enum(["above", "below"]).optional(),
+  accelerate: YesNoEnum.optional(),
+  beats: z.number().optional(),
+  secondBeats: z.number().optional(),
+  lastBeat: z.number().optional(),
+});
+export const TrillMarkSchema = TrillLikeSchema;
+export type TrillMark = z.infer<typeof TrillMarkSchema>;
+
+const TurnBaseSchema = TrillLikeSchema.extend({
+  slash: YesNoEnum.optional(),
+});
+export const TurnSchema = TurnBaseSchema;
+export type Turn = z.infer<typeof TurnSchema>;
+
+export const MordentSchema = TrillLikeSchema.extend({
+  long: YesNoEnum.optional(),
+  approach: z.enum(["above", "below"]).optional(),
+  departure: z.enum(["above", "below"]).optional(),
+});
+export type Mordent = z.infer<typeof MordentSchema>;
+
+const EmptyPlacementSchema = z.object({
+  placement: z.enum(["above", "below"]).optional(),
+});
+export const SchleiferSchema = EmptyPlacementSchema;
+export type Schleifer = z.infer<typeof SchleiferSchema>;
+
+export const ValuePlacementSchema = z.object({
+  value: z.string().optional(),
+  placement: z.enum(["above", "below"]).optional(),
+});
+
+export const OtherOrnamentSchema = z.object({
+  value: z.string().optional(),
+  placement: z.enum(["above", "below"]).optional(),
+  smufl: z.string().optional(),
+});
+export type OtherOrnament = z.infer<typeof OtherOrnamentSchema>;
+
+export const OrnamentsSchema = z.object({
+  trillMarks: z.array(TrillMarkSchema).optional(),
+  turns: z.array(TurnSchema).optional(),
+  delayedTurns: z.array(TurnSchema).optional(),
+  invertedTurns: z.array(TurnSchema).optional(),
+  delayedInvertedTurns: z.array(TurnSchema).optional(),
+  verticalTurns: z.array(TrillMarkSchema).optional(),
+  invertedVerticalTurns: z.array(TrillMarkSchema).optional(),
+  shakes: z.array(TrillMarkSchema).optional(),
+  wavyLines: z.array(WavyLineSchema).optional(),
+  mordents: z.array(MordentSchema).optional(),
+  invertedMordents: z.array(MordentSchema).optional(),
+  schleifers: z.array(SchleiferSchema).optional(),
+  tremolos: z.array(TremoloSchema).optional(),
+  haydns: z.array(TrillMarkSchema).optional(),
+  otherOrnaments: z.array(OtherOrnamentSchema).optional(),
+  accidentalMarks: z.array(AccidentalSchema).optional(),
+});
+export type Ornaments = z.infer<typeof OrnamentsSchema>;
+
+/** Technical notations **/
+
+export const FingeringSchema = z.object({
+  value: z.string().optional(),
+  substitution: YesNoEnum.optional(),
+  alternate: YesNoEnum.optional(),
+  placement: z.enum(["above", "below"]).optional(),
+});
+export type Fingering = z.infer<typeof FingeringSchema>;
+
+export const StringSchema = z.object({
+  value: z.number().int().optional(),
+  placement: z.enum(["above", "below"]).optional(),
+});
+export type StringNumber = z.infer<typeof StringSchema>;
+
+export const FretSchema = z.object({
+  value: z.number().int().optional(),
+  placement: z.enum(["above", "below"]).optional(),
+});
+export type Fret = z.infer<typeof FretSchema>;
+
+export const HammerOnPullOffSchema = z.object({
+  value: z.string().optional(),
+  type: z.enum(["start", "stop"]),
+  number: z.number().int().optional(),
+  placement: z.enum(["above", "below"]).optional(),
+});
+export type HammerOnPullOff = z.infer<typeof HammerOnPullOffSchema>;
+
+export const BendSchema = z.object({
+  shape: z.enum(["angled", "curved"]).optional(),
+  bendAlter: z.number().optional(),
+  release: z.boolean().optional(),
+  withBar: z.string().optional(),
+  placement: z.enum(["above", "below"]).optional(),
+});
+export type Bend = z.infer<typeof BendSchema>;
+
+export const TapSchema = z.object({
+  value: z.string().optional(),
+  hand: z.enum(["left", "right"]).optional(),
+  placement: z.enum(["above", "below"]).optional(),
+});
+export type Tap = z.infer<typeof TapSchema>;
+
+export const OtherTechnicalSchema = z.object({
+  value: z.string().optional(),
+  placement: z.enum(["above", "below"]).optional(),
+  smufl: z.string().optional(),
+});
+export type OtherTechnical = z.infer<typeof OtherTechnicalSchema>;
+
+export const TechnicalSchema = z.object({
+  upBows: z.array(EmptyPlacementSchema).optional(),
+  downBows: z.array(EmptyPlacementSchema).optional(),
+  harmonics: z.array(EmptyPlacementSchema).optional(),
+  openStrings: z.array(EmptyPlacementSchema).optional(),
+  thumbPositions: z.array(EmptyPlacementSchema).optional(),
+  fingerings: z.array(FingeringSchema).optional(),
+  plucks: z.array(ValuePlacementSchema).optional(),
+  frets: z.array(FretSchema).optional(),
+  strings: z.array(StringSchema).optional(),
+  hammerOns: z.array(HammerOnPullOffSchema).optional(),
+  pullOffs: z.array(HammerOnPullOffSchema).optional(),
+  bends: z.array(BendSchema).optional(),
+  taps: z.array(TapSchema).optional(),
+  otherTechnical: z.array(OtherTechnicalSchema).optional(),
+});
 
 /**
  * Represents an other-notation element.
