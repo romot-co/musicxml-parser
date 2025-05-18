@@ -34,7 +34,12 @@ export async function readMusicXmlFile(filePath: string): Promise<string> {
       encoding = "UTF-16BE";
     } else if (b0 === 0xff && b1 === 0xfe) {
       encoding = "UTF-16LE";
-    } else if (data.length >= 3 && b0 === 0xef && b1 === 0xbb && data[2] === 0xbf) {
+    } else if (
+      data.length >= 3 &&
+      b0 === 0xef &&
+      b1 === 0xbb &&
+      data[2] === 0xbf
+    ) {
       encoding = "UTF-8";
     }
   }
