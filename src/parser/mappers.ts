@@ -1686,11 +1686,13 @@ export const mapFontAttributes = (element: Element): Font => {
 
 export const mapScalingElement = (element: Element): Scaling | undefined => {
   if (!element) return undefined;
-  const scalingData: Partial<Scaling> = {
-    millimeters: parseFloatContent(element, 'millimeters'),
-    tenths: parseNumberContent(element, 'tenths'),
+  const millimeters = parseFloatContent(element, 'millimeters');
+  const tenths = parseNumberContent(element, 'tenths');
+  if (millimeters === undefined || tenths === undefined) return undefined;
+  const scalingData: Scaling = {
+    millimeters,
+    tenths,
   };
-  if (Object.values(scalingData).every(v => v === undefined)) return undefined;
   return ScalingSchema.parse(scalingData);
 };
 
