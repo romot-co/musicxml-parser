@@ -2340,7 +2340,41 @@ export const mapCreditWordsElement = (
 export const mapCreditSymbolElement = (
   _element: Element,
 ): CreditSymbol | undefined => {
-  return undefined; // Add this line to satisfy the return type
+  const smuflGlyphName = element.textContent?.trim() ?? "";
+
+  const formatting: Partial<SymbolFormatting> = {};
+  const dx = parseOptionalNumberAttribute(element, "default-x");
+  if (dx !== undefined) formatting.defaultX = dx;
+  const dy = parseOptionalNumberAttribute(element, "default-y");
+  if (dy !== undefined) formatting.defaultY = dy;
+  const haAttr = getAttribute(element, "halign");
+  if (haAttr && ["left", "center", "right"].includes(haAttr)) {
+    formatting.halign = haAttr as "left" | "center" | "right";
+  }
+  const vaAttr = getAttribute(element, "valign");
+  if (vaAttr && ["top", "middle", "bottom"].includes(vaAttr)) {
+    formatting.valign = vaAttr as "top" | "middle" | "bottom";
+  }
+
+  const data: Partial<CreditSymbol> = { smuflGlyphName };
+  if (Object.keys(formatting).length > 0) {
+    data.formatting = formatting as SymbolFormatting;
+  }
+
+  if (
+    data.smuflGlyphName === "" &&
+    Object.keys(formatting).length === 0 &&
+    !element.hasAttributes()
+  ) {
+    return undefined;
+  }
+
+  try {
+    return CreditSymbolSchema.parse(data);
+  } catch (e) {
+    // console.warn('CreditSymbol parse error', data, (e as z.ZodError).errors);
+    return undefined;
+  }
 };
 
 export function mapRootElement(
