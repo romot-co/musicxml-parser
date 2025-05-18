@@ -12,6 +12,66 @@ import type {
   Time,
   Clef,
   Attributes,
+  Direction,
+  DirectionType,
+  Words,
+  Metronome,
+  MetronomeBeatUnit,
+  MetronomePerMinute,
+  Transpose,
+  Diatonic,
+  Chromatic,
+  OctaveChange,
+  Double,
+  StaffDetails,
+  StaffTuning,
+  LineDetail,
+  MeasureStyle,
+  MultipleRest,
+  MeasureRepeat,
+  BeatRepeat,
+  Slash,
+  Accidental,
+  AccidentalValue,
+  Notations,
+  Slur,
+  Articulations,
+  Staccato,
+  Accent,
+  Barline,
+  BarStyle,
+  Repeat,
+  Ending,
+  Work,
+  Identification,
+  Creator,
+  Rights,
+  Encoding,
+  Beam,
+  BeamValue,
+  PartSymbol,
+  Lyric,
+  Grace,
+  Cue,
+  Unpitched,
+  Font,
+  Scaling,
+  LyricFont,
+  LyricLanguage,
+  Defaults,
+  CreditWords,
+  CreditSymbol,
+  CreditImage,
+  Credit,
+  TextFormatting,
+  SymbolFormatting,
+  Harmony,
+  MeasureContent,
+  PageLayout,
+  SystemLayout,
+  Margins,
+  LineWidth,
+  Appearance,
 } from '../types';
 import {
   PitchSchema,
@@ -25,6 +85,71 @@ import {
   TimeSchema,
   ClefSchema,
   AttributesSchema,
+  DirectionSchema,
+  DirectionTypeSchema,
+  WordsSchema,
+  MetronomeSchema,
+  MetronomeBeatUnitSchema,
+  MetronomePerMinuteSchema,
+  TransposeSchema,
+  DiatonicSchema,
+  ChromaticSchema,
+  OctaveChangeSchema,
+  DoubleSchema,
+  StaffDetailsSchema,
+  StaffTuningSchema,
+  LineDetailSchema,
+  MeasureStyleSchema,
+  MultipleRestSchema,
+  MeasureRepeatSchema,
+  BeatRepeatSchema,
+  SlashSchema,
+  AccidentalSchema,
+  NotationsSchema,
+  SlurSchema,
+  ArticulationsSchema,
+  StaccatoSchema,
+  AccentSchema,
+  BarlineSchema,
+  RepeatSchema,
+  EndingSchema,
+  WorkSchema,
+  IdentificationSchema,
+  CreatorSchema,
+  RightsSchema,
+  EncodingSchema,
+  BeamSchema,
+  PartSymbolSchema,
+  LyricSchema,
+  GraceSchema,
+  CueSchema,
+  UnpitchedSchema,
+  FontSchema,
+  ScalingSchema,
+  LyricFontSchema,
+  LyricLanguageSchema,
+  DefaultsSchema,
+  CreditWordsSchema,
+  CreditSymbolSchema,
+  CreditImageSchema,
+  CreditSchema,
+  TextFormattingSchema,
+  SymbolFormattingSchema,
+  HarmonySchema,
+  GroupSymbolValueEnum,
+  RootSchema,
+  KindSchema,
+  BassSchema,
+  DegreeSchema,
+  RootStepSchema,
+  KindValueEnum,
+  BassStepSchema,
+  DegreeTypeEnum,
+  PageLayoutSchema,
+  MarginsSchema,
+  LineWidthSchema,
+  AppearanceSchema,
+  SystemLayoutSchema,
 } from '../schemas';
 
 // Helper function to get text content of a child element
@@ -42,10 +167,19 @@ export const parseNumberContent = (
   tagName: string,
 ): number | undefined => {
   const textContent = getTextContent(element, tagName);
-  if (textContent === undefined) {
-    return undefined;
-  }
+  if (textContent === undefined) return undefined;
   const num = parseInt(textContent, 10);
+  return isNaN(num) ? undefined : num;
+};
+
+// Helper function to parse floating point content of a child element
+export const parseFloatContent = (
+  element: Element,
+  tagName: string,
+): number | undefined => {
+  const textContent = getTextContent(element, tagName);
+  if (textContent === undefined) return undefined;
+  const num = parseFloat(textContent);
   return isNaN(num) ? undefined : num;
 };
 
@@ -82,37 +216,151 @@ export const mapPitchElement = (element: Element): Pitch => {
 // This function is more of a conceptual placeholder if we were to map a standalone <rest> tag
 // which is not typical in note-based contexts. The logic is handled in mapNoteElement.
 
+// Mapper for <accidental> element
+export const mapAccidentalElement = (element: Element): Accidental => {
+  const value = element.textContent?.trim() as AccidentalValue | undefined;
+  const cautionary = getAttribute(element, 'cautionary') as 'yes' | 'no' | undefined;
+  const editorial = getAttribute(element, 'editorial') as 'yes' | 'no' | undefined;
+
+  if (!value) {
+    throw new Error('<accidental> element must have text content specifying the accidental type.');
+  }
+
+  const accidentalData: Partial<Accidental> = {
+    value: value,
+    cautionary: cautionary,
+    editorial: editorial,
+  };
+  return AccidentalSchema.parse(accidentalData);
+};
+
+// Helper function to map a <grace> element
+export const mapGraceElement = (element: Element): Grace => {
+  const graceData: Partial<Grace> = {
+    stealTimePrevious: parseFloatContent(element, 'steal-time-previous'),
+    stealTimeFollowing: parseFloatContent(element, 'steal-time-following'),
+    makeTime: parseFloatContent(element, 'make-time'),
+    slash: getAttribute(element, 'slash') as 'yes' | 'no' | undefined,
+  };
+  return GraceSchema.parse(graceData);
+};
+
+// Helper function to map a <cue> element
+export const mapCueElement = (_element: Element): Cue => {
+  return CueSchema.parse({}); // Cue is an empty element
+};
+
+// Helper function to map an <unpitched> element
+export const mapUnpitchedElement = (element: Element): Unpitched => {
+  const unpitchedData: Partial<Unpitched> = {
+    displayStep: getTextContent(element, 'display-step'),
+    displayOctave: parseNumberContent(element, 'display-octave'),
+  };
+  return UnpitchedSchema.parse(unpitchedData);
+};
+
+// Helper function to map a <lyric> element
+export const mapLyricElement = (element: Element): Lyric => {
+  const lyricData: Partial<Lyric> = {
+    text: getTextContent(element, 'text') ?? '',
+    syllabic: getTextContent(element, 'syllabic') as 'single' | 'begin' | 'end' | 'middle' | undefined,
+    // TODO: Map other lyric attributes and child elements like number, name, extend, elision etc.
+  };
+  return LyricSchema.parse(lyricData);
+};
+
 // Mapper for <note> element
 export const mapNoteElement = (element: Element): Note => {
-  const duration = parseNumberContent(element, 'duration');
-  const type = getTextContent(element, 'type');
+  const graceElement = element.querySelector('grace');
+  const cueElement = element.querySelector('cue');
+  const chordElement = element.querySelector('chord');
   const pitchElement = element.querySelector('pitch');
+  const unpitchedElement = element.querySelector('unpitched');
   const restElement = element.querySelector('rest');
-  const lyricElement = element.querySelector('lyric');
+  const type = getTextContent(element, 'type');
+  const dotElements = Array.from(element.querySelectorAll('dot'));
+  const accidentalElement = element.querySelector('accidental');
+  const stemContent = getTextContent(element, 'stem');
+  const beamElements = Array.from(element.querySelectorAll('beam'));
+  const notationsElement = element.querySelector('notations');
+  const lyricElements = Array.from(element.querySelectorAll('lyric'));
+  const tieElements = Array.from(element.querySelectorAll('tie'));
 
-  let noteData: Partial<Note> = {
-    duration: duration ?? 1, // Default duration if not specified
+  const noteData: Partial<Note> = {
+    _type: 'note',
     type: type,
   };
 
-  if (pitchElement) {
-    noteData.pitch = mapPitchElement(pitchElement);
-  } else if (restElement) {
-    noteData.rest = {
-      // MusicXML <rest> elements don't have complex children like <display-step> by default in simple cases
-      // but Zod schema allows for it if needed. For now, an empty object or specific rest attributes.
-      // measure: getAttribute(restElement, 'measure') === 'yes' ? true : undefined, // Example attribute
-    };
-  } else {
-    // Neither pitch nor rest, could be an error or an unhandled note type
-    // For now, we'll rely on Zod validation to catch this if schema requires one.
+  // Parse attributes of the <note> element itself
+  noteData.printLeger = getAttribute(element, 'print-leger') as 'yes' | 'no' | undefined;
+  const dynamicsAttr = getAttribute(element, 'dynamics');
+  if (dynamicsAttr) noteData.dynamics = parseFloat(dynamicsAttr);
+  const endDynamicsAttr = getAttribute(element, 'end-dynamics');
+  if (endDynamicsAttr) noteData.endDynamics = parseFloat(endDynamicsAttr);
+  const attackAttr = getAttribute(element, 'attack');
+  if (attackAttr) noteData.attack = parseFloat(attackAttr);
+  const releaseAttr = getAttribute(element, 'release');
+  if (releaseAttr) noteData.release = parseFloat(releaseAttr);
+  noteData.pizzicato = getAttribute(element, 'pizzicato') as 'yes' | 'no' | undefined;
+
+
+  if (graceElement) {
+    noteData.grace = mapGraceElement(graceElement);
+  }
+  if (cueElement) {
+    noteData.cue = mapCueElement(cueElement);
+  }
+  if (chordElement) {
+    noteData.isChord = true;
   }
 
-  if (lyricElement) {
-    noteData.lyric = {
-      text: getTextContent(lyricElement, 'text') ?? '',
-      syllabic: getTextContent(lyricElement, 'syllabic'),
+  if (pitchElement) {
+    noteData.pitch = mapPitchElement(pitchElement);
+  } else if (unpitchedElement) {
+    noteData.unpitched = mapUnpitchedElement(unpitchedElement);
+  } else if (restElement) {
+    noteData.rest = {
+      // measure: getAttribute(restElement, 'measure') === 'yes' ? true : undefined,
     };
+  }
+
+  // Duration is handled based on grace/cue presence by NoteSchema.refine
+  // Only parse duration if not a grace note. If cue but not grace, it's required.
+  // If neither grace nor cue, it's required.
+  const duration = parseNumberContent(element, 'duration');
+  if (duration !== undefined) {
+    noteData.duration = duration;
+  }
+
+
+  if (tieElements.length > 0) {
+    // Assuming TieSchema and mapTieElement exist and handle the 'type' attribute
+    // For now, storing them as simple objects if mapTieElement is not defined
+    noteData.ties = tieElements.map(el => ({ type: getAttribute(el, 'type') as 'start' | 'stop' | undefined }) )
+                           .filter(t => t.type) as { type: 'start' | 'stop' }[];
+                           // This needs to be mapTieElement if complex tie objects are needed.
+                           // For now, it's a simplified placeholder.
+                           // Example: noteData.ties = tieElements.map(mapTieElement).filter(Boolean) as Tie[];
+  }
+
+
+  if (dotElements.length > 0) {
+    noteData.dots = dotElements.map(() => ({}));
+  }
+  if (accidentalElement) {
+    noteData.accidental = mapAccidentalElement(accidentalElement);
+  }
+  if (stemContent) {
+    noteData.stem = stemContent as 'up' | 'down' | 'none' | 'double';
+  }
+  if (beamElements.length > 0) {
+    noteData.beams = beamElements.map(mapBeamElement).filter(Boolean) as Beam[];
+  }
+  if (notationsElement) {
+    noteData.notations = mapNotationsElement(notationsElement);
+  }
+  if (lyricElements.length > 0) {
+    noteData.lyrics = lyricElements.map(mapLyricElement);
   }
 
   try {
@@ -135,11 +383,18 @@ const mapKeyElement = (element: Element): Key => {
 
 // Helper function to map a <time> element
 const mapTimeElement = (element: Element): Time => {
-  const timeData = {
-    beats: getTextContent(element, 'beats') ?? '4',
-    'beat-type': getTextContent(element, 'beat-type') ?? '4',
+  const senzaMisuraElement = element.querySelector('senza-misura');
+  let timeData: Partial<Time> = {
     symbol: getAttribute(element, 'symbol'),
   };
+
+  if (senzaMisuraElement) {
+    timeData.senzaMisura = true;
+  } else {
+    timeData.beats = getTextContent(element, 'beats') ?? '4';
+    timeData['beat-type'] = getTextContent(element, 'beat-type') ?? '4';
+  }
+  
   return TimeSchema.parse(timeData);
 };
 
@@ -154,50 +409,742 @@ const mapClefElement = (element: Element): Clef => {
   return ClefSchema.parse(clefData);
 };
 
+// Helper function to map a <slur> element
+const mapSlurElement = (element: Element): Slur => {
+  const slurData = {
+    type: getAttribute(element, 'type') as 'start' | 'stop' | 'continue',
+    number: parseOptionalNumberAttribute(element, 'number'),
+    placement: getAttribute(element, 'placement') as 'above' | 'below' | undefined,
+    // TODO: Map other slur attributes
+  };
+  // Validate that type is one of the expected values before parsing
+  if (!['start', 'stop', 'continue'].includes(slurData.type)) {
+    throw new Error(`Invalid slur type: ${slurData.type}`);
+  }
+  return SlurSchema.parse(slurData);
+};
+
+// Helper function to map an <articulations> element
+const mapArticulationsElement = (element: Element): Articulations => {
+  const staccatoElement = element.querySelector('staccato');
+  const accentElement = element.querySelector('accent');
+  // TODO: Query for other articulation types
+
+  const articulationsData: Partial<Articulations> = {
+    placement: getAttribute(element, 'placement') as 'above' | 'below' | undefined,
+  };
+
+  if (staccatoElement) {
+    articulationsData.staccato = {}; // StaccatoSchema is an empty object
+  }
+  if (accentElement) {
+    articulationsData.accent = {}; // AccentSchema is an empty object
+  }
+  // TODO: Map other articulations
+
+  return ArticulationsSchema.parse(articulationsData);
+};
+
+// Helper function to map a <words> element (within <direction-type>)
+const mapWordsElement = (element: Element): Words => {
+  const text = element.textContent?.trim() ?? '';
+  const formatting: Partial<TextFormatting> = {};
+  const fontFamily = getAttribute(element, 'font-family');
+  const fontStyleAttr = getAttribute(element, 'font-style');
+  const fontSize = getAttribute(element, 'font-size');
+  const fontWeightAttr = getAttribute(element, 'font-weight');
+  const justifyAttr = getAttribute(element, 'justify');
+  const defaultX = parseOptionalNumberAttribute(element, 'default-x');
+  const defaultY = parseOptionalNumberAttribute(element, 'default-y');
+  const valignAttr = getAttribute(element, 'valign');
+
+  if (fontFamily) formatting.fontFamily = fontFamily;
+  if (fontSize) formatting.fontSize = fontSize;
+  if (defaultX !== undefined) formatting.defaultX = defaultX;
+  if (defaultY !== undefined) formatting.defaultY = defaultY;
+
+  if (fontStyleAttr === 'normal' || fontStyleAttr === 'italic') {
+    formatting.fontStyle = fontStyleAttr;
+  }
+  if (fontWeightAttr === 'normal' || fontWeightAttr === 'bold') {
+    formatting.fontWeight = fontWeightAttr;
+  }
+  if (justifyAttr === 'left' || justifyAttr === 'center' || justifyAttr === 'right') {
+    formatting.justify = justifyAttr;
+  }
+  if (valignAttr === 'top' || valignAttr === 'middle' || valignAttr === 'bottom' || valignAttr === 'baseline') {
+    formatting.valign = valignAttr;
+  }
+
+  const wordsData: Partial<Words> = { text };
+  if (Object.keys(formatting).length > 0) {
+    wordsData.formatting = formatting as TextFormatting;
+  }
+
+  try {
+    return WordsSchema.parse(wordsData);
+  } catch (e) {
+    // console.warn("Words parse error. Data:", JSON.stringify(wordsData, null, 2), "Error:", (e as z.ZodError).errors, element.outerHTML);
+    // Fallback or rethrow if critical
+    // For now, if parsing fails, return object without formatting or throw
+    // To match CreditWords, return as is and let tests catch if this is wrong.
+    // However, WordsSchema requires text, and formatting is optional.
+    // If formatting parse fails, we should probably still return the text.
+    // A more robust approach would be to parse formatting separately and only add if successful.
+    return WordsSchema.parse({ text }); // Return with only text if formatting parse fails (or was empty initially)
+  }
+};
+
+// Helper function to map a <beat-unit> element (within <metronome>)
+const mapMetronomeBeatUnitElement = (element: Element): MetronomeBeatUnit => {
+  const beatUnitDotElements = Array.from(element.querySelectorAll('beat-unit-dot'));
+  const beatUnitData = {
+    'beat-unit': element.textContent?.trim() ?? '',
+    'beat-unit-dot': beatUnitDotElements.length > 0 ? beatUnitDotElements.map(() => ({})) : undefined,
+  };
+  return MetronomeBeatUnitSchema.parse(beatUnitData);
+};
+
+// Helper function to map a <per-minute> element (within <metronome>)
+const mapMetronomePerMinuteElement = (element: Element): MetronomePerMinute => {
+  const perMinuteData = {
+    'per-minute': element.textContent?.trim() ?? '',
+  };
+  return MetronomePerMinuteSchema.parse(perMinuteData);
+};
+
+// Helper function to map a <metronome> element (within <direction-type>)
+const mapMetronomeElement = (element: Element): Metronome => {
+  const beatUnitElement = element.querySelector('beat-unit');
+  const perMinuteElement = element.querySelector('per-minute');
+  const metronomeData: Partial<Metronome> = {};
+  if (beatUnitElement) {
+    metronomeData['beat-unit'] = mapMetronomeBeatUnitElement(beatUnitElement);
+  }
+  if (perMinuteElement) {
+    metronomeData['per-minute'] = mapMetronomePerMinuteElement(perMinuteElement);
+  }
+  return MetronomeSchema.parse(metronomeData);
+};
+
+// Helper function to map a <direction-type> element (within <direction>)
+const mapDirectionTypeElement = (element: Element): DirectionType => {
+  const wordsElement = element.querySelector('words');
+  const metronomeElement = element.querySelector('metronome');
+  const directionTypeData: Partial<DirectionType> = {};
+  if (wordsElement) {
+    directionTypeData.words = mapWordsElement(wordsElement);
+  }
+  if (metronomeElement) {
+    directionTypeData.metronome = mapMetronomeElement(metronomeElement);
+  }
+  return DirectionTypeSchema.parse(directionTypeData);
+};
+
+// Mapper for <direction> element
+export const mapDirectionElement = (element: Element): Direction => {
+  const directionTypeElements = Array.from(element.querySelectorAll('direction-type'));
+  const placement = getAttribute(element, 'placement') as 'above' | 'below' | 'between' | undefined;
+  const staff = parseOptionalNumberAttribute(element, 'staff');
+  const directionData: Partial<Direction> = {
+    _type: 'direction',
+    direction_type: directionTypeElements.map(mapDirectionTypeElement),
+    placement: placement,
+    staff: staff,
+  };
+  return DirectionSchema.parse(directionData);
+};
+
+// Helper function to map a <notations> element
+const mapNotationsElement = (element: Element): Notations => {
+  const slurElements = Array.from(element.querySelectorAll('slur'));
+  const articulationsElements = Array.from(element.querySelectorAll('articulations'));
+  // TODO: Query for other notation types like <tied>, <tuplet>, <ornaments>, <technical>
+
+  const notationsData: Partial<Notations> = {};
+
+  if (slurElements.length > 0) {
+    notationsData.slurs = slurElements.map(mapSlurElement);
+  }
+  if (articulationsElements.length > 0) {
+    notationsData.articulations = articulationsElements.map(mapArticulationsElement);
+  }
+
+  return NotationsSchema.parse(notationsData);
+};
+
+// Helper function to map a <repeat> element (within <barline>)
+const mapRepeatElement = (element: Element): Repeat => {
+  const direction = getAttribute(element, 'direction') as 'forward' | 'backward';
+  if (!direction) {
+    throw new Error('<repeat> element requires a "direction" attribute.');
+  }
+  const repeatData = {
+    direction: direction,
+    times: parseOptionalNumberAttribute(element, 'times'),
+    winged: getAttribute(element, 'winged') as 'none' | 'straight' | 'curved' | 'double-straight' | 'double-curved' | undefined,
+  };
+  return RepeatSchema.parse(repeatData);
+};
+
+// Helper function to map an <ending> element (within <barline>)
+const mapEndingElement = (element: Element): Ending => {
+  const number = getAttribute(element, 'number');
+  const type = getAttribute(element, 'type') as 'start' | 'stop' | 'discontinue';
+  if (!number || !type) {
+    throw new Error('<ending> element requires "number" and "type" attributes.');
+  }
+  const endingData = {
+    number: number,
+    type: type,
+    text: element.textContent?.trim() || undefined,
+    'print-object': getAttribute(element, 'print-object') as 'yes' | 'no' | undefined,
+  };
+  return EndingSchema.parse(endingData);
+};
+
+// Helper function to map a <barline> element
+export const mapBarlineElement = (element: Element): Barline => {
+  const barStyleElement = element.querySelector('bar-style');
+  const repeatElement = element.querySelector('repeat');
+  const endingElement = element.querySelector('ending');
+  const codaElement = element.querySelector('coda');
+  const segnoElement = element.querySelector('segno');
+
+  const barlineData: Partial<Barline> = {
+    _type: 'barline',
+    location: getAttribute(element, 'location') as 'left' | 'right' | 'middle' | undefined,
+  };
+
+  if (barStyleElement) {
+    barlineData.barStyle = barStyleElement.textContent?.trim() as BarStyle | undefined;
+  }
+  if (repeatElement) {
+    barlineData.repeat = mapRepeatElement(repeatElement);
+  }
+  if (endingElement) {
+    barlineData.ending = mapEndingElement(endingElement);
+  }
+  if (codaElement) {
+    barlineData.coda = {};
+  }
+  if (segnoElement) {
+    barlineData.segno = {};
+  }
+  // TODO: Parse other barline children and attributes
+
+  return BarlineSchema.parse(barlineData);
+};
+
+// Helper function to map a <work> element
+const mapWorkElement = (element: Element): Work => {
+  const workData = {
+    'work-number': getTextContent(element, 'work-number'),
+    'work-title': getTextContent(element, 'work-title'),
+  };
+  return WorkSchema.parse(workData);
+};
+
+// Helper function to map a <creator> element (within <identification>)
+const mapCreatorElement = (element: Element): Creator => {
+  const creatorData = {
+    type: getAttribute(element, 'type'),
+    name: element.textContent?.trim() ?? '',
+  };
+  return CreatorSchema.parse(creatorData);
+};
+
+// Helper function to map a <rights> element (within <identification>)
+const mapRightsElement = (element: Element): Rights => {
+  const rightsData = {
+    type: getAttribute(element, 'type'),
+    text: element.textContent?.trim() ?? '',
+  };
+  return RightsSchema.parse(rightsData);
+};
+
+// Helper function to map an <encoding> element (within <identification>)
+const mapEncodingElement = (element: Element): Encoding => {
+  const softwareElements = Array.from(element.querySelectorAll('software'));
+  const encodingDateElements = Array.from(element.querySelectorAll('encoding-date'));
+  const encoderElements = Array.from(element.querySelectorAll('encoder'));
+
+  const encodingData: Partial<Encoding> = {};
+  if (softwareElements.length > 0) {
+    encodingData.software = softwareElements.map(el => el.textContent?.trim() ?? '');
+  }
+  if (encodingDateElements.length > 0) {
+    encodingData['encoding-date'] = encodingDateElements.map(el => el.textContent?.trim() ?? '');
+  }
+  if (encoderElements.length > 0) {
+    encodingData.encoder = encoderElements.map(el => el.textContent?.trim() ?? '');
+  }
+  return EncodingSchema.parse(encodingData);
+};
+
+// Helper function to map an <identification> element
+const mapIdentificationElement = (element: Element): Identification => {
+  const creatorElements = Array.from(element.querySelectorAll('creator'));
+  const rightsElements = Array.from(element.querySelectorAll('rights'));
+  const encodingElement = element.querySelector('encoding');
+  const source = getTextContent(element, 'source');
+
+  const identificationData: Partial<Identification> = {
+    source: source,
+  };
+
+  if (creatorElements.length > 0) {
+    identificationData.creators = creatorElements.map(mapCreatorElement);
+  }
+  if (rightsElements.length > 0) {
+    identificationData.rights = rightsElements.map(mapRightsElement);
+  }
+  if (encodingElement) {
+    identificationData.encoding = mapEncodingElement(encodingElement);
+  }
+  return IdentificationSchema.parse(identificationData);
+};
+
+// Helper function to map a <beam> element
+const mapBeamElement = (element: Element): Beam | undefined => {
+  const value = element.textContent?.trim() as BeamValue | undefined;
+  if (!value) {
+    throw new Error('<beam> element must have text content specifying the beam type.');
+  }
+  const beamData = {
+    value: value,
+    number: parseOptionalNumberAttribute(element, 'number') ?? 1,
+    repeater: getAttribute(element, 'repeater') as 'yes' | 'no' | undefined,
+    fan: getAttribute(element, 'fan') as 'accel' | 'rit' | 'none' | undefined,
+  };
+  return BeamSchema.parse(beamData);
+};
+
+// Helper function to parse number attributes
+const parseOptionalInt = (value: string | null | undefined): number | undefined => {
+  if (value === null || value === undefined || value.trim() === '') return undefined;
+  const num = parseInt(value, 10);
+  return isNaN(num) ? undefined : num;
+};
+
+const parseOptionalFloat = (value: string | null | undefined): number | undefined => {
+  if (value === null || value === undefined || value.trim() === '') return undefined;
+  const num = parseFloat(value);
+  return isNaN(num) ? undefined : num;
+};
+
+export function mapPartSymbolElement(element: Element): PartSymbol | undefined {
+  if (!element) return undefined;
+  const value = element.textContent?.trim();
+  if (!value) return undefined;
+
+  const groupSymbolAttr = getAttribute(element, 'group-symbol');
+  const topStaffAttr = getAttribute(element, 'top-staff');
+  const bottomStaffAttr = getAttribute(element, 'bottom-staff');
+  const defaultXAttr = getAttribute(element, 'default-x');
+  const defaultYAttr = getAttribute(element, 'default-y');
+  const colorAttr = getAttribute(element, 'color');
+
+  const partSymbolData: Partial<PartSymbol> = {
+    value: value,
+    topStaff: parseOptionalInt(topStaffAttr),
+    bottomStaff: parseOptionalInt(bottomStaffAttr),
+    defaultX: parseOptionalFloat(defaultXAttr),
+    defaultY: parseOptionalFloat(defaultYAttr),
+    color: colorAttr || undefined,
+  };
+
+  if (groupSymbolAttr) {
+    const groupSymbolParseResult = GroupSymbolValueEnum.safeParse(groupSymbolAttr);
+    if (groupSymbolParseResult.success) {
+      partSymbolData.groupSymbol = groupSymbolParseResult.data;
+    }
+  }
+
+  const cleanedData = Object.fromEntries(
+    Object.entries(partSymbolData).filter(([_, v]) => v !== undefined)
+  );
+
+  if (!cleanedData.value) return undefined;
+
+  const validation = PartSymbolSchema.safeParse(cleanedData);
+  if (validation.success) {
+    return validation.data;
+  } else {
+    // console.error("Failed to parse part-symbol element:", validation.error, cleanedData, element.outerHTML);
+    return undefined;
+  }
+}
+
+// Function to map a <transpose> element
+export const mapTransposeElement = (element: Element): Transpose | undefined => {
+  const chromaticText = getTextContent(element, 'chromatic');
+  if (chromaticText === undefined) {
+    // Chromatic is required, if not present, this is not a valid transpose element according to schema
+    // However, to be robust, we might return undefined or let Zod validation handle it if schema demands it.
+    // For now, if chromatic is missing, we treat it as an invalid/incomplete element for mapping.
+    return undefined;
+  }
+
+  const diatonic = parseNumberContent(element, 'diatonic');
+  const chromatic = parseFloat(chromaticText); // Use parseFloat for chromatic as per schema suggestion
+  const octaveChange = parseNumberContent(element, 'octave-change');
+  const doubleElement = element.querySelector('double');
+  const numberAttr = getAttribute(element, 'number');
+
+  const transposeData: Partial<Transpose> = {};
+
+  if (diatonic !== undefined) {
+    transposeData.diatonic = diatonic;
+  }
+  transposeData.chromatic = chromatic;
+  if (octaveChange !== undefined) {
+    transposeData.octaveChange = octaveChange;
+  }
+  if (doubleElement) {
+    transposeData.double = {
+      above: getAttribute(doubleElement, 'above') as 'yes' | 'no' | undefined,
+    };
+  }
+  if (numberAttr !== undefined) {
+    transposeData.number = parseInt(numberAttr, 10);
+  }
+
+  try {
+    return TransposeSchema.parse(transposeData);
+  } catch (e) {
+    console.error('Failed to parse transpose element:', JSON.stringify(transposeData, null, 2));
+    console.error('Validation errors:', (e as z.ZodError).errors);
+    // Depending on strictness, you might throw e or return undefined
+    return undefined;
+  }
+};
+
+// Function to map a <staff-details> element
+export const mapStaffDetailsElement = (element: Element): StaffDetails | undefined => {
+  if (!element) return undefined;
+
+  const staffDetailsData: Partial<StaffDetails> = {
+    staffType: getTextContent(element, 'staff-type'),
+    staffLines: parseNumberContent(element, 'staff-lines'),
+    // lineDetail: // TODO: map line-detail elements
+    // staffTuning: // TODO: map staff-tuning elements
+    capo: parseNumberContent(element, 'capo'),
+    number: parseOptionalNumberAttribute(element, 'number'),
+    showFrets: getAttribute(element, 'show-frets') as 'numbers' | 'letters' | undefined,
+    printObject: getAttribute(element, 'print-object') as 'yes' | 'no' | undefined,
+    printSpacing: getAttribute(element, 'print-spacing') as 'yes' | 'no' | undefined,
+  };
+
+  const staffSizeElement = element.querySelector('staff-size');
+  if (staffSizeElement) {
+    const valueText = staffSizeElement.textContent?.trim();
+    const scalingAttr = getAttribute(staffSizeElement, 'scaling');
+    if (valueText) {
+      const valueNum = parseFloat(valueText);
+      if (!isNaN(valueNum)) {
+        staffDetailsData.staffSize = {
+          value: valueNum,
+          scaling: scalingAttr ? parseFloat(scalingAttr) : undefined,
+        };
+      }
+    }
+  }
+
+  const cleanedData = Object.fromEntries(
+    Object.entries(staffDetailsData).filter(([, v]) => v !== undefined)
+  );
+
+  if (Object.keys(cleanedData).length === 0) { 
+      return undefined;
+  }
+
+  try {
+    return StaffDetailsSchema.parse(cleanedData);
+  } catch (e) {
+    console.error('Failed to parse staff-details element:', JSON.stringify(cleanedData, null, 2));
+    console.error('Validation errors:', (e as z.ZodError).errors);
+    return undefined;
+  }
+};
+
+const mapMultipleRestElement = (element: Element): MultipleRest | undefined => {
+  const valueText = element.textContent?.trim();
+  if (!valueText) return undefined;
+  const value = parseInt(valueText, 10);
+  if (isNaN(value)) return undefined;
+
+  const data = {
+    value: value,
+    useSymbols: getAttribute(element, 'use-symbols') as 'yes' | 'no' | undefined,
+  };
+  try {
+    return MultipleRestSchema.parse(data);
+  } catch (e) {
+    console.error('Failed to parse multiple-rest element:', JSON.stringify(data, null, 2), (e as z.ZodError).errors);
+    return undefined;
+  }
+};
+
+const mapMeasureRepeatElement = (element: Element): MeasureRepeat | undefined => {
+  const valueText = element.textContent?.trim();
+  const type = getAttribute(element, 'type') as 'start' | 'stop' | undefined;
+  if (!valueText || !type) return undefined;
+
+  const value = parseInt(valueText, 10);
+  if (isNaN(value)) return undefined;
+
+  const slashes = parseOptionalNumberAttribute(element, 'slashes');
+
+  const data = {
+    value,
+    type,
+    slashes,
+  };
+   try {
+    return MeasureRepeatSchema.parse(data);
+  } catch (e) {
+    console.error('Failed to parse measure-repeat element:', JSON.stringify(data, null, 2), (e as z.ZodError).errors);
+    return undefined;
+  }
+};
+
+const mapBeatRepeatElement = (element: Element): BeatRepeat | undefined => {
+  const type = getAttribute(element, 'type') as 'start' | 'stop' | undefined;
+  if (!type) return undefined;
+
+  const data = {
+    type,
+    slashes: parseOptionalNumberAttribute(element, 'slashes'),
+    useDots: getAttribute(element, 'use-dots') as 'yes' | 'no' | undefined,
+    slashType: getTextContent(element, 'slash-type'),
+    // slashDot: ...
+    // exceptVoice: ...
+  };
+  try {
+    return BeatRepeatSchema.parse(data);
+  } catch (e) {
+    console.error('Failed to parse beat-repeat element:', JSON.stringify(data, null, 2), (e as z.ZodError).errors);
+    return undefined;
+  }
+};
+
+const mapSlashElement = (element: Element): Slash | undefined => {
+  const type = getAttribute(element, 'type') as 'start' | 'stop' | undefined;
+  if (!type) return undefined;
+
+  const data = {
+    type,
+    useDots: getAttribute(element, 'use-dots') as 'yes' | 'no' | undefined,
+    useStems: getAttribute(element, 'use-stems') as 'yes' | 'no' | undefined,
+    slashType: getTextContent(element, 'slash-type'),
+    // slashDot: ...
+    // exceptVoice: ...
+  };
+  try {
+    return SlashSchema.parse(data);
+  } catch (e) {
+    console.error('Failed to parse slash element:', JSON.stringify(data, null, 2), (e as z.ZodError).errors);
+    return undefined;
+  }
+};
+
+export const mapMeasureStyleElement = (element: Element): MeasureStyle | undefined => {
+  if (!element) return undefined;
+
+  const measureStyleData: Partial<MeasureStyle> = {
+    number: parseOptionalNumberAttribute(element, 'number'),
+  };
+
+  const multipleRestEl = element.querySelector('multiple-rest');
+  const measureRepeatEl = element.querySelector('measure-repeat');
+  const beatRepeatEl = element.querySelector('beat-repeat');
+  const slashEl = element.querySelector('slash');
+
+  let styleFound = false;
+  if (multipleRestEl) {
+    const mapped = mapMultipleRestElement(multipleRestEl);
+    if (mapped) measureStyleData.multipleRest = mapped; styleFound = !!mapped;
+  }
+  if (!styleFound && measureRepeatEl) {
+    const mapped = mapMeasureRepeatElement(measureRepeatEl);
+    if (mapped) measureStyleData.measureRepeat = mapped; styleFound = !!mapped;
+  }
+  if (!styleFound && beatRepeatEl) {
+    const mapped = mapBeatRepeatElement(beatRepeatEl);
+    if (mapped) measureStyleData.beatRepeat = mapped; styleFound = !!mapped;
+  }
+  if (!styleFound && slashEl) {
+    const mapped = mapSlashElement(slashEl);
+    if (mapped) measureStyleData.slash = mapped; styleFound = !!mapped;
+  }
+
+  if (!styleFound && measureStyleData.number === undefined) {
+      return undefined;
+  }
+
+  const cleanedData = Object.fromEntries(
+    Object.entries(measureStyleData).filter(([, v]) => v !== undefined)
+  );
+  
+  // Ensure that if no specific style type was parsed but attributes exist (e.g. 'number'),
+  // we don't accidentally fail the .refine check if it expects one style type.
+  // The refine in MeasureStyleSchema expects exactly one style if any style data is present.
+  // If only 'number' is present, it means no style type, so parse should actually fail refine.
+  // This logic is to ensure we pass a valid structure to Zod or nothing if it makes no sense.
+
+  if (Object.keys(cleanedData).length === 0) return undefined;
+  // If cleanedData only contains 'number' and no style type, Zod will (and should) fail refine.
+  // If a style type IS present, cleanedData is what we want to parse.
+
+  try {
+    return MeasureStyleSchema.parse(cleanedData);
+  } catch (e) {
+    console.error('Failed to parse measure-style element:', JSON.stringify(cleanedData, null, 2));
+    console.error('Validation errors:', (e as z.ZodError).errors);
+    return undefined;
+  }
+};
+
 // Function to map an <attributes> element
 export const mapAttributesElement = (element: Element): Attributes => {
-  const divisions = element.querySelector('divisions');
+  const divisions = parseNumberContent(element, 'divisions');
   const keyElements = Array.from(element.querySelectorAll('key'));
   const timeElements = Array.from(element.querySelectorAll('time'));
   const clefElements = Array.from(element.querySelectorAll('clef'));
+  const stavesContent = getTextContent(element, 'staves'); // Read content of <staves>
+  const partSymbolElement = element.querySelector('part-symbol');
+  const transposeElement = element.querySelector('transpose');
+  const staffDetailsElements = Array.from(element.querySelectorAll('staff-details'));
+  const measureStyleElements = Array.from(element.querySelectorAll('measure-style'));
 
-  const attributesData: Partial<Attributes> = { // Use Partial<Attributes> for building
-    divisions: divisions ? parseInt(divisions.textContent ?? '1', 10) : undefined,
+  const attributesData: Partial<Attributes> = {
+    _type: 'attributes',
   };
 
+  if (divisions !== undefined) {
+    attributesData.divisions = divisions;
+  }
   if (keyElements.length > 0) {
-    attributesData.key = keyElements.map(mapKeyElement);
+    attributesData.key = keyElements.map(mapKeyElement).filter(Boolean) as Key[];
   }
   if (timeElements.length > 0) {
-    attributesData.time = timeElements.map(mapTimeElement);
+    attributesData.time = timeElements.map(mapTimeElement).filter(Boolean) as Time[];
   }
   if (clefElements.length > 0) {
-    attributesData.clef = clefElements.map(mapClefElement);
+    attributesData.clef = clefElements.map(mapClefElement).filter(Boolean) as Clef[];
   }
 
-  return AttributesSchema.parse(attributesData);
+  if (stavesContent !== undefined) {
+    const stavesNum = parseInt(stavesContent, 10);
+    if (!isNaN(stavesNum)) {
+      attributesData.staves = stavesNum;
+    }
+  }
+
+  if (partSymbolElement) {
+    const mappedPartSymbol = mapPartSymbolElement(partSymbolElement);
+    if (mappedPartSymbol) attributesData.partSymbol = mappedPartSymbol;
+  }
+
+  if (transposeElement) {
+    const mappedTranspose = mapTransposeElement(transposeElement);
+    if (mappedTranspose) attributesData.transpose = mappedTranspose;
+  }
+
+  if (staffDetailsElements.length > 0) {
+    attributesData.staffDetails = staffDetailsElements.map(mapStaffDetailsElement).filter(Boolean) as StaffDetails[];
+  }
+
+  if (measureStyleElements.length > 0) {
+    attributesData.measureStyle = measureStyleElements.map(mapMeasureStyleElement).filter(Boolean) as MeasureStyle[];
+  }
+
+  try {
+    return AttributesSchema.parse(attributesData);
+  } catch (e) {
+    console.error('Failed to parse attributes element:', JSON.stringify(attributesData, null, 2));
+    console.error('Validation errors:', (e as z.ZodError).errors);
+    throw e; // Or return a default/fallback object if appropriate
+  }
 };
 
 // Mapper for <measure> element
-export const mapMeasureElement = (element: Element): Measure => {
-  const noteElements = Array.from(element.querySelectorAll('note'));
-  const attributesElements = Array.from(element.querySelectorAll('attributes')); // Select all attributes
+export function mapMeasureElement(measureElement: Element): Measure {
+  const content: MeasureContent[] = [];
+  measureElement.childNodes.forEach(node => {
+    if (node.nodeType === 1) { // Element node
+      const childElement = node as Element;
+      let mappedElement: MeasureContent | undefined;
 
-  const measureData = {
-    number: getAttribute(element, 'number') ?? '0',
-    notes: noteElements.map(mapNoteElement),
-    attributes: attributesElements.length > 0 ? attributesElements.map(mapAttributesElement) : undefined,
-  };
-  try {
-    return MeasureSchema.parse(measureData);
-  } catch (e) {
-    console.error('Failed to parse measure:', JSON.stringify(measureData, null, 2));
-    if (e instanceof z.ZodError) {
-      console.error('Validation errors:', e.errors);
+      switch (childElement.nodeName.toLowerCase()) { // Use toLowerCase for robustness
+        case 'note':
+          mappedElement = mapNoteElement(childElement);
+          break;
+        case 'attributes':
+          mappedElement = mapAttributesElement(childElement);
+          break;
+        case 'direction':
+          mappedElement = mapDirectionElement(childElement);
+          break;
+        case 'barline':
+          mappedElement = mapBarlineElement(childElement);
+          break;
+        case 'harmony':
+          mappedElement = mapHarmonyElement(childElement);
+          break;
+        // case 'backup': // Example for future elements
+        //   mappedElement = mapBackupElement(childElement);
+        //   break;
+        // case 'forward':
+        //   mappedElement = mapForwardElement(childElement);
+        //   break;
+        // case 'print':
+        //   mappedElement = mapPrintElement(childElement);
+        //   break;
+        // case 'sound':
+        //   mappedElement = mapSoundElement(childElement);
+        //   break;
+      }
+      if (mappedElement) {
+        // Before pushing, validate with the specific schema if possible (optional)
+        // This helps catch issues earlier. For example, if mappedElement is Note:
+        // if (childElement.nodeName.toLowerCase() === 'note') {
+        //   try { NoteSchema.parse(mappedElement); } catch (e) { console.error('Note parse error', e, mappedElement); }
+        // }
+        content.push(mappedElement);
+      }
     }
-    throw e;
+  });
+
+  const measureNumber = measureElement.getAttribute('number') || '';
+  const implicitAttr = measureElement.getAttribute('implicit');
+  const nonControllingAttr = measureElement.getAttribute('non-controlling');
+  const widthAttr = measureElement.getAttribute('width');
+
+  const measureData: Partial<Measure> = {
+    number: measureNumber,
+    implicit: implicitAttr === 'yes' ? true : undefined,
+    nonControlling: nonControllingAttr === 'yes' ? true : undefined,
+    width: widthAttr ? parseOptionalFloat(widthAttr) : undefined,
+    content: content.length > 0 ? content : undefined,
+  };
+  
+  // Remove undefined properties from measureData before parsing
+  const cleanedMeasureData = Object.fromEntries(
+    Object.entries(measureData).filter(([_, v]) => v !== undefined)
+  ) as Measure;
+
+  // It is crucial that the returned object strictly matches the Measure schema
+  try {
+    return MeasureSchema.parse(cleanedMeasureData); 
+  } catch (e) {
+    console.error("Failed to parse measure element: ", e, cleanedMeasureData, measureElement.outerHTML);
+    // Return a default or throw, depending on desired error handling
+    // For now, rethrow to make issues visible during development
+    throw new Error(`Measure parsing failed for measure number ${measureNumber}: ${e}`);
   }
-};
+}
 
 // Mapper for <part> element
 export const mapPartElement = (element: Element): Part => {
@@ -243,17 +1190,610 @@ export const mapPartListElement = (element: Element): PartList => {
   return result.data;
 };
 
+// Helper to parse <margins> element (common for page and system layout)
+const mapMarginsElement = (element: Element): Margins | undefined => {
+  if (!element) return undefined;
+  const marginsData: Partial<Margins> = {
+    leftMargin: parseFloatContent(element, 'left-margin'),
+    rightMargin: parseFloatContent(element, 'right-margin'),
+    topMargin: parseFloatContent(element, 'top-margin'),
+    bottomMargin: parseFloatContent(element, 'bottom-margin'),
+  };
+  // Remove undefined to allow Zod to correctly validate optional fields
+  Object.keys(marginsData).forEach(key => marginsData[key as keyof Margins] === undefined && delete marginsData[key as keyof Margins]);
+  if (Object.keys(marginsData).length === 0) return undefined;
+  try {
+    return MarginsSchema.parse(marginsData);
+  } catch (e) {
+    // console.warn("Failed to parse margins element:", JSON.stringify(marginsData, null, 2), (e as z.ZodError).errors);
+    return undefined;
+  }
+};
+
+// Helper to parse <page-layout> element
+const mapPageLayoutElement = (element: Element): PageLayout | undefined => {
+  if (!element) return undefined;
+  const pageLayoutData: Partial<PageLayout> = {
+    pageHeight: parseFloatContent(element, 'page-height'),
+    pageWidth: parseFloatContent(element, 'page-width'),
+  };
+  const pageMarginsElements = Array.from(element.querySelectorAll('page-margins'));
+  if (pageMarginsElements.length > 0) {
+    const mappedMargins = pageMarginsElements.map(mapMarginsElement).filter(Boolean) as Margins[];
+    if (mappedMargins.length > 0) pageLayoutData.pageMargins = mappedMargins;
+  }
+  Object.keys(pageLayoutData).forEach(key => pageLayoutData[key as keyof PageLayout] === undefined && delete pageLayoutData[key as keyof PageLayout]);
+  if (Object.keys(pageLayoutData).length === 0) return undefined;
+  try {
+    return PageLayoutSchema.parse(pageLayoutData);
+  } catch (e) {
+    // console.warn("Failed to parse page-layout element:", JSON.stringify(pageLayoutData, null, 2), (e as z.ZodError).errors);
+    return undefined;
+  }
+};
+
+// Helper to parse <system-layout> element
+const mapSystemLayoutElement = (element: Element): SystemLayout | undefined => {
+  if (!element) return undefined;
+  const systemLayoutData: Partial<SystemLayout> = {
+    systemDistance: parseFloatContent(element, 'system-distance'),
+    topSystemDistance: parseFloatContent(element, 'top-system-distance'),
+  };
+  const systemMarginsElement = element.querySelector('system-margins');
+  if (systemMarginsElement) {
+    const mappedMargins = mapMarginsElement(systemMarginsElement);
+    if (mappedMargins) systemLayoutData.systemMargins = mappedMargins;
+  }
+  Object.keys(systemLayoutData).forEach(key => systemLayoutData[key as keyof SystemLayout] === undefined && delete systemLayoutData[key as keyof SystemLayout]);
+  if (Object.keys(systemLayoutData).length === 0) return undefined;
+  try {
+    return SystemLayoutSchema.parse(systemLayoutData);
+  } catch (e) {
+    // console.warn("Failed to parse system-layout element:", JSON.stringify(systemLayoutData, null, 2), (e as z.ZodError).errors);
+    return undefined;
+  }
+};
+
+// Helper to parse <line-width> element
+const mapLineWidthElement = (element: Element): LineWidth | undefined => {
+  if (!element) return undefined;
+  const lineWidthData: Partial<LineWidth> = {
+    type: getAttribute(element, 'type'),
+    value: element.textContent ? parseFloat(element.textContent.trim()) : undefined,
+  };
+  Object.keys(lineWidthData).forEach(key => lineWidthData[key as keyof LineWidth] === undefined && delete lineWidthData[key as keyof LineWidth]);
+  if (Object.keys(lineWidthData).length === 0 || lineWidthData.type === undefined) return undefined; // type is often crucial
+  try {
+    return LineWidthSchema.parse(lineWidthData);
+  } catch (e) {
+    // console.warn("Failed to parse line-width element:", JSON.stringify(lineWidthData, null, 2), (e as z.ZodError).errors);
+    return undefined;
+  }
+};
+
+// Helper to parse <appearance> element
+const mapAppearanceElement = (element: Element): Appearance | undefined => {
+  if (!element) return undefined;
+  const appearanceData: Partial<Appearance> = {};
+  const lineWidthElements = Array.from(element.querySelectorAll('line-width'));
+  if (lineWidthElements.length > 0) {
+    const mappedLineWidths = lineWidthElements.map(mapLineWidthElement).filter(Boolean) as LineWidth[];
+    if (mappedLineWidths.length > 0) appearanceData.lineWidths = mappedLineWidths;
+  }
+  // Add other appearance properties here (e.g., note-size)
+  if (Object.keys(appearanceData).length === 0) return undefined;
+  try {
+    return AppearanceSchema.parse(appearanceData);
+  } catch (e) {
+    // console.warn("Failed to parse appearance element:", JSON.stringify(appearanceData, null, 2), (e as z.ZodError).errors);
+    return undefined;
+  }
+};
+
+// Helper to parse font attributes, assuming FontSchema structure
+export const mapFontAttributes = (element: Element): Font => {
+  const fontFamily = getAttribute(element, 'font-family');
+  const fontStyleAttr = getAttribute(element, 'font-style');
+  const fontSize = getAttribute(element, 'font-size');
+  const fontWeightAttr = getAttribute(element, 'font-weight');
+
+  const fontData: Partial<Font> = {};
+
+  if (fontFamily) fontData.fontFamily = fontFamily;
+  if (fontSize) fontData.fontSize = fontSize;
+
+  if (fontStyleAttr === 'normal' || fontStyleAttr === 'italic') {
+    fontData.fontStyle = fontStyleAttr;
+  }
+
+  if (fontWeightAttr === 'normal' || fontWeightAttr === 'bold') {
+    fontData.fontWeight = fontWeightAttr;
+  }
+  return FontSchema.parse(fontData);
+};
+
+export const mapScalingElement = (element: Element): Scaling | undefined => {
+  if (!element) return undefined;
+  const scalingData: Partial<Scaling> = {
+    millimeters: parseFloatContent(element, 'millimeters'),
+    tenths: parseNumberContent(element, 'tenths'),
+  };
+  if (Object.values(scalingData).every(v => v === undefined)) return undefined;
+  return ScalingSchema.parse(scalingData);
+};
+
+export const mapLyricFontElement = (element: Element): LyricFont | undefined => {
+  if (!element) return undefined;
+  const fontAttrs = mapFontAttributes(element); 
+  const lyricFontData: Partial<LyricFont> = {
+    ...fontAttrs,
+    number: getAttribute(element, 'number'),
+    name: getAttribute(element, 'name'),
+  };
+  Object.keys(lyricFontData).forEach(key => lyricFontData[key as keyof LyricFont] === undefined && delete lyricFontData[key as keyof LyricFont]);
+  if (Object.keys(lyricFontData).length === 0) return undefined;
+  return LyricFontSchema.parse(lyricFontData);
+};
+
+export const mapDefaultsElement = (element: Element): Defaults | undefined => {
+  if (!element) return undefined;
+
+  const scalingElement = element.querySelector('scaling');
+  const concertScoreElement = element.querySelector('concert-score');
+  const pageLayoutElement = element.querySelector('page-layout'); // Added
+  const systemLayoutElement = element.querySelector('system-layout'); // Added
+  const appearanceElement = element.querySelector('appearance'); // Added
+  const musicFontElement = element.querySelector('music-font');
+  const wordFontElement = element.querySelector('word-font');
+  const lyricFontElements = Array.from(element.querySelectorAll('lyric-font'));
+  const lyricLanguageElements = Array.from(element.querySelectorAll('lyric-language'));
+  // TODO: Add staff-layout mapping if needed
+
+  const defaultsData: Partial<Defaults> = {};
+
+  if (scalingElement) {
+    const mappedScaling = mapScalingElement(scalingElement);
+    if (mappedScaling) defaultsData.scaling = mappedScaling;
+  }
+  if (concertScoreElement) {
+    defaultsData.concertScore = {}; 
+  }
+  if (pageLayoutElement) { // Added
+    const mappedPageLayout = mapPageLayoutElement(pageLayoutElement);
+    if (mappedPageLayout) defaultsData.pageLayout = mappedPageLayout;
+  }
+  if (systemLayoutElement) { // Added
+    const mappedSystemLayout = mapSystemLayoutElement(systemLayoutElement);
+    if (mappedSystemLayout) defaultsData.systemLayout = mappedSystemLayout;
+  }
+  if (appearanceElement) { // Added
+    const mappedAppearance = mapAppearanceElement(appearanceElement);
+    if (mappedAppearance) defaultsData.appearance = mappedAppearance;
+  }
+  if (musicFontElement) {
+    try {
+        defaultsData.musicFont = mapFontAttributes(musicFontElement);
+    } catch (e) {
+        console.warn("Failed to parse music-font attributes", e);
+    }
+  }
+  if (wordFontElement) {
+    try {
+        defaultsData.wordFont = mapFontAttributes(wordFontElement);
+    } catch (e) {
+        console.warn("Failed to parse word-font attributes", e);
+    }
+  }
+  if (lyricFontElements.length > 0) {
+    const mappedFonts = lyricFontElements.map(mapLyricFontElement).filter(Boolean) as LyricFont[];
+    if (mappedFonts.length > 0) defaultsData.lyricFonts = mappedFonts;
+  }
+  if (lyricLanguageElements.length > 0) {
+    const mappedLanguages = lyricLanguageElements.map(mapLyricLanguageElement).filter(Boolean) as LyricLanguage[];
+    if (mappedLanguages.length > 0) defaultsData.lyricLanguages = mappedLanguages;
+  }
+
+  if (Object.keys(defaultsData).length === 0) {
+    return undefined;
+  }
+  try {
+    return DefaultsSchema.parse(defaultsData);
+  } catch (e) {
+    console.error("Failed to parse defaults element:", JSON.stringify(defaultsData, null, 2));
+    console.error("Validation errors:", (e as z.ZodError).errors);
+    return undefined;
+  }
+};
+
+export const mapCreditWordsElement = (element: Element): CreditWords | undefined => {
+  const text = element.textContent?.trim();
+
+  const formatting: Partial<TextFormatting> = {};
+  const fontFamily = getAttribute(element, 'font-family');
+  const fontStyleAttr = getAttribute(element, 'font-style');
+  const fontSize = getAttribute(element, 'font-size');
+  const fontWeightAttr = getAttribute(element, 'font-weight');
+  const justifyAttr = getAttribute(element, 'justify');
+  const defaultX = parseOptionalNumberAttribute(element, 'default-x');
+  const defaultY = parseOptionalNumberAttribute(element, 'default-y');
+  const valignAttr = getAttribute(element, 'valign');
+  const halignAttr = getAttribute(element, 'halign'); // Read halign
+
+  if (fontFamily) formatting.fontFamily = fontFamily;
+  if (fontSize) formatting.fontSize = fontSize;
+  if (defaultX !== undefined) formatting.defaultX = defaultX;
+  if (defaultY !== undefined) formatting.defaultY = defaultY;
+
+  if (fontStyleAttr === 'normal' || fontStyleAttr === 'italic') {
+    formatting.fontStyle = fontStyleAttr;
+  }
+  if (fontWeightAttr === 'normal' || fontWeightAttr === 'bold') {
+    formatting.fontWeight = fontWeightAttr;
+  }
+  if (justifyAttr === 'left' || justifyAttr === 'center' || justifyAttr === 'right') {
+    formatting.justify = justifyAttr;
+  }
+  if (valignAttr === 'top' || valignAttr === 'middle' || valignAttr === 'bottom' || valignAttr === 'baseline') {
+    formatting.valign = valignAttr;
+  }
+
+  let finalJustify = justifyAttr;
+  if (!finalJustify && halignAttr) {
+    finalJustify = halignAttr;
+  }
+
+  if (finalJustify === 'left' || finalJustify === 'center' || finalJustify === 'right') {
+    formatting.justify = finalJustify;
+  }
+
+  const data: Partial<CreditWords> = { text: text || "" }; // Ensure text is always a string
+  if (Object.keys(formatting).length > 0) {
+    data.formatting = formatting as TextFormatting;
+  }
+  
+  // Only return undefined if there's no text AND no formatting attributes at all,
+  // unless the element itself has other attributes (which implies it's meaningful).
+  // An empty text string with formatting is valid.
+  if (data.text === "" && Object.keys(formatting).length === 0 && !element.hasAttributes()) {
+    return undefined;
+  }
+
+  try { 
+    return CreditWordsSchema.parse(data); 
+  } catch (e) { 
+    // console.warn("CreditWords parse error. Data:", JSON.stringify(data, null, 2), "Error:", (e as z.ZodError).errors);
+    return undefined; 
+  }
+};
+
+export const mapCreditSymbolElement = (element: Element): CreditSymbol | undefined => {
+  return undefined; // Add this line to satisfy the return type
+};
+
+export function mapRootElement(element: Element): z.infer<typeof RootSchema> | undefined {
+  if (!element) return undefined;
+  const stepContent = element.querySelector('root-step')?.textContent?.trim();
+  const alterContent = element.querySelector('root-alter')?.textContent?.trim();
+  const textContentVal = element.querySelector('text')?.textContent?.trim();
+
+  const rootData: Partial<z.infer<typeof RootSchema>> = {};
+  if (stepContent) {
+    const stepParseResult = RootStepSchema.safeParse(stepContent);
+    if (stepParseResult.success) rootData.step = stepParseResult.data;
+  }
+  if (alterContent) rootData.alter = parseOptionalInt(alterContent);
+  if (textContentVal) rootData.text = textContentVal;
+
+  const result = RootSchema.safeParse(rootData);
+  if (result.success) return result.data;
+  return undefined;
+}
+
+export function mapKindElement(element: Element): z.infer<typeof KindSchema> | undefined {
+  if (!element) return undefined;
+  const valueContent = element.querySelector('kind')?.textContent?.trim(); // Assuming 'kind' is the text content element for value
+  // If kind value is directly in textContent of <kind> itself and not a child:
+  // const valueContent = element.textContent?.trim();
+
+
+  if (!valueContent) { // If there's no direct child/text content for value, or it's empty
+      // Check for text attribute as a fallback if your schema/data uses it for kind value
+      const textAttrValue = getAttribute(element, 'text');
+      if (textAttrValue) {
+        // This part depends on how your KindSchema expects the 'value' and 'text'
+        // If 'text' attribute can define the kind's 'value':
+        const valueParseResult = KindValueEnum.safeParse(textAttrValue);
+        if (valueParseResult.success) {
+            const kindData : Partial<z.infer<typeof KindSchema>> = { value: valueParseResult.data, text: textAttrValue };
+            // Add other attributes like useSymbols, parenthesesDegrees, bracketDegrees
+            const useSymbolsAttr = getAttribute(element, 'use-symbols');
+            if (useSymbolsAttr) kindData.useSymbols = useSymbolsAttr as 'yes' | 'no';
+            // ... parse other attributes ...
+            const finalResult = KindSchema.safeParse(kindData);
+            if(finalResult.success) return finalResult.data;
+        }
+        return undefined; // Or handle as 'other' if applicable
+      }
+      return undefined; // No value found
+  }
+
+
+  const kindData: Partial<z.infer<typeof KindSchema>> = {};
+  const valueParseResult = KindValueEnum.safeParse(valueContent);
+  
+  if (valueParseResult.success) {
+    kindData.value = valueParseResult.data;
+  } else {
+    // If parsing the content fails, check if it's meant to be 'other' with text attribute
+    const textAttr = getAttribute(element, 'text');
+    if (textAttr) { // If there's a text attribute, assume 'other'
+        kindData.value = 'other';
+        kindData.text = textAttr; // Use the text attribute
+    } else {
+        // console.warn(`Kind value "${valueContent}" is not a valid KindValueEnum and no text attribute for 'other'.`);
+        return undefined; // Or default to 'other' if that's desired: kindData.value = 'other'; kindData.text = valueContent;
+    }
+  }
+
+  // If kindData.value was set (either parsed or defaulted to 'other')
+  // then proceed to parse other attributes.
+  if (kindData.value){
+      // If value was parsed successfully but there's also a text attribute, it might override or supplement.
+      // Current KindSchema uses 'text' for 'other' or specific alterations.
+      // If valueContent was successfully parsed, and there's a text attribute, and it's not 'other', decide precedence.
+      // For now, if valueContent parsed, we use it. If it was 'other', textAttr is already assigned.
+      const textAttr = getAttribute(element, 'text');
+      if (textAttr && kindData.value === 'other' && !kindData.text) { // If 'other' and text not set from valueContent
+          kindData.text = textAttr;
+      } else if (textAttr && kindData.value !== 'other') {
+          // If kind is not 'other' but has a text attribute, MusicXML might use it for display.
+          // Add it if your schema expects/allows it.
+          kindData.text = textAttr; // Example: store it if present
+      }
+
+
+      const useSymbolsAttr = getAttribute(element, 'use-symbols');
+      const parenthesesDegreesAttr = getAttribute(element, 'parentheses-degrees');
+      const bracketDegreesAttr = getAttribute(element, 'bracket-degrees');
+
+      if (useSymbolsAttr) kindData.useSymbols = useSymbolsAttr as 'yes' | 'no';
+      if (parenthesesDegreesAttr) kindData.parenthesesDegrees = parenthesesDegreesAttr as 'yes' | 'no';
+      if (bracketDegreesAttr) kindData.bracketDegrees = bracketDegreesAttr as 'yes' | 'no';
+  } else {
+      return undefined; // If no kind value could be determined
+  }
+
+  const result = KindSchema.safeParse(kindData);
+  if (result.success) return result.data;
+  // console.warn("Failed to parse kind element:", result.error, kindData, element.outerHTML);
+  return undefined;
+}
+
+export function mapBassElement(element: Element): z.infer<typeof BassSchema> | undefined {
+  if (!element) return undefined;
+  const stepContent = element.querySelector('bass-step')?.textContent?.trim();
+  const alterContent = element.querySelector('bass-alter')?.textContent?.trim();
+  const textContentVal = element.querySelector('text')?.textContent?.trim(); // For text attribute of bass itself if any
+
+  const bassData: Partial<z.infer<typeof BassSchema>> = {};
+  if (stepContent) {
+    const stepParseResult = BassStepSchema.safeParse(stepContent);
+    if (stepParseResult.success) bassData.step = stepParseResult.data;
+  }
+  if (alterContent) bassData.alter = parseOptionalInt(alterContent);
+  
+  // In MusicXML, <bass> itself doesn't have a text attribute for its value,
+  // but if there's a <text> child element for display purposes (not standard for <bass>):
+  if (textContentVal) bassData.text = textContentVal;
+
+
+  const result = BassSchema.safeParse(bassData);
+  if (result.success && (bassData.step || bassData.text)) return result.data; // Ensure there's at least a step or text
+  return undefined;
+}
+
+export function mapDegreeElement(element: Element): z.infer<typeof DegreeSchema> | undefined {
+  if (!element) return undefined;
+  const valueContent = element.querySelector('degree-value')?.textContent?.trim();
+  const typeContent = element.querySelector('degree-type')?.textContent?.trim();
+  // const alterContent = element.querySelector('degree-alter')?.textContent?.trim(); // Corrected selector
+  const alterElement = element.querySelector('degree-alter');
+
+
+  if (!valueContent || !typeContent) return undefined;
+  
+  const degreeData: Partial<z.infer<typeof DegreeSchema>> = {};
+  const valueNum = parseOptionalInt(valueContent);
+  if (valueNum === undefined) return undefined; 
+  degreeData.value = valueNum;
+
+  const typeParseResult = DegreeTypeEnum.safeParse(typeContent);
+  if (typeParseResult.success) degreeData.type = typeParseResult.data;
+  else return undefined; 
+
+  // const alterNum = alterContent ? parseOptionalInt(alterContent) : undefined;
+  // if (alterNum !== undefined) degreeData.alter = alterNum;
+  if (alterElement) {
+    const alterText = alterElement.textContent?.trim();
+    if (alterText) {
+        const alterNum = parseOptionalInt(alterText);
+        if (alterNum !== undefined) {
+            // Check if alter is compatible with degree type (e.g., 'add' usually doesn't have alter)
+            // This logic depends on how strict you want to be based on MusicXML rules.
+            // For now, we parse it if present.
+            degreeData.alter = alterNum;
+        }
+    }
+  }
+
+
+  const textAttr = getAttribute(element, 'text');
+  const printObjectAttr = getAttribute(element, 'print-object');
+
+  if (textAttr) degreeData.text = textAttr;
+  if (printObjectAttr) degreeData.printObject = printObjectAttr as 'yes' | 'no';
+
+  const result = DegreeSchema.safeParse(degreeData);
+  if (result.success) return result.data;
+  // console.warn("Failed to parse degree element:", result.error, degreeData, element.outerHTML);
+  return undefined;
+}
+
+export function mapHarmonyElement(harmonyElement: Element): Harmony | undefined {
+  if (!harmonyElement) return undefined;
+
+  const rootNode = harmonyElement.querySelector('root');
+  const kindNode = harmonyElement.querySelector('kind');
+  const bassNode = harmonyElement.querySelector('bass');
+  const degreeNodes = Array.from(harmonyElement.querySelectorAll('degree'));
+  
+  const inversionText = harmonyElement.querySelector('inversion')?.textContent?.trim();
+  const staffText = harmonyElement.querySelector('staff')?.textContent?.trim();
+  const printObjectAttr = getAttribute(harmonyElement, 'print-object');
+  const printFrameAttr = getAttribute(harmonyElement, 'print-frame');
+  const placementAttr = getAttribute(harmonyElement, 'placement');
+  const typeAttr = getAttribute(harmonyElement, 'type'); // For harmony type
+
+  const harmony: Partial<Harmony> = {
+    _type: 'harmony'
+  };
+
+  if (typeAttr && (typeAttr === 'explicit' || typeAttr === 'implied' || typeAttr === 'alternate')) {
+    harmony.type = typeAttr as 'explicit' | 'implied' | 'alternate';
+  }
+
+  const mappedRoot = rootNode ? mapRootElement(rootNode) : undefined;
+  if(mappedRoot) harmony.root = mappedRoot;
+  
+  const mappedKind = kindNode ? mapKindElement(kindNode) : undefined;
+  if(mappedKind) harmony.kind = mappedKind;
+
+  if(inversionText) harmony.inversion = parseOptionalInt(inversionText);
+  
+  const mappedBass = bassNode ? mapBassElement(bassNode) : undefined;
+  if(mappedBass) harmony.bass = mappedBass;
+  
+  const mappedDegrees = degreeNodes.map(mapDegreeElement).filter(Boolean) as z.infer<typeof DegreeSchema>[];
+  if(mappedDegrees && mappedDegrees.length > 0) harmony.degrees = mappedDegrees;
+
+  // Frame mapping (placeholder for now, needs actual FrameSchema and mapper)
+  const frameNode = harmonyElement.querySelector('frame');
+  if (frameNode) {
+    // harmony.frame = mapFrameElement(frameNode); // This will be the call when mapFrameElement exists
+    // For now, if FrameSchema is just a placeholder, we might not map anything or map a placeholder
+  }
+
+  if(staffText) harmony.staff = parseOptionalInt(staffText);
+  if(printObjectAttr) harmony.printObject = printObjectAttr as 'yes' | 'no';
+  if(printFrameAttr) harmony.printFrame = printFrameAttr as 'yes' | 'no';
+  if(placementAttr && (placementAttr === 'above' || placementAttr === 'below')) {
+      harmony.placement = placementAttr as 'above' | 'below';
+  }
+  
+  // Only attempt to parse if there's at least one core harmony component
+  // (root, kind, bass, or degrees). Type attribute alone might not be enough.
+  if (!harmony.root && !harmony.kind && !harmony.bass && (!harmony.degrees || harmony.degrees.length === 0) && !harmony.type) {
+    // If only _type and no other meaningful data, consider it not a valid harmony object to map.
+    // This check might need adjustment based on how minimal a <harmony> can be.
+    // For example, if <harmony type="implied"/> is valid with nothing else.
+    if (Object.keys(harmony).length <= 1) return undefined; // Only _type
+  }
+
+
+  const validation = HarmonySchema.safeParse(harmony);
+  if (validation.success) {
+    return validation.data;
+  } else {
+    // console.error("Failed to parse harmony element:", validation.error.flatten().fieldErrors, JSON.stringify(harmony,null,2), harmonyElement.outerHTML);
+    return undefined;
+  }
+};
+
+export const mapCreditImageElement = (element: Element): CreditImage | undefined => {
+  const source = getAttribute(element, 'source');
+  const type = getAttribute(element, 'type');
+  if (!source || !type) {
+    // console.warn("<credit-image> is missing required 'source' or 'type' attribute.");
+    return undefined;
+  }
+
+  const data: Partial<CreditImage> = { source, type };
+  const h = parseOptionalNumberAttribute(element, 'height'); if(h !== undefined) data.height = h;
+  const w = parseOptionalNumberAttribute(element, 'width'); if(w !== undefined) data.width = w;
+  const dx = parseOptionalNumberAttribute(element, 'default-x'); if(dx !== undefined) data.defaultX = dx;
+  const dy = parseOptionalNumberAttribute(element, 'default-y'); if(dy !== undefined) data.defaultY = dy;
+  const haAttr = getAttribute(element, 'halign');
+  const vaAttr = getAttribute(element, 'valign');
+
+  if (haAttr && (haAttr === 'left' || haAttr === 'center' || haAttr === 'right')) {
+    data.halign = haAttr as 'left' | 'center' | 'right';
+  }
+  if (vaAttr && (vaAttr === 'top' || vaAttr === 'middle' || vaAttr === 'bottom')) {
+    data.valign = vaAttr as 'top' | 'middle' | 'bottom';
+  }
+
+  try { 
+    return CreditImageSchema.parse(data); 
+  } catch (e) { 
+    // console.warn("CreditImage parse error", data, (e as z.ZodError).errors);
+    return undefined; 
+  }
+};
+
+export const mapCreditElement = (element: Element): Credit | undefined => {
+  const page = getAttribute(element, 'page');
+  const creditTypes = Array.from(element.querySelectorAll('credit-type')).map(el => el.textContent?.trim()).filter(Boolean) as string[];
+  const creditWordsElements = Array.from(element.querySelectorAll('credit-words'));
+  const creditSymbolElements = Array.from(element.querySelectorAll('credit-symbol'));
+  const creditImageEl = element.querySelector('credit-image');
+
+  const creditWords = creditWordsElements.map(mapCreditWordsElement).filter(Boolean) as CreditWords[];
+  const creditSymbols = creditSymbolElements.map(mapCreditSymbolElement).filter(Boolean) as CreditSymbol[];
+  const creditImage = creditImageEl ? mapCreditImageElement(creditImageEl) : undefined;
+
+  const data: Partial<Credit> = {};
+  if (page) data.page = page;
+  if (creditTypes.length > 0) data.creditTypes = creditTypes;
+  
+  if (creditWords.length > 0) data.creditWords = creditWords;
+  // MusicXML DTD implies credit-words, credit-symbol, credit-image are choices,
+  // but common usage might mix them. For stricter parsing, you might need a refine on CreditSchema.
+  // For now, we allow them to coexist if mapped.
+  if (creditSymbols.length > 0) data.creditSymbols = creditSymbols;
+  if (creditImage) data.creditImage = creditImage;
+
+  // If nothing was mapped besides potentially a page number, it might not be a valid credit element.
+  if (Object.keys(data).length === 0 || (Object.keys(data).length === 1 && data.page)) {
+      if (creditWords.length === 0 && creditSymbols.length === 0 && !creditImage && creditTypes.length === 0) {
+          // console.warn("Credit element is empty or only has page number, returning undefined.", element.outerHTML);
+          return undefined;
+      }
+  }
+  
+  try { 
+    return CreditSchema.parse(data); 
+  } catch (e) { 
+    console.error("Credit parse error", JSON.stringify(data, null, 2), (e as z.ZodError).errors); 
+    return undefined; 
+  }
+};
+
 // Main mapper for the document
 export const mapDocumentToScorePartwise = (
   doc: XMLDocument,
 ): ScorePartwise => {
-  const rootElement = doc.documentElement; // Should be <score-partwise>
+  const rootElement = doc.documentElement;
   if (rootElement.nodeName !== 'score-partwise') {
     throw new Error(
       `Expected root element <score-partwise>, but got <${rootElement.nodeName}>`,
     );
   }
 
+  const workElement = rootElement.querySelector('work');
+  const movementTitleElement = rootElement.querySelector('movement-title');
+  const identificationElement = rootElement.querySelector('identification');
+  const defaultsElement = rootElement.querySelector('defaults');
+  const creditElements = Array.from(rootElement.querySelectorAll('credit'));
   const partListElement = rootElement.querySelector('part-list');
   const partElements = Array.from(rootElement.querySelectorAll('part'));
 
@@ -261,11 +1801,29 @@ export const mapDocumentToScorePartwise = (
     throw new Error('<part-list> element not found in <score-partwise>');
   }
 
-  const scorePartwiseData = {
+  const scorePartwiseData: Partial<ScorePartwise> = {
+    version: getAttribute(rootElement, 'version') || '1.0', // Default to 1.0 if not specified
     partList: mapPartListElement(partListElement),
     parts: partElements.map(mapPartElement),
-    version: getAttribute(rootElement, 'version') || '1.0', // Default or parse
   };
+
+  if (workElement) {
+    scorePartwiseData.work = mapWorkElement(workElement);
+  }
+  if (movementTitleElement) {
+    scorePartwiseData.movementTitle = movementTitleElement.textContent?.trim();
+  }
+  if (identificationElement) {
+    scorePartwiseData.identification = mapIdentificationElement(identificationElement);
+  }
+  if (defaultsElement) {
+    const mappedDefaults = mapDefaultsElement(defaultsElement);
+    if (mappedDefaults) scorePartwiseData.defaults = mappedDefaults;
+  }
+  if (creditElements.length > 0) {
+    const mappedCredits = creditElements.map(mapCreditElement).filter(Boolean) as Credit[];
+    if (mappedCredits.length > 0) scorePartwiseData.credit = mappedCredits;
+  }
 
   const result = ScorePartwiseSchema.safeParse(scorePartwiseData);
   if (!result.success) {
@@ -277,4 +1835,20 @@ export const mapDocumentToScorePartwise = (
     throw new Error('ScorePartwise parsing failed.');
   }
   return result.data;
+};
+
+export const mapLyricLanguageElement = (element: Element): LyricLanguage | undefined => {
+  if (!element) return undefined;
+  const xmlLang = getAttribute(element, 'xml:lang');
+  if (!xmlLang) { 
+    console.warn("<lyric-language> is missing required 'xml:lang' attribute.");
+    return undefined;
+  }
+  const lyricLanguageData: Partial<LyricLanguage> = {
+    number: getAttribute(element, 'number'),
+    name: getAttribute(element, 'name'),
+    xmlLang: xmlLang,
+  };
+  Object.keys(lyricLanguageData).forEach(key => lyricLanguageData[key as keyof LyricLanguage] === undefined && delete lyricLanguageData[key as keyof LyricLanguage]);
+  return LyricLanguageSchema.parse(lyricLanguageData);
 };

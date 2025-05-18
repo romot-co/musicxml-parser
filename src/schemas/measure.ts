@@ -1,40 +1,40 @@
 import { z } from 'zod';
 import { NoteSchema } from './note';
-import { AttributesSchema } from './attributes'; // Import AttributesSchema
+import { AttributesSchema } from './attributes';
+import { DirectionSchema } from './direction';
+import { BarlineSchema } from './barline';
+import { HarmonySchema } from './harmony';
+// Import other implemented schemas that can be direct children of <measure>
+// For example, if ForwardSchema, BackupSchema are implemented, import them here.
 
-// Placeholder for a more detailed AttributesSchema
-// This will eventually be defined in its own file (e.g., src/schemas/attributes.ts)
-// and include schemas for <key>, <time>, <clef>, <divisions>, etc.
-const AttributesSchemaPlaceholder = z.object({
-  // Example placeholder fields, these would be more specific:
-  // divisions: z.number().positive().optional(),
-  // key: KeySchema.optional(), // Requires KeySchema
-  // time: TimeSchema.optional(), // Requires TimeSchema
-  // clef: ClefSchema.optional(), // Requires ClefSchema
-}).passthrough(); // Allows other attributes not explicitly defined for now
+// Defines the content of a measure, which can be a mix of elements
+// Add other valid measure content elements to this union as they are implemented.
+export const MeasureContentSchema = z.union([
+  NoteSchema,
+  AttributesSchema,
+  DirectionSchema,
+  BarlineSchema,
+  HarmonySchema,
+  // FiguredBassSchema, // Add when implemented
+  // PrintSchema,       // Add when implemented
+  // SoundSchema,       // Add when implemented
+  // GroupingSchema,    // Add when implemented
+  // LinkSchema,        // Add when implemented
+  // BookmarkSchema,    // Add when implemented
+  // BackupSchema,      // Add when implemented
+  // ForwardSchema,     // Add when implemented
+]);
 
-/**
- * Represents a single measure in a piece of music.
- */
 export const MeasureSchema = z.object({
-  /** The measure number (e.g., "1", "2", "1a"). Usually a string. */
-  number: z.string(),
-  /**
-   * Attributes describe musical information such as key signature, time signature, clef, etc.
-   * These often appear at the beginning of a part or when changes occur.
-   */
-  attributes: z.array(AttributesSchema).optional(), // Attributes can appear in a measure
-  /**
-   * An array of notes, rests, and potentially other musical elements within the measure.
-   * Can be empty for pickup measures or measures with only barlines/directions.
-   */
-  notes: z.array(NoteSchema).optional().default([]), // notes can be optional, default to empty array
-  // Other potential elements within a measure:
-  // barline: BarlineSchema.optional(),
-  // direction: z.array(DirectionSchema).optional(),
-  // harmony: z.array(HarmonySchema).optional(),
-  // print: PrintSchema.optional(), // For page breaks, system breaks etc.
-  // sound: SoundSchema.optional(), // For tempo, dynamics etc. (sometimes within direction)
-}).passthrough(); // Allows other elements not explicitly defined for now, useful for forward compatibility
+  number: z.string(), // Measure number can be complex (e.g., "1a")
+  implicit: z.boolean().optional(),
+  nonControlling: z.boolean().optional(),
+  width: z.number().optional(),
+  content: z.array(MeasureContentSchema).optional().default([]),
+  // The 'passthrough()' below was removed as explicit content modeling is preferred.
+  // If truly unknown elements need to be captured, a specific 'any' or 'unknown'
+  // type could be added to the union, or passthrough could be re-enabled with caution.
+});
 
 export type Measure = z.infer<typeof MeasureSchema>;
+export type MeasureContent = z.infer<typeof MeasureContentSchema>;
