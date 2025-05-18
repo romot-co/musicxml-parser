@@ -44,3 +44,6 @@ export * from "./timeModification";
 export * from "./fermata";
 export * from "./wavyLine";
 export * from "./editorial";
+export * from "./scoreInstrument";
+export * from "./midiDevice";
+export * from "./midiInstrument";
