@@ -47,4 +47,24 @@ describe("Direction parsing", () => {
     expect(dt.segno).toBeDefined();
     expect(dt.coda).toBeDefined();
   });
+
+  it("parses wedge with all attributes", () => {
+    const xml = `<direction><direction-type><wedge type="crescendo" number="3" spread="12.5" niente="yes" line-type="dashed" dash-length="1.2" space-length="2.3" default-x="4.5" default-y="-3" relative-x="1" relative-y="-2" color="red" id="w1"/></direction-type></direction>`;
+    const el = createElement(xml);
+    const direction = mapDirectionElement(el);
+    const wedge = direction.direction_type[0].wedge!;
+    expect(wedge.type).toBe("crescendo");
+    expect(wedge.number).toBe(3);
+    expect(wedge.spread).toBe(12.5);
+    expect(wedge.niente).toBe("yes");
+    expect(wedge.lineType).toBe("dashed");
+    expect(wedge.dashLength).toBe(1.2);
+    expect(wedge.spaceLength).toBe(2.3);
+    expect(wedge.defaultX).toBe(4.5);
+    expect(wedge.defaultY).toBe(-3);
+    expect(wedge.relativeX).toBe(1);
+    expect(wedge.relativeY).toBe(-2);
+    expect(wedge.color).toBe("red");
+    expect(wedge.id).toBe("w1");
+  });
 });

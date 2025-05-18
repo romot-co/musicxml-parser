@@ -73,6 +73,7 @@ import type {
   Grace,
   Cue,
   Unpitched,
+  TimeModification,
   Font,
   Scaling,
   LyricFont,
@@ -175,6 +176,7 @@ import {
   GraceSchema,
   CueSchema,
   UnpitchedSchema,
+  TimeModificationSchema,
   FontSchema,
   ScalingSchema,
   LyricFontSchema,
@@ -333,6 +335,29 @@ export const mapLyricElement = (element: Element): Lyric => {
   return LyricSchema.parse(lyricData);
 };
 
+// Helper function to map a <time-modification> element
+export const mapTimeModificationElement = (
+  element: Element,
+): TimeModification => {
+  const actualNotes = parseNumberContent(element, "actual-notes");
+  const normalNotes = parseNumberContent(element, "normal-notes");
+  if (actualNotes === undefined || normalNotes === undefined) {
+    throw new Error("<time-modification> requires actual-notes and normal-notes");
+  }
+  const normalType = getTextContent(element, "normal-type");
+  const normalDotElements = Array.from(element.querySelectorAll("normal-dot"));
+
+  const tmData: Partial<TimeModification> = {
+    actualNotes,
+    normalNotes,
+  };
+  if (normalType) tmData.normalType = normalType;
+  if (normalDotElements.length > 0) {
+    tmData.normalDots = normalDotElements.map(() => ({}));
+  }
+  return TimeModificationSchema.parse(tmData);
+};
+
 // Mapper for <note> element
 export const mapNoteElement = (element: Element): Note => {
   const graceElement = element.querySelector("grace");
@@ -349,6 +374,7 @@ export const mapNoteElement = (element: Element): Note => {
   const notationsElement = element.querySelector("notations");
   const lyricElements = Array.from(element.querySelectorAll("lyric"));
   const tieElements = Array.from(element.querySelectorAll("tie"));
+  const timeModElement = element.querySelector("time-modification");
 
   const noteData: Partial<Note> = {
     _type: "note",
@@ -399,6 +425,9 @@ export const mapNoteElement = (element: Element): Note => {
   const duration = parseNumberContent(element, "duration");
   if (duration !== undefined) {
     noteData.duration = duration;
+  }
+  if (timeModElement) {
+    noteData.timeModification = mapTimeModificationElement(timeModElement);
   }
 
   if (tieElements.length > 0) {
@@ -866,6 +895,49 @@ const mapDirectionTypeElement = (element: Element): DirectionType => {
       const sp = parseFloat(spread);
       if (!isNaN(sp)) wedgeData.spread = sp;
     }
+    const numberAttr = getAttribute(wedgeElement, "number");
+    if (numberAttr) {
+      const num = parseOptionalInt(numberAttr);
+      if (num !== undefined) wedgeData.number = num;
+    }
+    const nienteAttr = getAttribute(wedgeElement, "niente");
+    if (nienteAttr === "yes" || nienteAttr === "no") wedgeData.niente = nienteAttr;
+    const lineTypeAttr = getAttribute(wedgeElement, "line-type");
+    if (lineTypeAttr) wedgeData.lineType = lineTypeAttr;
+    const dashLenAttr = getAttribute(wedgeElement, "dash-length");
+    if (dashLenAttr) {
+      const dl = parseOptionalFloat(dashLenAttr);
+      if (dl !== undefined) wedgeData.dashLength = dl;
+    }
+    const spaceLenAttr = getAttribute(wedgeElement, "space-length");
+    if (spaceLenAttr) {
+      const sl = parseOptionalFloat(spaceLenAttr);
+      if (sl !== undefined) wedgeData.spaceLength = sl;
+    }
+    const defaultXAttr = getAttribute(wedgeElement, "default-x");
+    if (defaultXAttr) {
+      const dx = parseOptionalFloat(defaultXAttr);
+      if (dx !== undefined) wedgeData.defaultX = dx;
+    }
+    const defaultYAttr = getAttribute(wedgeElement, "default-y");
+    if (defaultYAttr) {
+      const dy = parseOptionalFloat(defaultYAttr);
+      if (dy !== undefined) wedgeData.defaultY = dy;
+    }
+    const relativeXAttr = getAttribute(wedgeElement, "relative-x");
+    if (relativeXAttr) {
+      const rx = parseOptionalFloat(relativeXAttr);
+      if (rx !== undefined) wedgeData.relativeX = rx;
+    }
+    const relativeYAttr = getAttribute(wedgeElement, "relative-y");
+    if (relativeYAttr) {
+      const ry = parseOptionalFloat(relativeYAttr);
+      if (ry !== undefined) wedgeData.relativeY = ry;
+    }
+    const colorAttr = getAttribute(wedgeElement, "color");
+    if (colorAttr) wedgeData.color = colorAttr;
+    const idAttr = getAttribute(wedgeElement, "id");
+    if (idAttr) wedgeData.id = idAttr;
     directionTypeData.wedge = WedgeSchema.parse(wedgeData);
   }
   if (segnoElement) {
@@ -988,7 +1060,7 @@ const mapEndingElement = (element: Element): Ending => {
       '<ending> element requires "number" and "type" attributes.',
     );
   }
-  const endingData = {
+  const endingData: Partial<Ending> = {
     number: number,
     type: type,
     text: element.textContent?.trim() || undefined,
@@ -997,6 +1069,64 @@ const mapEndingElement = (element: Element): Ending => {
       | "no"
       | undefined,
   };
+
+  const defaultXAttr = getAttribute(element, "default-x");
+  const defaultYAttr = getAttribute(element, "default-y");
+  const relativeXAttr = getAttribute(element, "relative-x");
+  const relativeYAttr = getAttribute(element, "relative-y");
+  const fontFamily = getAttribute(element, "font-family");
+  const fontStyleAttr = getAttribute(element, "font-style");
+  const fontSize = getAttribute(element, "font-size");
+  const fontWeightAttr = getAttribute(element, "font-weight");
+  const colorAttr = getAttribute(element, "color");
+  const systemAttr = getAttribute(element, "system") as
+    | "none"
+    | "only-top"
+    | "also-top"
+    | undefined;
+  const endLengthAttr = getAttribute(element, "end-length");
+  const textXAttr = getAttribute(element, "text-x");
+  const textYAttr = getAttribute(element, "text-y");
+
+  if (defaultXAttr) {
+    const val = parseFloat(defaultXAttr);
+    if (!isNaN(val)) endingData.defaultX = val;
+  }
+  if (defaultYAttr) {
+    const val = parseFloat(defaultYAttr);
+    if (!isNaN(val)) endingData.defaultY = val;
+  }
+  if (relativeXAttr) {
+    const val = parseFloat(relativeXAttr);
+    if (!isNaN(val)) endingData.relativeX = val;
+  }
+  if (relativeYAttr) {
+    const val = parseFloat(relativeYAttr);
+    if (!isNaN(val)) endingData.relativeY = val;
+  }
+  if (fontFamily) endingData.fontFamily = fontFamily;
+  if (fontSize) endingData.fontSize = fontSize;
+  if (colorAttr) endingData.color = colorAttr;
+  if (fontStyleAttr === "normal" || fontStyleAttr === "italic") {
+    endingData.fontStyle = fontStyleAttr;
+  }
+  if (fontWeightAttr === "normal" || fontWeightAttr === "bold") {
+    endingData.fontWeight = fontWeightAttr;
+  }
+  if (systemAttr) endingData.system = systemAttr;
+  if (endLengthAttr) {
+    const val = parseFloat(endLengthAttr);
+    if (!isNaN(val)) endingData.endLength = val;
+  }
+  if (textXAttr) {
+    const val = parseFloat(textXAttr);
+    if (!isNaN(val)) endingData.textX = val;
+  }
+  if (textYAttr) {
+    const val = parseFloat(textYAttr);
+    if (!isNaN(val)) endingData.textY = val;
+  }
+
   return EndingSchema.parse(endingData);
 };
 
@@ -1719,6 +1849,22 @@ export const mapSoundElement = (element: Element): Sound => {
   const soundData: Partial<Sound> = { _type: "sound" };
   const tempoAttr = getAttribute(element, "tempo");
   const dynamicsAttr = getAttribute(element, "dynamics");
+  const dacapoAttr = getAttribute(element, "dacapo");
+  const segnoAttr = getAttribute(element, "segno");
+  const dalsegnoAttr = getAttribute(element, "dalsegno");
+  const codaAttr = getAttribute(element, "coda");
+  const tocodaAttr = getAttribute(element, "tocoda");
+  const divisionsAttr = getAttribute(element, "divisions");
+  const forwardRepeatAttr = getAttribute(element, "forward-repeat");
+  const fineAttr = getAttribute(element, "fine");
+  const timeOnlyAttr = getAttribute(element, "time-only");
+  const pizzicatoAttr = getAttribute(element, "pizzicato");
+  const panAttr = getAttribute(element, "pan");
+  const elevationAttr = getAttribute(element, "elevation");
+  const damperPedalAttr = getAttribute(element, "damper-pedal");
+  const softPedalAttr = getAttribute(element, "soft-pedal");
+  const sostenutoPedalAttr = getAttribute(element, "sostenuto-pedal");
+  const idAttr = getAttribute(element, "id");
 
   if (tempoAttr) {
     const tempo = parseFloat(tempoAttr);
@@ -1728,6 +1874,64 @@ export const mapSoundElement = (element: Element): Sound => {
     const dyn = parseFloat(dynamicsAttr);
     if (!isNaN(dyn)) soundData.dynamics = dyn;
   }
+  if (dacapoAttr === "yes" || dacapoAttr === "no") {
+    soundData.dacapo = dacapoAttr;
+  }
+  if (segnoAttr) soundData.segno = segnoAttr;
+  if (dalsegnoAttr) soundData.dalsegno = dalsegnoAttr;
+  if (codaAttr) soundData.coda = codaAttr;
+  if (tocodaAttr) soundData.tocoda = tocodaAttr;
+  if (divisionsAttr) {
+    const div = parseFloat(divisionsAttr);
+    if (!isNaN(div)) soundData.divisions = div;
+  }
+  if (forwardRepeatAttr === "yes" || forwardRepeatAttr === "no") {
+    soundData.forwardRepeat = forwardRepeatAttr;
+  }
+  if (fineAttr) soundData.fine = fineAttr;
+  if (timeOnlyAttr) soundData.timeOnly = timeOnlyAttr;
+  if (pizzicatoAttr === "yes" || pizzicatoAttr === "no") {
+    soundData.pizzicato = pizzicatoAttr;
+  }
+  if (panAttr) {
+    const pan = parseFloat(panAttr);
+    if (!isNaN(pan)) soundData.pan = pan;
+  }
+  if (elevationAttr) {
+    const elevation = parseFloat(elevationAttr);
+    if (!isNaN(elevation)) soundData.elevation = elevation;
+  }
+  if (damperPedalAttr) {
+    const val = damperPedalAttr === "yes" || damperPedalAttr === "no"
+      ? damperPedalAttr
+      : parseFloat(damperPedalAttr);
+    if (val === "yes" || val === "no") {
+      soundData.damperPedal = val;
+    } else if (!isNaN(val as number)) {
+      soundData.damperPedal = val as number;
+    }
+  }
+  if (softPedalAttr) {
+    const val = softPedalAttr === "yes" || softPedalAttr === "no"
+      ? softPedalAttr
+      : parseFloat(softPedalAttr);
+    if (val === "yes" || val === "no") {
+      soundData.softPedal = val;
+    } else if (!isNaN(val as number)) {
+      soundData.softPedal = val as number;
+    }
+  }
+  if (sostenutoPedalAttr) {
+    const val = sostenutoPedalAttr === "yes" || sostenutoPedalAttr === "no"
+      ? sostenutoPedalAttr
+      : parseFloat(sostenutoPedalAttr);
+    if (val === "yes" || val === "no") {
+      soundData.sostenutoPedal = val;
+    } else if (!isNaN(val as number)) {
+      soundData.sostenutoPedal = val as number;
+    }
+  }
+  if (idAttr) soundData.id = idAttr;
 
   return SoundSchema.parse(soundData);
 };
