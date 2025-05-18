@@ -51,6 +51,9 @@ import type {
   Repeat,
   Ending,
   Fermata,
+  WavyLine,
+  Footnote,
+  Level,
   Work,
   Identification,
   Creator,
@@ -137,6 +140,9 @@ import {
   TechnicalSchema,
   TieSchema,
   BarlineSchema,
+  WavyLineSchema,
+  FootnoteSchema,
+  LevelSchema,
   RepeatSchema,
   EndingSchema,
   FermataSchema,
@@ -486,6 +492,38 @@ const mapFermataElement = (element: Element) => {
   return FermataSchema.parse(fermataData);
 };
 
+const mapWavyLineElement = (element: Element): WavyLine => {
+  const wavyLineData: Partial<WavyLine> = {
+    type: getAttribute(element, 'type') as 'start' | 'stop' | 'continue' | undefined,
+    number: parseOptionalNumberAttribute(element, 'number'),
+    smufl: getAttribute(element, 'smufl') || undefined,
+    placement: getAttribute(element, 'placement') as 'above' | 'below' | undefined,
+    color: getAttribute(element, 'color') || undefined,
+    accelerate: getAttribute(element, 'accelerate') as 'yes' | 'no' | undefined,
+    beats: parseOptionalNumberAttribute(element, 'beats'),
+    secondBeats: parseOptionalNumberAttribute(element, 'second-beats'),
+    lastBeat: parseOptionalNumberAttribute(element, 'last-beat'),
+  };
+  return WavyLineSchema.parse(wavyLineData);
+};
+
+const mapFootnoteElement = (element: Element): Footnote => {
+  const data = { value: element.textContent?.trim() || '' };
+  return FootnoteSchema.parse(data);
+};
+
+const mapLevelElement = (element: Element): Level => {
+  const levelData: Partial<Level> = {
+    value: element.textContent?.trim() || undefined,
+    reference: getAttribute(element, 'reference') as 'yes' | 'no' | undefined,
+    type: getAttribute(element, 'type') as 'start' | 'stop' | 'single' | undefined,
+    parentheses: getAttribute(element, 'parentheses') as 'yes' | 'no' | undefined,
+    bracket: getAttribute(element, 'bracket') as 'yes' | 'no' | undefined,
+    size: getAttribute(element, 'size') || undefined,
+  };
+  return LevelSchema.parse(levelData);
+};
+
 // Helper function to map an <articulations> element
 const mapArticulationsElement = (element: Element): Articulations => {
   const staccatoElement = element.querySelector('staccato');
@@ -733,6 +771,9 @@ export const mapBarlineElement = (element: Element): Barline => {
   const endingElement = element.querySelector('ending');
   const codaElement = element.querySelector('coda');
   const segnoElement = element.querySelector('segno');
+  const wavyLineElement = element.querySelector('wavy-line');
+  const footnoteElement = element.querySelector('footnote');
+  const levelElement = element.querySelector('level');
   const fermataElements = Array.from(element.querySelectorAll('fermata'));
 
   const barlineData: Partial<Barline> = {
@@ -754,6 +795,15 @@ export const mapBarlineElement = (element: Element): Barline => {
   }
   if (segnoElement) {
     barlineData.segno = {};
+  }
+  if (footnoteElement) {
+    barlineData.footnote = mapFootnoteElement(footnoteElement);
+  }
+  if (levelElement) {
+    barlineData.level = mapLevelElement(levelElement);
+  }
+  if (wavyLineElement) {
+    barlineData.wavyLine = mapWavyLineElement(wavyLineElement);
   }
   if (fermataElements.length > 0) {
     barlineData.fermata = fermataElements.map(mapFermataElement);

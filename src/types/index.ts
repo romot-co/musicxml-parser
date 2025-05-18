@@ -90,6 +90,8 @@ export type { Sound } from '../schemas/sound';
 export type { MeasureContent } from '../schemas/measure';
 export type { Backup } from '../schemas/backup';
 export type { Forward } from '../schemas/forward';
+export type { WavyLine } from '../schemas/wavyLine';
+export type { Footnote, Level } from '../schemas/editorial';
 // Add other inferred types from Zod schemas here as they are created.
 
 export interface ParsedMusicXml {
