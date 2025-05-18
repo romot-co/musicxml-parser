@@ -23,6 +23,8 @@ export type {
   Metronome,
   MetronomeBeatUnit,
   MetronomePerMinute,
+  MetronomeNote,
+  MetronomeRelation,
   Dynamics,
   Pedal,
   Wedge,
@@ -67,6 +69,7 @@ export type {
 export type { Barline, BarStyle, Repeat, Ending } from "../schemas/barline";
 export type { Fermata, FermataShape } from "../schemas/fermata";
 export type { Work } from "../schemas/work";
+export type { Opus } from "../schemas/opus";
 export type {
   Identification,
   Creator,
@@ -105,6 +108,10 @@ export type {
   SystemLayout,
   StaffLayout,
   Appearance,
+  NoteSize,
+  Distance,
+  Glyph,
+  OtherAppearance,
   ConcertScore,
   MusicFont,
   WordFont,
@@ -121,9 +128,7 @@ export type {
   TextFormatting,
   SymbolFormatting,
 } from "../schemas/credit";
-export type { Link } from "../schemas/link";
-export type { Bookmark } from "../schemas/bookmark";
-export type { Harmony } from "../schemas/harmony";
+export type { Harmony, Frame, FrameNote, FirstFret } from "../schemas/harmony";
 export type { Print } from "../schemas/print";
 export type { Sound } from "../schemas/sound";
 export type { MeasureContent } from "../schemas/measure";
@@ -133,12 +138,21 @@ export type { WavyLine } from "../schemas/wavyLine";
 export type { Footnote, Level } from "../schemas/editorial";
 export type { GroupSymbolValue } from "../schemas/partSymbol";
 export type { PartGroup } from "../schemas/partGroup";
+export type { ScoreInstrument } from "../schemas/scoreInstrument";
+export type { MidiInstrument } from "../schemas/midiInstrument";
+export type { FiguredBass, Figure } from "../schemas/figuredBass";
+export type { Grouping, Feature } from "../schemas/grouping";
+export type { Link } from "../schemas/link";
+export type { Bookmark } from "../schemas/bookmark";
 export type {
   Glissando,
   Slide,
   Tremolo,
   OtherNotation,
 } from "../schemas/notations";
+export type { ScoreInstrument } from "../schemas/scoreInstrument";
+export type { MidiDevice } from "../schemas/midiDevice";
+export type { MidiInstrument } from "../schemas/midiInstrument";
 export type { TimeModification } from "../schemas/timeModification";
 // Add other inferred types from Zod schemas here as they are created.
 

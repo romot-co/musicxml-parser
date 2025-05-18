@@ -1,6 +1,15 @@
 import { describe, it, expect } from "vitest";
 import { mapNoteElement } from "../src/parser/mappers";
-import type { Note, Pitch, Rest, Lyric, Beam, Slur } from "../src/types"; // Added more types as needed
+import type {
+  Note,
+  Pitch,
+  Rest,
+  Lyric,
+  Beam,
+  Slur,
+  Tie,
+  TimeModification,
+} from "../src/types";
 import { JSDOM } from "jsdom";
 
 // Helper to create an Element from an XML string snippet
@@ -102,6 +111,19 @@ describe("Note Schema Tests (note.mod)", () => {
       expect(beam2.value).toBe("begin");
     });
 
+    it('parses a <beam> with color attribute', () => {
+      const xml =
+        '<note><pitch><step>A</step><octave>4</octave></pitch><duration>1</duration><type>16th</type><beam number="1" color="red">begin</beam></note>';
+      const element = createElement(xml);
+      const note = mapNoteElement(element);
+      expect(note.beams).toBeDefined();
+      expect(note.beams).toHaveLength(1);
+      const beam = note.beams?.[0] as Beam;
+      expect(beam.number).toBe(1);
+      expect(beam.value).toBe("begin");
+      expect(beam.color).toBe("red");
+    });
+
     it("should parse a <note> with <notations> and <slur>", () => {
       const xml =
         '<note><pitch><step>D</step><octave>5</octave></pitch><duration>2</duration><notations><slur type="start" number="1" placement="above"/></notations></note>';
@@ -116,6 +138,23 @@ describe("Note Schema Tests (note.mod)", () => {
       expect(slur.placement).toBe("above");
     });
 
+    it("parses slur with orientation, color, line-type, and bezier attributes", () => {
+      const xml =
+        '<note><pitch><step>E</step><octave>4</octave></pitch><duration>4</duration><notations><slur type="start" orientation="over" color="red" line-type="dashed" bezier-x="1" bezier-y="2" bezier-x2="3" bezier-y2="4" bezier-offset="5" bezier-offset2="6"/></notations></note>';
+      const el = createElement(xml);
+      const note = mapNoteElement(el);
+      const slur = note.notations?.slurs?.[0] as Slur;
+      expect(slur.orientation).toBe("over");
+      expect(slur.color).toBe("red");
+      expect(slur.lineType).toBe("dashed");
+      expect(slur.bezierX).toBe(1);
+      expect(slur.bezierY).toBe(2);
+      expect(slur.bezierX2).toBe(3);
+      expect(slur.bezierY2).toBe(4);
+      expect(slur.bezierOffset).toBe(5);
+      expect(slur.bezierOffset2).toBe(6);
+    });
+
     it("should parse a <note> with <accidental>", () => {
       const xml =
         "<note><pitch><step>F</step><alter>1</alter><octave>4</octave></pitch><duration>4</duration><accidental>sharp</accidental></note>";
@@ -124,6 +163,19 @@ describe("Note Schema Tests (note.mod)", () => {
       expect(note.accidental).toBeDefined();
       expect(note.accidental?.value).toBe("sharp");
       expect(note.pitch?.alter).toBe(1);
+    });
+
+    it("parses accidental attributes parentheses, bracket and size", () => {
+      const xml =
+        '<note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration><accidental parentheses="yes" bracket="no" size="cue">natural</accidental></note>';
+      const element = createElement(xml);
+      const note = mapNoteElement(element);
+      expect(note.accidental).toBeDefined();
+      const acc = note.accidental!;
+      expect(acc.value).toBe("natural");
+      expect(acc.parentheses).toBe("yes");
+      expect(acc.bracket).toBe("no");
+      expect(acc.size).toBe("cue");
     });
 
     it("should parse a <note> with <dot>", () => {
@@ -215,6 +267,52 @@ describe("Note Schema Tests (note.mod)", () => {
       expect(note.timeModification?.normalDots).toHaveLength(1);
     });
 
-    // TODO: Add tests for tie, time-modification, notations (articulations, ornaments, technical), etc.
+    it("parses tie elements at the note level", () => {
+      const xml =
+        '<note><pitch><step>C</step><octave>4</octave></pitch><duration>4</duration><tie type="start"/><tie type="stop"/></note>';
+      const element = createElement(xml);
+      const note = mapNoteElement(element);
+      expect(note.ties).toBeDefined();
+      expect(note.ties).toHaveLength(2);
+      const [t1, t2] = note.ties as Tie[];
+      expect(t1.type).toBe("start");
+      expect(t2.type).toBe("stop");
+    });
+
+    it("parses minimal <time-modification>", () => {
+      const xml =
+        '<note><pitch><step>A</step><octave>4</octave></pitch><duration>2</duration><time-modification><actual-notes>5</actual-notes><normal-notes>4</normal-notes></time-modification></note>';
+      const element = createElement(xml);
+      const note = mapNoteElement(element);
+      const tm = note.timeModification as TimeModification;
+      expect(tm.actualNotes).toBe(5);
+      expect(tm.normalNotes).toBe(4);
+      expect(tm.normalType).toBeUndefined();
+      expect(tm.normalDots).toBeUndefined();
+    });
+
+    it("parses multiple normal-dot elements in <time-modification>", () => {
+      const xml =
+        '<note><pitch><step>B</step><octave>4</octave></pitch><duration>1</duration><time-modification><actual-notes>3</actual-notes><normal-notes>2</normal-notes><normal-dot/><normal-dot/></time-modification></note>';
+      const element = createElement(xml);
+      const note = mapNoteElement(element);
+      expect(note.timeModification?.normalDots).toHaveLength(2);
+    });
+
+    it("parses complex notations with articulations, ornaments and technical", () => {
+      const xml =
+        '<note><pitch><step>E</step><octave>4</octave></pitch><duration>1</duration><notations><articulations placement="below"><accent/><staccato/></articulations><articulations><tenuto/></articulations><ornaments/><technical/></notations></note>';
+      const element = createElement(xml);
+      const note = mapNoteElement(element);
+      expect(note.notations?.articulations).toHaveLength(2);
+      const art1 = note.notations?.articulations?.[0];
+      const art2 = note.notations?.articulations?.[1];
+      expect(art1?.accent).toBeDefined();
+      expect(art1?.staccato).toBeDefined();
+      expect(art1?.placement).toBe("below");
+      expect(art2?.tenuto).toBeDefined();
+      expect(note.notations?.ornaments).toHaveLength(1);
+      expect(note.notations?.technical).toHaveLength(1);
+    });
   });
 });

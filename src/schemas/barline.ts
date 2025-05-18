@@ -2,6 +2,7 @@ import { z } from "zod";
 import { FermataSchema } from "./fermata";
 import { WavyLineSchema } from "./wavyLine";
 import { FootnoteSchema, LevelSchema } from "./editorial";
+import { YesNoEnum } from "./common";
 
 /**
  * The bar-style simple type represents the graphic appearance of a barline.
@@ -34,6 +35,8 @@ export const RepeatSchema = z.object({
   winged: z
     .enum(["none", "straight", "curved", "double-straight", "double-curved"])
     .optional(),
+  /** MusicXML 4.0: Indicates if repeats are played after a D.S. or D.C. jump. */
+  afterJump: YesNoEnum.optional(),
 });
 export type Repeat = z.infer<typeof RepeatSchema>;
 
@@ -78,6 +81,8 @@ export const BarlineSchema = z.object({
    * The bar-style element indicates the style of the barline (e.g., heavy, light-light, none).
    */
   barStyle: BarStyleEnum.optional(),
+  /** Optional color attribute for the bar-style element. */
+  barStyleColor: z.string().optional(),
   /**
    * The repeat element indicates a repeat mark.
    */

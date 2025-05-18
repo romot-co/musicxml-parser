@@ -67,4 +67,23 @@ describe("Direction parsing", () => {
     expect(wedge.color).toBe("red");
     expect(wedge.id).toBe("w1");
   });
+
+  it("parses metronome notes and relation", () => {
+    const xml = `<direction><direction-type><metronome><metronome-note><metronome-type>quarter</metronome-type><metronome-dot/></metronome-note><metronome-relation>equals</metronome-relation><metronome-note><metronome-type>eighth</metronome-type></metronome-note></metronome></direction-type></direction>`;
+    const el = createElement(xml);
+    const direction = mapDirectionElement(el);
+    const met = direction.direction_type[0].metronome!;
+    expect(met["metronome-note"]?.length).toBe(2);
+    expect(met["metronome-note"]?.[0]["metronome-type"]).toBe("quarter");
+    expect(met["metronome-note"]?.[0]["metronome-dot"]?.length).toBe(1);
+    expect(met["metronome-relation"]).toBe("equals");
+    expect(met["metronome-note"]?.[1]["metronome-type"]).toBe("eighth");
+  });
+
+  it("parses directive attribute", () => {
+    const xml = `<direction directive="yes"><direction-type><words>Tempo</words></direction-type></direction>`;
+    const el = createElement(xml);
+    const direction = mapDirectionElement(el);
+    expect(direction.directive).toBe("yes");
+  });
 });

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { YesNoEnum } from "./common";
 
 // Based on MusicXML 4.0 accidental-value simple type
 const AccidentalValueEnum = z.enum([
@@ -62,7 +63,12 @@ export const AccidentalSchema = z.object({
    * Indicates whether the accidental is editorial (e.g., in square brackets).
    */
   editorial: z.enum(["yes", "no"]).optional(),
-  // TODO: Add other attributes like parentheses, bracket, size from MusicXML 4.0 if needed
+  /** Indicates whether the accidental is shown in parentheses. */
+  parentheses: YesNoEnum.optional(),
+  /** Indicates whether the accidental is shown in square brackets. */
+  bracket: YesNoEnum.optional(),
+  /** Size of the accidental, e.g., "cue" or "large". */
+  size: z.string().optional(),
 });
 
 export type Accidental = z.infer<typeof AccidentalSchema>;

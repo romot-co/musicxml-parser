@@ -93,6 +93,10 @@ import type {
   Margins,
   LineWidth,
   Appearance,
+  NoteSize,
+  Distance,
+  Glyph,
+  OtherAppearance,
   TimewisePart,
   TimewiseMeasure,
   ScoreTimewise,
@@ -197,6 +201,10 @@ import {
   MarginsSchema,
   LineWidthSchema,
   AppearanceSchema,
+  NoteSizeSchema,
+  DistanceSchema,
+  GlyphSchema,
+  OtherAppearanceSchema,
   SystemLayoutSchema,
   SystemDividersSchema,
   StaffLayoutSchema,
@@ -374,6 +382,60 @@ const mapLineWidthElement = (element: Element): LineWidth | undefined => {
   }
 };
 
+const mapNoteSizeElement = (element: Element): NoteSize | undefined => {
+  if (!element) return undefined;
+  const type = getAttribute(element, "type");
+  const value = element.textContent
+    ? parseFloat(element.textContent.trim())
+    : undefined;
+  if (!type || value === undefined) return undefined;
+  try {
+    return NoteSizeSchema.parse({ type, value });
+  } catch {
+    return undefined;
+  }
+};
+
+const mapDistanceElement = (element: Element): Distance | undefined => {
+  if (!element) return undefined;
+  const type = getAttribute(element, "type");
+  const value = element.textContent
+    ? parseFloat(element.textContent.trim())
+    : undefined;
+  if (!type || value === undefined) return undefined;
+  try {
+    return DistanceSchema.parse({ type, value });
+  } catch {
+    return undefined;
+  }
+};
+
+const mapGlyphElement = (element: Element): Glyph | undefined => {
+  if (!element) return undefined;
+  const type = getAttribute(element, "type");
+  const value = element.textContent?.trim();
+  if (!type || !value) return undefined;
+  try {
+    return GlyphSchema.parse({ type, value });
+  } catch {
+    return undefined;
+  }
+};
+
+const mapOtherAppearanceElement = (
+  element: Element,
+): OtherAppearance | undefined => {
+  if (!element) return undefined;
+  const type = getAttribute(element, "type");
+  const value = element.textContent?.trim();
+  if (!type || !value) return undefined;
+  try {
+    return OtherAppearanceSchema.parse({ type, value });
+  } catch {
+    return undefined;
+  }
+};
+
 // Helper to parse <appearance> element
 const mapAppearanceElement = (element: Element): Appearance | undefined => {
   if (!element) return undefined;
@@ -386,7 +448,34 @@ const mapAppearanceElement = (element: Element): Appearance | undefined => {
     if (mappedLineWidths.length > 0)
       appearanceData.lineWidths = mappedLineWidths;
   }
-  // Add other appearance properties here (e.g., note-size)
+  const noteSizeElements = Array.from(element.querySelectorAll("note-size"));
+  if (noteSizeElements.length > 0) {
+    const mapped = noteSizeElements
+      .map(mapNoteSizeElement)
+      .filter(Boolean) as NoteSize[];
+    if (mapped.length > 0) appearanceData.noteSizes = mapped;
+  }
+  const distanceElements = Array.from(element.querySelectorAll("distance"));
+  if (distanceElements.length > 0) {
+    const mapped = distanceElements
+      .map(mapDistanceElement)
+      .filter(Boolean) as Distance[];
+    if (mapped.length > 0) appearanceData.distances = mapped;
+  }
+  const glyphElements = Array.from(element.querySelectorAll("glyph"));
+  if (glyphElements.length > 0) {
+    const mapped = glyphElements.map(mapGlyphElement).filter(Boolean) as Glyph[];
+    if (mapped.length > 0) appearanceData.glyphs = mapped;
+  }
+  const otherElements = Array.from(
+    element.querySelectorAll("other-appearance"),
+  );
+  if (otherElements.length > 0) {
+    const mapped = otherElements
+      .map(mapOtherAppearanceElement)
+      .filter(Boolean) as OtherAppearance[];
+    if (mapped.length > 0) appearanceData.otherAppearances = mapped;
+  }
   if (Object.keys(appearanceData).length === 0) return undefined;
   try {
     return AppearanceSchema.parse(appearanceData);
