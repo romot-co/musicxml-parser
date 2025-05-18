@@ -79,7 +79,7 @@ import type {
   CreditImage,
   Credit,
   TextFormatting,
-  // SymbolFormatting,
+  SymbolFormatting, // Added
   Harmony,
   Backup,
   Forward,
@@ -173,7 +173,7 @@ import {
   LyricLanguageSchema,
   DefaultsSchema,
   CreditWordsSchema,
-  // CreditSymbolSchema,
+  CreditSymbolSchema, // Added
   CreditImageSchema,
   CreditSchema,
   // TextFormattingSchema,
@@ -2338,7 +2338,7 @@ export const mapCreditWordsElement = (
 };
 
 export const mapCreditSymbolElement = (
-  _element: Element,
+  element: Element,
 ): CreditSymbol | undefined => {
   const smuflGlyphName = element.textContent?.trim() ?? "";
 
@@ -2371,8 +2371,9 @@ export const mapCreditSymbolElement = (
 
   try {
     return CreditSymbolSchema.parse(data);
-  } catch (e) {
-    // console.warn('CreditSymbol parse error', data, (e as z.ZodError).errors);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (_e) {
+    // console.warn('CreditSymbol parse error', data, (_e as z.ZodError).errors);
     return undefined;
   }
 };

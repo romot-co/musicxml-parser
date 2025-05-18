@@ -36,9 +36,9 @@ function getAttributesFromContent(
 
 describe("Reference MusicXML sample parsing", () => {
   for (const file of sampleFiles) {
-    it(`parses ${file} without mapping errors`, () => {
+    it(`parses ${file} without mapping errors`, async () => {
       const xmlString = fs.readFileSync(path.join(samplesDir, file), "utf-8");
-      const xmlDoc = parseMusicXmlString(xmlString);
+      const xmlDoc = await parseMusicXmlString(xmlString);
       expect(xmlDoc).not.toBeNull();
       if (!xmlDoc) return;
       const spy = vi.spyOn(console, "error");
@@ -51,12 +51,12 @@ describe("Reference MusicXML sample parsing", () => {
 });
 
 describe("Specific feature checks from samples", () => {
-  it("Saltarello.musicxml contains slur notation", () => {
+  it("Saltarello.musicxml contains slur notation", async () => {
     const xmlString = fs.readFileSync(
       path.join(samplesDir, "Saltarello.musicxml"),
       "utf-8",
     );
-    const xmlDoc = parseMusicXmlString(xmlString);
+    const xmlDoc = await parseMusicXmlString(xmlString);
     if (!xmlDoc) throw new Error("Saltarello.musicxml failed to parse");
     const score = mapDocumentToScorePartwise(xmlDoc);
     const part = score.parts[0];
@@ -66,12 +66,12 @@ describe("Specific feature checks from samples", () => {
     expect(noteWithSlur).toBeDefined();
   });
 
-  it("MozartTrio.musicxml contains transpose information", () => {
+  it("MozartTrio.musicxml contains transpose information", async () => {
     const xmlString = fs.readFileSync(
       path.join(samplesDir, "MozartTrio.musicxml"),
       "utf-8",
     );
-    const xmlDoc = parseMusicXmlString(xmlString);
+    const xmlDoc = await parseMusicXmlString(xmlString);
     if (!xmlDoc) throw new Error("MozartTrio.musicxml failed to parse");
     const score = mapDocumentToScorePartwise(xmlDoc);
     const measureWithTranspose = score.parts[0].measures.find((m) =>
@@ -84,12 +84,12 @@ describe("Specific feature checks from samples", () => {
     expect(transpose?.chromatic).toBe(-3);
   });
 
-  it("DebuMandSample.musicxml maps staccato articulations", () => {
+  it("DebuMandSample.musicxml maps staccato articulations", async () => {
     const xmlString = fs.readFileSync(
       path.join(samplesDir, "DebuMandSample.musicxml"),
       "utf-8",
     );
-    const xmlDoc = parseMusicXmlString(xmlString);
+    const xmlDoc = await parseMusicXmlString(xmlString);
     if (!xmlDoc) throw new Error("DebuMandSample.musicxml failed to parse");
     const score = mapDocumentToScorePartwise(xmlDoc);
     const noteWithStaccato = score.parts[0].measures
@@ -98,12 +98,12 @@ describe("Specific feature checks from samples", () => {
     expect(noteWithStaccato).toBeDefined();
   });
 
-  it("ActorPreludeSample.musicxml captures staff-layout defaults", () => {
+  it("ActorPreludeSample.musicxml captures staff-layout defaults", async () => {
     const xmlString = fs.readFileSync(
       path.join(samplesDir, "ActorPreludeSample.musicxml"),
       "utf-8",
     );
-    const xmlDoc = parseMusicXmlString(xmlString);
+    const xmlDoc = await parseMusicXmlString(xmlString);
     if (!xmlDoc) throw new Error("ActorPreludeSample.musicxml failed to parse");
     const score = mapDocumentToScorePartwise(xmlDoc);
     expect(score.defaults?.staffLayout).toBeDefined();

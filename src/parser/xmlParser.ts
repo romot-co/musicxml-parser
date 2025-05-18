@@ -6,7 +6,9 @@
  * @returns The parsed Document object, or null if parsing fails.
  * @throws Error if DOMParser is not available in the current environment.
  */
-export function parseMusicXmlString(xmlString: string): Document | null {
+export async function parseMusicXmlString(
+  xmlString: string,
+): Promise<Document | null> {
   let DOMParserImpl: typeof DOMParser | undefined =
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (globalThis as any).DOMParser;
@@ -14,10 +16,10 @@ export function parseMusicXmlString(xmlString: string): Document | null {
   if (!DOMParserImpl) {
     if (typeof process !== "undefined" && process.versions?.node) {
       try {
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const { JSDOM } = require("jsdom") as typeof import("jsdom");
+        const { JSDOM } = await import("jsdom");
         DOMParserImpl = new JSDOM().window.DOMParser;
-      } catch (e) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (_e) {
         throw new Error(
           "DOMParser is not available and jsdom could not be loaded.",
         );

@@ -52,8 +52,8 @@ const sampleTimewiseXml = `
 `;
 
 describe("Timewise MusicXML parsing", () => {
-  it("parses a simple timewise score", () => {
-    const doc = parseMusicXmlString(sampleTimewiseXml);
+  it("parses a simple timewise score", async () => {
+    const doc = await parseMusicXmlString(sampleTimewiseXml);
     expect(doc).not.toBeNull();
     if (!doc) return;
     const score = mapDocumentToScoreTimewise(doc);

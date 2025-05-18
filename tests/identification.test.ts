@@ -16,9 +16,9 @@ const filePath = path.resolve(
 );
 
 describe("Identification extras parsing", () => {
-  it("maps supports, relation, and miscellaneous elements", () => {
+  it("maps supports, relation, and miscellaneous elements", async () => {
     const xmlString = fs.readFileSync(filePath, "utf-8");
-    const xmlDoc = parseMusicXmlString(xmlString);
+    const xmlDoc = await parseMusicXmlString(xmlString);
     if (!xmlDoc) throw new Error("failed to parse xml");
     const score = mapDocumentToScorePartwise(xmlDoc);
     const id = score.identification;

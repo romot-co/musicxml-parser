@@ -100,8 +100,8 @@ const sampleMusicXml = `
 `;
 
 describe("MusicXML Parser", () => {
-  it("should parse a MusicXML string into a ScorePartwise object with attributes and lyrics", () => {
-    const xmlDoc = parseMusicXmlString(sampleMusicXml);
+  it("should parse a MusicXML string into a ScorePartwise object with attributes and lyrics", async () => {
+    const xmlDoc = await parseMusicXmlString(sampleMusicXml);
     expect(xmlDoc).not.toBeNull();
 
     if (!xmlDoc) return;

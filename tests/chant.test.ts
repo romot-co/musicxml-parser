@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeAll } from "vitest";
 import * as fs from "fs";
 import * as path from "path";
 import { parseMusicXmlString } from "../src/parser/xmlParser";
@@ -57,18 +57,22 @@ function getDirectionsFromContent(
 describe("Chant.musicxml Parser Test", () => {
   let scorePartwise: ScorePartwise | null = null;
 
-  try {
-    const xmlString = fs.readFileSync(filePath, "utf-8");
-    const xmlDoc = parseMusicXmlString(xmlString);
-    if (xmlDoc) {
-      scorePartwise = mapDocumentToScorePartwise(xmlDoc);
+  beforeAll(async () => {
+    try {
+      const xmlString = fs.readFileSync(filePath, "utf-8");
+      const xmlDoc = await parseMusicXmlString(xmlString);
+      if (xmlDoc) {
+        scorePartwise = mapDocumentToScorePartwise(xmlDoc);
+      } else {
+        scorePartwise = null;
+      }
+    } catch (e) {
+      console.error(
+        `Failed to read or parse Chant.musicxml: ${(e as Error).message}`,
+      );
+      scorePartwise = null;
     }
-  } catch (e) {
-    console.error(
-      `Failed to read or parse Chant.musicxml: ${(e as Error).message}`,
-    );
-    scorePartwise = null;
-  }
+  });
 
   it("should parse the file without errors", () => {
     expect(scorePartwise).not.toBeNull();
