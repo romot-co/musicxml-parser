@@ -59,6 +59,8 @@ import type {
   Glissando,
   Slide,
   Tremolo,
+  Arpeggiate,
+  NonArpeggiate,
   OtherNotation,
   Tie,
   Barline,
@@ -196,6 +198,8 @@ import {
   GlissandoSchema,
   SlideSchema,
   TremoloSchema,
+  ArpeggiateSchema,
+  NonArpeggiateSchema,
   OtherNotationSchema,
   TieSchema,
   BarlineSchema,
@@ -1120,6 +1124,29 @@ const mapOtherNotationElement = (element: Element): OtherNotation => {
   return OtherNotationSchema.parse(data);
 };
 
+const mapArpeggiateElement = (element: Element): Arpeggiate => {
+  const data: Partial<Arpeggiate> = {
+    number: parseOptionalNumberAttribute(element, "number"),
+    direction: getAttribute(element, "direction") as "up" | "down" | undefined,
+    unbroken: getAttribute(element, "unbroken") as "yes" | "no" | undefined,
+  };
+  return ArpeggiateSchema.parse(data);
+};
+
+const mapNonArpeggiateElement = (element: Element): NonArpeggiate => {
+  const typeAttr = getAttribute(element, "type") as "top" | "bottom" | undefined;
+  if (!typeAttr) {
+    throw new Error(
+      '<non-arpeggiate> element requires a "type" attribute.',
+    );
+  }
+  const data: Partial<NonArpeggiate> = {
+    type: typeAttr,
+    number: parseOptionalNumberAttribute(element, "number"),
+  };
+  return NonArpeggiateSchema.parse(data);
+};
+
 // Helper function to map a <words> element (within <direction-type>)
 const mapWordsElement = (element: Element): Words => {
   const text = element.textContent?.trim() ?? "";
@@ -1667,6 +1694,12 @@ const mapNotationsElement = (element: Element): Notations => {
   const glissandoElements = Array.from(element.querySelectorAll("glissando"));
   const slideElements = Array.from(element.querySelectorAll("slide"));
   const tremoloElements = Array.from(element.querySelectorAll("tremolo"));
+  const arpeggiateElements = Array.from(
+    element.querySelectorAll("arpeggiate"),
+  );
+  const nonArpeggiateElements = Array.from(
+    element.querySelectorAll("non-arpeggiate"),
+  );
   const otherNotationElements = Array.from(
     element.querySelectorAll("other-notation"),
   );
@@ -1701,6 +1734,14 @@ const mapNotationsElement = (element: Element): Notations => {
   }
   if (tremoloElements.length > 0) {
     notationsData.tremolos = tremoloElements.map(mapTremoloElement);
+  }
+  if (arpeggiateElements.length > 0) {
+    notationsData.arpeggiates = arpeggiateElements.map(mapArpeggiateElement);
+  }
+  if (nonArpeggiateElements.length > 0) {
+    notationsData.nonArpeggiates = nonArpeggiateElements.map(
+      mapNonArpeggiateElement,
+    );
   }
   if (otherNotationElements.length > 0) {
     notationsData.otherNotations = otherNotationElements.map(
