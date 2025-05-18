@@ -5,15 +5,12 @@ import { parseMusicXmlString } from "../src/parser/xmlParser";
 import { mapDocumentToScorePartwise } from "../src/parser/mappers";
 import type { Measure, Note, Attributes } from "../src/types";
 import { NoteSchema, AttributesSchema } from "../src/schemas";
+import { readMusicXmlFile } from "../src/utils/readMusicXmlFile";
 
 const samplesDir = path.resolve(__dirname, "../reference/xmlsamples");
 const sampleFiles = fs
   .readdirSync(samplesDir)
-  .filter(
-    (f) =>
-      f.endsWith(".musicxml") &&
-      !["MozaChloSample.musicxml", "MozaVeilSample.musicxml"].includes(f),
-  );
+  .filter((f) => /\.(musicxml|mxl)$/.test(f));
 
 function getNotesFromContent(content: Measure["content"] | undefined): Note[] {
   if (!content) return [];
@@ -37,7 +34,7 @@ function getAttributesFromContent(
 describe("Reference MusicXML sample parsing", () => {
   for (const file of sampleFiles) {
     it(`parses ${file} without mapping errors`, async () => {
-      const xmlString = fs.readFileSync(path.join(samplesDir, file), "utf-8");
+      const xmlString = await readMusicXmlFile(path.join(samplesDir, file));
       const xmlDoc = await parseMusicXmlString(xmlString);
       expect(xmlDoc).not.toBeNull();
       if (!xmlDoc) return;
@@ -52,9 +49,8 @@ describe("Reference MusicXML sample parsing", () => {
 
 describe("Specific feature checks from samples", () => {
   it("Saltarello.musicxml contains slur notation", async () => {
-    const xmlString = fs.readFileSync(
+    const xmlString = await readMusicXmlFile(
       path.join(samplesDir, "Saltarello.musicxml"),
-      "utf-8",
     );
     const xmlDoc = await parseMusicXmlString(xmlString);
     if (!xmlDoc) throw new Error("Saltarello.musicxml failed to parse");
@@ -69,9 +65,8 @@ describe("Specific feature checks from samples", () => {
   });
 
   it("MozartTrio.musicxml contains transpose information", async () => {
-    const xmlString = fs.readFileSync(
+    const xmlString = await readMusicXmlFile(
       path.join(samplesDir, "MozartTrio.musicxml"),
-      "utf-8",
     );
     const xmlDoc = await parseMusicXmlString(xmlString);
     if (!xmlDoc) throw new Error("MozartTrio.musicxml failed to parse");
@@ -89,9 +84,8 @@ describe("Specific feature checks from samples", () => {
   });
 
   it("DebuMandSample.musicxml maps staccato articulations", async () => {
-    const xmlString = fs.readFileSync(
+    const xmlString = await readMusicXmlFile(
       path.join(samplesDir, "DebuMandSample.musicxml"),
-      "utf-8",
     );
     const xmlDoc = await parseMusicXmlString(xmlString);
     if (!xmlDoc) throw new Error("DebuMandSample.musicxml failed to parse");
@@ -105,9 +99,8 @@ describe("Specific feature checks from samples", () => {
   });
 
   it("ActorPreludeSample.musicxml captures staff-layout defaults", async () => {
-    const xmlString = fs.readFileSync(
+    const xmlString = await readMusicXmlFile(
       path.join(samplesDir, "ActorPreludeSample.musicxml"),
-      "utf-8",
     );
     const xmlDoc = await parseMusicXmlString(xmlString);
     if (!xmlDoc) throw new Error("ActorPreludeSample.musicxml failed to parse");
