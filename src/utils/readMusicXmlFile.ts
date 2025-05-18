@@ -16,12 +16,21 @@ export async function readMusicXmlFile(filePath: string): Promise<string> {
   let data: Buffer;
 
   if (filePath.toLowerCase().endsWith(".mxl")) {
-    const { stdout } = await execFileAsync(
-      "unzip",
-      ["-p", filePath, "*.musicxml"],
-      { maxBuffer: 10 * 1024 * 1024, encoding: "buffer" },
-    );
-    data = stdout as Buffer;
+    try {
+      const { stdout } = await execFileAsync(
+        "unzip",
+        ["-p", filePath, "*.musicxml"],
+        { maxBuffer: 10 * 1024 * 1024, encoding: "buffer" },
+      );
+      data = stdout as Buffer;
+    } catch (err) {
+      const message =
+        (err as NodeJS.ErrnoException)?.code === "ENOENT"
+          ?
+              "The 'unzip' command is required to read MXL files. Please install it or provide a compatible environment."
+          : `Failed to extract ${filePath}: ${(err as Error).message}`;
+      throw new Error(message);
+    }
   } else {
     data = await fs.readFile(filePath);
   }
