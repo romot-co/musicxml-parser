@@ -7,13 +7,29 @@
  * @throws Error if DOMParser is not available in the current environment.
  */
 export function parseMusicXmlString(xmlString: string): Document | null {
-  if (typeof DOMParser === "undefined") {
-    throw new Error(
-      "DOMParser is not available in this environment. For Node.js, consider using a library like jsdom.",
-    );
+  let DOMParserImpl: typeof DOMParser | undefined =
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (globalThis as any).DOMParser;
+
+  if (!DOMParserImpl) {
+    if (typeof process !== "undefined" && process.versions?.node) {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const { JSDOM } = require("jsdom") as typeof import("jsdom");
+        DOMParserImpl = new JSDOM().window.DOMParser;
+      } catch (e) {
+        throw new Error(
+          "DOMParser is not available and jsdom could not be loaded.",
+        );
+      }
+    } else {
+      throw new Error(
+        "DOMParser is not available in this environment. For Node.js, consider using a library like jsdom.",
+      );
+    }
   }
 
-  const parser = new DOMParser();
+  const parser = new DOMParserImpl();
   const doc = parser.parseFromString(xmlString, "application/xml");
 
   // Check for parsing errors (browser-specific)
