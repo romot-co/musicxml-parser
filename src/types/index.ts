@@ -23,11 +23,27 @@ export type {
   Metronome,
   MetronomeBeatUnit,
   MetronomePerMinute,
-} from '../schemas/direction';
-export type { Transpose, Diatonic, Chromatic, OctaveChange, Double } from '../schemas/transpose';
-export type { StaffDetails, StaffTuning, LineDetail } from '../schemas/staffDetails';
-export type { MeasureStyle, MultipleRest, MeasureRepeat, BeatRepeat, Slash } from '../schemas/measureStyle';
-export type { Accidental, AccidentalValue } from '../schemas/accidental';
+} from "../schemas/direction";
+export type {
+  Transpose,
+  Diatonic,
+  Chromatic,
+  OctaveChange,
+  Double,
+} from "../schemas/transpose";
+export type {
+  StaffDetails,
+  StaffTuning,
+  LineDetail,
+} from "../schemas/staffDetails";
+export type {
+  MeasureStyle,
+  MultipleRest,
+  MeasureRepeat,
+  BeatRepeat,
+  Slash,
+} from "../schemas/measureStyle";
+export type { Accidental, AccidentalValue } from "../schemas/accidental";
 export type {
   Notations,
   Slur,
@@ -41,10 +57,10 @@ export type {
   Tuplet,
   Ornaments,
   Technical,
-} from '../schemas/notations';
-export type { Barline, BarStyle, Repeat, Ending } from '../schemas/barline';
-export type { Fermata, FermataShape } from '../schemas/fermata';
-export type { Work } from '../schemas/work';
+} from "../schemas/notations";
+export type { Barline, BarStyle, Repeat, Ending } from "../schemas/barline";
+export type { Fermata, FermataShape } from "../schemas/fermata";
+export type { Work } from "../schemas/work";
 export type {
   Identification,
   Creator,
@@ -56,15 +72,26 @@ export type {
   MiscellaneousField,
   EncodingSoftwareSchema as EncodingSoftware,
   EncodingDateSchema as EncodingDate,
-  EncoderSchema as Encoder
-} from '../schemas/identification';
-export type { Beam, BeamValue } from '../schemas/beam';
-export type { PartSymbol } from '../schemas/partSymbol';
-export type { StemValue } from '../schemas/stem';
-export type { Grace } from '../schemas/grace';
-export type { Cue } from '../schemas/cue';
-export type { Unpitched, DisplayStep, DisplayOctave } from '../schemas/unpitched';
-export type { YesNo, Font, FontStyleEnum, FontWeightEnum, Margins, LineWidth } from '../schemas/common';
+  EncoderSchema as Encoder,
+} from "../schemas/identification";
+export type { Beam, BeamValue } from "../schemas/beam";
+export type { PartSymbol } from "../schemas/partSymbol";
+export type { StemValue } from "../schemas/stem";
+export type { Grace } from "../schemas/grace";
+export type { Cue } from "../schemas/cue";
+export type {
+  Unpitched,
+  DisplayStep,
+  DisplayOctave,
+} from "../schemas/unpitched";
+export type {
+  YesNo,
+  Font,
+  FontStyleEnum,
+  FontWeightEnum,
+  Margins,
+  LineWidth,
+} from "../schemas/common";
 export type {
   Defaults,
   Scaling,
@@ -77,7 +104,7 @@ export type {
   WordFont,
   LyricFont,
   LyricLanguage,
-} from '../schemas/defaults';
+} from "../schemas/defaults";
 export type {
   Credit,
   CreditType,
@@ -86,15 +113,13 @@ export type {
   CreditImage,
   TextFormatting,
   SymbolFormatting,
-} from '../schemas/credit';
-export type { Harmony } from '../schemas/harmony';
-export type { Print } from '../schemas/print';
-export type { Sound } from '../schemas/sound';
-export type { MeasureContent } from '../schemas/measure';
-export type { Backup } from '../schemas/backup';
-export type { Forward } from '../schemas/forward';
+} from "../schemas/credit";
+export type { Harmony } from "../schemas/harmony";
+export type { Print } from "../schemas/print";
+export type { Sound } from "../schemas/sound";
+export type { MeasureContent } from "../schemas/measure";
+export type { Backup } from "../schemas/backup";
+export type { Forward } from "../schemas/forward";
 // Add other inferred types from Zod schemas here as they are created.
 
-export interface ParsedMusicXml {
-  // ... existing code ...
-}
+export type ParsedMusicXml = Record<string, unknown>;

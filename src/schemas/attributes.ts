@@ -1,14 +1,14 @@
-import { z } from 'zod';
-import { KeySchema } from './key';
-import { TimeSchema } from './time';
-import { ClefSchema } from './clef';
-import { TransposeSchema } from './transpose';
-import { StaffDetailsSchema } from './staffDetails';
-import { MeasureStyleSchema } from './measureStyle';
-import { PartSymbolSchema } from './partSymbol';
+import { z } from "zod";
+import { KeySchema } from "./key";
+import { TimeSchema } from "./time";
+import { ClefSchema } from "./clef";
+import { TransposeSchema } from "./transpose";
+import { StaffDetailsSchema } from "./staffDetails";
+import { MeasureStyleSchema } from "./measureStyle";
+import { PartSymbolSchema } from "./partSymbol";
 
 export const AttributesSchema = z.object({
-  _type: z.literal('attributes'),
+  _type: z.literal("attributes"),
   divisions: z.number().int().positive().optional(),
   key: z.array(KeySchema).optional(), // <key> can appear multiple times for different staves, though often once
   time: z.array(TimeSchema).optional(), // <time> can appear multiple times
