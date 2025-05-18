@@ -65,6 +65,21 @@ describe('Note Schema Tests (note.mod)', () => {
       expect(lyric2.text).toBe('lo');
     });
 
+    it('should parse lyric attributes number, name, extend and elision', () => {
+      const xml = '<note><pitch><step>C</step><octave>4</octave></pitch><duration>4</duration><lyric number="1" name="verse"><syllabic>single</syllabic><text>la</text><extend type="start"/><elision>_</elision></lyric></note>';
+      const element = createElement(xml);
+      const note = mapNoteElement(element);
+      expect(note.lyrics).toBeDefined();
+      expect(note.lyrics).toHaveLength(1);
+      const lyric = note.lyrics?.[0] as Lyric;
+      expect(lyric.number).toBe('1');
+      expect(lyric.name).toBe('verse');
+      expect(lyric.extend).toBeDefined();
+      expect(lyric.extend?.type).toBe('start');
+      expect(lyric.elision).toBeDefined();
+      expect(lyric.elision?.text).toBe('_');
+    });
+
     it('should parse a <note> with <beam> elements', () => {
       const xml = '<note><pitch><step>A</step><octave>4</octave></pitch><duration>1</duration><type>16th</type><beam number="1">begin</beam><beam number="2">begin</beam></note>';
       const element = createElement(xml);

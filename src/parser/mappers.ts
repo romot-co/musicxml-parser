@@ -272,8 +272,25 @@ export const mapLyricElement = (element: Element): Lyric => {
   const lyricData: Partial<Lyric> = {
     text: getTextContent(element, 'text') ?? '',
     syllabic: getTextContent(element, 'syllabic') as 'single' | 'begin' | 'end' | 'middle' | undefined,
-    // TODO: Map other lyric attributes and child elements like number, name, extend, elision etc.
   };
+  const numberAttr = getAttribute(element, 'number');
+  const nameAttr = getAttribute(element, 'name');
+  if (numberAttr) lyricData.number = numberAttr;
+  if (nameAttr) lyricData.name = nameAttr;
+
+  const extendElement = element.querySelector('extend');
+  if (extendElement) {
+    lyricData.extend = {
+      type: getAttribute(extendElement, 'type') as 'start' | 'stop' | 'continue' | undefined,
+    };
+  }
+
+  const elisionElement = element.querySelector('elision');
+  if (elisionElement) {
+    lyricData.elision = {
+      text: elisionElement.textContent?.trim() || undefined,
+    };
+  }
   return LyricSchema.parse(lyricData);
 };
 
