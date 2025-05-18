@@ -77,12 +77,16 @@ describe("Specific feature checks from samples", () => {
     if (!xmlDoc) throw new Error("MozartTrio.musicxml failed to parse");
     const score = mapDocumentToScorePartwise(xmlDoc);
     const measureWithTranspose = score.parts[0].measures.find((m: Measure) =>
-      getAttributesFromContent(m.content).some((a: Attributes) => a.transpose),
+      getAttributesFromContent(m.content).some(
+        (a: Attributes) => a.transpose && a.transpose.length > 0,
+      ),
     );
     expect(measureWithTranspose).toBeDefined();
     const transpose = getAttributesFromContent(
       measureWithTranspose!.content,
-    ).find((a) => a.transpose)?.transpose;
+    )
+      .find((a) => a.transpose && a.transpose.length > 0)!
+      .transpose?.[0];
     expect(transpose?.chromatic).toBe(-3);
   });
 
