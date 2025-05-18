@@ -211,7 +211,12 @@ import {
 } from "../../schemas";
 
 // Re-exported mappers from other modules
-import { mapDefaultsElement } from "./defaultsMappers";
+import {
+  mapDefaultsElement,
+  mapPageLayoutElement,
+  mapSystemLayoutElement,
+  mapStaffLayoutElement,
+} from "./defaultsMappers";
 import { mapCreditElement } from "./creditMappers";
 import {
   getTextContent,
@@ -1616,6 +1621,9 @@ export const mapPrintElement = (element: Element): Print => {
   const newSystemAttr = getAttribute(element, "new-system");
   const newPageAttr = getAttribute(element, "new-page");
   const pageNumber = getAttribute(element, "page-number");
+  const staffSpacingAttr = getAttribute(element, "staff-spacing");
+  const blankPage = getAttribute(element, "blank-page");
+  const idAttr = getAttribute(element, "id");
 
   if (newSystemAttr === "yes" || newSystemAttr === "no") {
     printData.newSystem = newSystemAttr;
@@ -1623,9 +1631,36 @@ export const mapPrintElement = (element: Element): Print => {
   if (newPageAttr === "yes" || newPageAttr === "no") {
     printData.newPage = newPageAttr;
   }
-  if (pageNumber) {
-    printData.pageNumber = pageNumber;
+  if (pageNumber) printData.pageNumber = pageNumber;
+  if (blankPage) printData.blankPage = blankPage;
+  if (idAttr) printData.id = idAttr;
+  if (staffSpacingAttr) {
+    const ss = parseFloat(staffSpacingAttr);
+    if (!isNaN(ss)) printData.staffSpacing = ss;
   }
+
+  const pageLayoutElement = element.querySelector("page-layout");
+  if (pageLayoutElement) {
+    const mappedPageLayout = mapPageLayoutElement(pageLayoutElement);
+    if (mappedPageLayout) printData.pageLayout = mappedPageLayout;
+  }
+  const systemLayoutElement = element.querySelector("system-layout");
+  if (systemLayoutElement) {
+    const mappedSystemLayout = mapSystemLayoutElement(systemLayoutElement);
+    if (mappedSystemLayout) printData.systemLayout = mappedSystemLayout;
+  }
+  const staffLayoutElements = Array.from(element.querySelectorAll("staff-layout"));
+  if (staffLayoutElements.length > 0) {
+    const mapped = staffLayoutElements
+      .map(mapStaffLayoutElement)
+      .filter(Boolean) as StaffLayout[];
+    if (mapped.length > 0) printData.staffLayout = mapped;
+  }
+
+  Object.keys(printData).forEach(
+    (key) =>
+      printData[key as keyof Print] === undefined && delete printData[key as keyof Print],
+  );
 
   return PrintSchema.parse(printData);
 };

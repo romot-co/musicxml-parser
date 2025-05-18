@@ -88,6 +88,7 @@ import type {
   MeasureContent,
   PageLayout,
   SystemLayout,
+  SystemDividers,
   StaffLayout,
   Margins,
   LineWidth,
@@ -197,6 +198,7 @@ import {
   LineWidthSchema,
   AppearanceSchema,
   SystemLayoutSchema,
+  SystemDividersSchema,
   StaffLayoutSchema,
   BackupSchema,
   ForwardSchema,
@@ -225,6 +227,7 @@ const mapMarginsElement = (element: Element): Margins | undefined => {
     rightMargin: parseFloatContent(element, "right-margin"),
     topMargin: parseFloatContent(element, "top-margin"),
     bottomMargin: parseFloatContent(element, "bottom-margin"),
+    type: getAttribute(element, "type") as Margins["type"],
   };
   // Remove undefined to allow Zod to correctly validate optional fields
   Object.keys(marginsData).forEach(
@@ -242,7 +245,7 @@ const mapMarginsElement = (element: Element): Margins | undefined => {
 };
 
 // Helper to parse <page-layout> element
-const mapPageLayoutElement = (element: Element): PageLayout | undefined => {
+export const mapPageLayoutElement = (element: Element): PageLayout | undefined => {
   if (!element) return undefined;
   const pageLayoutData: Partial<PageLayout> = {
     pageHeight: parseFloatContent(element, "page-height"),
@@ -272,7 +275,24 @@ const mapPageLayoutElement = (element: Element): PageLayout | undefined => {
 };
 
 // Helper to parse <system-layout> element
-const mapSystemLayoutElement = (element: Element): SystemLayout | undefined => {
+const mapSystemDividersElement = (
+  element: Element,
+): SystemDividers | undefined => {
+  if (!element) return undefined;
+  const dividersData: Partial<SystemDividers> = {};
+  if (element.querySelector("left-divider")) dividersData.leftDivider = true;
+  if (element.querySelector("right-divider")) dividersData.rightDivider = true;
+  if (Object.keys(dividersData).length === 0) return undefined;
+  try {
+    return SystemDividersSchema.parse(dividersData);
+  } catch {
+    return undefined;
+  }
+};
+
+export const mapSystemLayoutElement = (
+  element: Element,
+): SystemLayout | undefined => {
   if (!element) return undefined;
   const systemLayoutData: Partial<SystemLayout> = {
     systemDistance: parseFloatContent(element, "system-distance"),
@@ -282,6 +302,11 @@ const mapSystemLayoutElement = (element: Element): SystemLayout | undefined => {
   if (systemMarginsElement) {
     const mappedMargins = mapMarginsElement(systemMarginsElement);
     if (mappedMargins) systemLayoutData.systemMargins = mappedMargins;
+  }
+  const dividersElement = element.querySelector("system-dividers");
+  if (dividersElement) {
+    const mappedDividers = mapSystemDividersElement(dividersElement);
+    if (mappedDividers) systemLayoutData.systemDividers = mappedDividers;
   }
   Object.keys(systemLayoutData).forEach(
     (key) =>
@@ -298,7 +323,9 @@ const mapSystemLayoutElement = (element: Element): SystemLayout | undefined => {
 };
 
 // Helper to parse <staff-layout> element
-const mapStaffLayoutElement = (element: Element): StaffLayout | undefined => {
+export const mapStaffLayoutElement = (
+  element: Element,
+): StaffLayout | undefined => {
   if (!element) return undefined;
   const staffLayoutData: Partial<StaffLayout> = {
     number: parseOptionalNumberAttribute(element, "number"),

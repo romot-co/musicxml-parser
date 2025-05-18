@@ -102,6 +102,7 @@ export type {
   Scaling,
   PageLayout,
   SystemLayout,
+  SystemDividers,
   StaffLayout,
   Appearance,
   ConcertScore,

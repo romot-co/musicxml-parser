@@ -31,4 +31,45 @@ describe("Measure print and sound parsing", () => {
     expect(sound._type).toBe("sound");
     expect(sound.tempo).toBe(120);
   });
+
+  it("parses additional print attributes and layout elements", () => {
+    const xml = `\
+<measure number="1">\
+  <print blank-page="3" staff-spacing="12.5" id="pr1">\
+    <page-layout>\
+      <page-height>1000</page-height>\
+      <page-width>800</page-width>\
+      <page-margins type="both">\
+        <left-margin>50</left-margin>\
+        <right-margin>50</right-margin>\
+        <top-margin>60</top-margin>\
+        <bottom-margin>60</bottom-margin>\
+      </page-margins>\
+    </page-layout>\
+    <system-layout>\
+      <system-margins>\
+        <left-margin>30</left-margin>\
+        <right-margin>30</right-margin>\
+      </system-margins>\
+      <system-distance>120</system-distance>\
+      <top-system-distance>150</top-system-distance>\
+    </system-layout>\
+    <staff-layout number="1">\
+      <staff-distance>70</staff-distance>\
+    </staff-layout>\
+  </print>\
+</measure>`;
+
+    const element = createElement(xml);
+    const measure = mapMeasureElement(element);
+    const print = measure.content?.[0] as Print;
+    expect(print.blankPage).toBe("3");
+    expect(print.staffSpacing).toBe(12.5);
+    expect(print.id).toBe("pr1");
+    expect(print.pageLayout?.pageHeight).toBe(1000);
+    expect(print.pageLayout?.pageMargins?.[0]?.type).toBe("both");
+    expect(print.systemLayout?.systemDistance).toBe(120);
+    expect(print.staffLayout?.[0].number).toBe(1);
+    expect(print.staffLayout?.[0].staffDistance).toBe(70);
+  });
 });
