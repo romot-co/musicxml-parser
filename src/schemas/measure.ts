@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { NoteSchema } from './note';
+import { AttributesSchema } from './attributes'; // Import AttributesSchema
 
 // Placeholder for a more detailed AttributesSchema
 // This will eventually be defined in its own file (e.g., src/schemas/attributes.ts)
@@ -22,7 +23,7 @@ export const MeasureSchema = z.object({
    * Attributes describe musical information such as key signature, time signature, clef, etc. 
    * These often appear at the beginning of a part or when changes occur.
    */
-  attributes: AttributesSchemaPlaceholder.optional(),
+  attributes: z.array(AttributesSchema).optional(), // Attributes can appear in a measure
   /** 
    * An array of notes, rests, and potentially other musical elements within the measure. 
    * Can be empty for pickup measures or measures with only barlines/directions.

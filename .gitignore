@@ -108,3 +108,5 @@ public
 # Vitest coverage
 coverage/
 coverage-vitest/ # If you use a specific output like coverage/vitest
+
+implements.md
