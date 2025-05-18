@@ -8,6 +8,10 @@ import { BackupSchema } from "./backup";
 import { ForwardSchema } from "./forward";
 import { PrintSchema } from "./print";
 import { SoundSchema } from "./sound";
+import { FiguredBassSchema } from "./figuredBass";
+import { GroupingSchema } from "./grouping";
+import { LinkSchema } from "./link";
+import { BookmarkSchema } from "./bookmark";
 // Import other implemented schemas that can be direct children of <measure>
 // For example, if ForwardSchema, BackupSchema are implemented, import them here.
 
@@ -21,10 +25,10 @@ export const MeasureContentSchema = z.union([
   HarmonySchema,
   PrintSchema,
   SoundSchema,
-  // FiguredBassSchema, // Add when implemented
-  // GroupingSchema,    // Add when implemented
-  // LinkSchema,        // Add when implemented
-  // BookmarkSchema,    // Add when implemented
+  FiguredBassSchema,
+  GroupingSchema,
+  LinkSchema,
+  BookmarkSchema,
   BackupSchema,
   ForwardSchema,
 ]);
