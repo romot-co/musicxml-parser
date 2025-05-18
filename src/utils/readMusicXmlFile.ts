@@ -1,35 +1,54 @@
 import { promises as fs } from "fs";
-import { execFile } from "child_process";
-import { promisify } from "util";
+import * as zlib from "zlib";
 
-const execFileAsync = promisify(execFile);
+async function extractMusicXmlEntry(filePath: string): Promise<Buffer> {
+  const buf = await fs.readFile(filePath);
+  const eocd = buf.lastIndexOf(Buffer.from("PK\x05\x06"));
+  if (eocd === -1) throw new Error("Invalid zip archive");
+  const cdOffset = buf.readUInt32LE(eocd + 16);
+  let ptr = cdOffset;
+  while (ptr < eocd) {
+    if (buf.readUInt32LE(ptr) !== 0x02014b50) break;
+    const compMethod = buf.readUInt16LE(ptr + 10);
+    const compSize = buf.readUInt32LE(ptr + 20);
+    const fileNameLen = buf.readUInt16LE(ptr + 28);
+    const extraLen = buf.readUInt16LE(ptr + 30);
+    const commentLen = buf.readUInt16LE(ptr + 32);
+    const localOffset = buf.readUInt32LE(ptr + 42);
+    const name = buf
+      .slice(ptr + 46, ptr + 46 + fileNameLen)
+      .toString("utf8");
+    ptr += 46 + fileNameLen + extraLen + commentLen;
+    if (name.toLowerCase().endsWith(".musicxml")) {
+      if (buf.readUInt32LE(localOffset) !== 0x04034b50) {
+        throw new Error("Invalid local header");
+      }
+      const lhNameLen = buf.readUInt16LE(localOffset + 26);
+      const lhExtraLen = buf.readUInt16LE(localOffset + 28);
+      const dataStart = localOffset + 30 + lhNameLen + lhExtraLen;
+      const compressed = buf.slice(dataStart, dataStart + compSize);
+      if (compMethod === 0) return compressed;
+      if (compMethod === 8) return zlib.inflateRawSync(compressed);
+      throw new Error("Unsupported compression method");
+    }
+  }
+  throw new Error(`No .musicxml entry found in ${filePath}`);
+}
 
 /**
  * Read a MusicXML or MXL file and return its XML contents as a UTF-8 string.
  * The function checks the XML prolog for an encoding declaration and converts
  * UTF-16 files to UTF-8.
  *
- * For `.mxl` archives this implementation relies on the system `unzip` command
- * to extract the first `*.musicxml` entry.
+ * For `.mxl` archives this implementation extracts the first `*.musicxml`
+ * entry directly using Node.js and does not require the external `unzip`
+ * command.
  */
 export async function readMusicXmlFile(filePath: string): Promise<string> {
   let data: Buffer;
 
   if (filePath.toLowerCase().endsWith(".mxl")) {
-    try {
-      const { stdout } = await execFileAsync(
-        "unzip",
-        ["-p", filePath, "*.musicxml"],
-        { maxBuffer: 10 * 1024 * 1024, encoding: "buffer" },
-      );
-      data = stdout as Buffer;
-    } catch (err) {
-      const message =
-        (err as NodeJS.ErrnoException)?.code === "ENOENT"
-          ? "The 'unzip' command is required to read MXL files. Please install it or provide a compatible environment."
-          : `Failed to extract ${filePath}: ${(err as Error).message}`;
-      throw new Error(message);
-    }
+    data = await extractMusicXmlEntry(filePath);
   } else {
     data = await fs.readFile(filePath);
   }

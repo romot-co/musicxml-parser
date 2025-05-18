@@ -22,6 +22,7 @@ This project is currently in **Phase 1: Core Parsing Functionality**.
 *   Maps the parsed DOM structure to a typed JavaScript object (`ScorePartwise`) according to the defined Zod schemas.
 *   Validates the mapped object against the Zod schemas at each step of the mapping process.
 *   Basic unit tests for the core parsing and mapping logic.
+*   Reads `.mxl` archives directly using Node.js—no external `unzip` command is required.
 
 **Design Choices:**
 *   **DOM-based Parsing:** Utilizes `DOMParser` in browsers and loads `jsdom` on demand in Node.js to build a Document Object Model from the MusicXML string. This approach was chosen for its suitability for both transformation and potential future editing capabilities, offering easier random access and manipulation of the XML structure compared to SAX-based parsing.
