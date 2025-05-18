@@ -70,6 +70,45 @@ export const TechnicalSchema = z.object({});
 export type Technical = z.infer<typeof TechnicalSchema>;
 
 /**
+ * Represents a glissando notation.
+ */
+export const GlissandoSchema = z.object({
+  value: z.string().optional(),
+  type: z.enum(["start", "stop"]),
+  number: z.number().int().optional(),
+});
+export type Glissando = z.infer<typeof GlissandoSchema>;
+
+/**
+ * Represents a slide notation.
+ */
+export const SlideSchema = z.object({
+  value: z.string().optional(),
+  type: z.enum(["start", "stop"]),
+  number: z.number().int().optional(),
+});
+export type Slide = z.infer<typeof SlideSchema>;
+
+/**
+ * Represents a tremolo notation.
+ */
+export const TremoloSchema = z.object({
+  value: z.number().int(),
+  type: z.enum(["single", "start", "stop", "unmeasured"]).optional(),
+});
+export type Tremolo = z.infer<typeof TremoloSchema>;
+
+/**
+ * Represents an other-notation element.
+ */
+export const OtherNotationSchema = z.object({
+  value: z.string().optional(),
+  type: z.enum(["start", "stop", "single"]),
+  number: z.number().int().optional(),
+});
+export type OtherNotation = z.infer<typeof OtherNotationSchema>;
+
+/**
  * The articulations element groups multiple articulation marks.
  */
 export const ArticulationsSchema = z.object({
@@ -94,5 +133,9 @@ export const NotationsSchema = z.object({
   tuplets: z.array(TupletSchema).optional(),
   ornaments: z.array(OrnamentsSchema).optional(),
   technical: z.array(TechnicalSchema).optional(),
+  glissandos: z.array(GlissandoSchema).optional(),
+  slides: z.array(SlideSchema).optional(),
+  tremolos: z.array(TremoloSchema).optional(),
+  otherNotations: z.array(OtherNotationSchema).optional(),
 });
 export type Notations = z.infer<typeof NotationsSchema>;
