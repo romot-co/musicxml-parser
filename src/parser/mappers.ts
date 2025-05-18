@@ -82,6 +82,7 @@ import type {
   MeasureContent,
   PageLayout,
   SystemLayout,
+  StaffLayout,
   Margins,
   LineWidth,
   Appearance,
@@ -172,6 +173,7 @@ import {
   LineWidthSchema,
   AppearanceSchema,
   SystemLayoutSchema,
+  StaffLayoutSchema,
   BackupSchema,
   ForwardSchema,
   PrintSchema,
@@ -1521,6 +1523,25 @@ const mapSystemLayoutElement = (element: Element): SystemLayout | undefined => {
   }
 };
 
+// Helper to parse <staff-layout> element
+const mapStaffLayoutElement = (element: Element): StaffLayout | undefined => {
+  if (!element) return undefined;
+  const staffLayoutData: Partial<StaffLayout> = {
+    number: parseOptionalNumberAttribute(element, 'number'),
+    staffDistance: parseFloatContent(element, 'staff-distance'),
+  };
+  Object.keys(staffLayoutData).forEach(
+    key => staffLayoutData[key as keyof StaffLayout] === undefined && delete staffLayoutData[key as keyof StaffLayout],
+  );
+  if (Object.keys(staffLayoutData).length === 0) return undefined;
+  try {
+    return StaffLayoutSchema.parse(staffLayoutData);
+  } catch (e) {
+    // console.warn('Failed to parse staff-layout element:', JSON.stringify(staffLayoutData, null, 2), (e as z.ZodError).errors);
+    return undefined;
+  }
+};
+
 // Helper to parse <line-width> element
 const mapLineWidthElement = (element: Element): LineWidth | undefined => {
   if (!element) return undefined;
@@ -1614,7 +1635,7 @@ export const mapDefaultsElement = (element: Element): Defaults | undefined => {
   const wordFontElement = element.querySelector('word-font');
   const lyricFontElements = Array.from(element.querySelectorAll('lyric-font'));
   const lyricLanguageElements = Array.from(element.querySelectorAll('lyric-language'));
-  // TODO: Add staff-layout mapping if needed
+  const staffLayoutElements = Array.from(element.querySelectorAll('staff-layout'));
 
   const defaultsData: Partial<Defaults> = {};
 
@@ -1632,6 +1653,12 @@ export const mapDefaultsElement = (element: Element): Defaults | undefined => {
   if (systemLayoutElement) { // Added
     const mappedSystemLayout = mapSystemLayoutElement(systemLayoutElement);
     if (mappedSystemLayout) defaultsData.systemLayout = mappedSystemLayout;
+  }
+  if (staffLayoutElements.length > 0) {
+    const mappedStaffLayouts = staffLayoutElements
+      .map(mapStaffLayoutElement)
+      .filter(Boolean) as StaffLayout[];
+    if (mappedStaffLayouts.length > 0) defaultsData.staffLayout = mappedStaffLayouts;
   }
   if (appearanceElement) { // Added
     const mappedAppearance = mapAppearanceElement(appearanceElement);

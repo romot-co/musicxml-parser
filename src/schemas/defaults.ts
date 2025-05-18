@@ -16,9 +16,13 @@ export const SystemLayoutSchema = z.object({
   systemDistance: z.number().optional(),
   topSystemDistance: z.number().optional(),
 }); 
-export const StaffLayoutSchema = z.object({ // TODO: Define staff layout details
-  staffDistance: z.number().optional(), // Example from layout.mod
-}); 
+export const StaffLayoutSchema = z.object({
+  /** Optional staff number this layout applies to. Staves are numbered from top
+   *  to bottom starting at 1. */
+  number: z.number().int().optional(),
+  /** Distance from the previous staff in tenths. */
+  staffDistance: z.number().optional(),
+});
 export const AppearanceSchema = z.object({
   lineWidths: z.array(LineWidthSchema).optional(),
 }); 
