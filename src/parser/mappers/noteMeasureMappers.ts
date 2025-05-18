@@ -1134,11 +1134,12 @@ const mapArpeggiateElement = (element: Element): Arpeggiate => {
 };
 
 const mapNonArpeggiateElement = (element: Element): NonArpeggiate => {
-  const typeAttr = getAttribute(element, "type") as "top" | "bottom" | undefined;
+  const typeAttr = getAttribute(element, "type") as
+    | "top"
+    | "bottom"
+    | undefined;
   if (!typeAttr) {
-    throw new Error(
-      '<non-arpeggiate> element requires a "type" attribute.',
-    );
+    throw new Error('<non-arpeggiate> element requires a "type" attribute.');
   }
   const data: Partial<NonArpeggiate> = {
     type: typeAttr,
@@ -1232,7 +1233,11 @@ const mapRehearsalElement = (element: Element): Rehearsal => {
   if (fontWeightAttr === "normal" || fontWeightAttr === "bold") {
     formatting.fontWeight = fontWeightAttr;
   }
-  if (justifyAttr === "left" || justifyAttr === "center" || justifyAttr === "right") {
+  if (
+    justifyAttr === "left" ||
+    justifyAttr === "center" ||
+    justifyAttr === "right"
+  ) {
     formatting.justify = justifyAttr;
   }
   if (
@@ -1245,7 +1250,8 @@ const mapRehearsalElement = (element: Element): Rehearsal => {
   }
 
   const data: Partial<Rehearsal> = { text };
-  if (Object.keys(formatting).length > 0) data.formatting = formatting as TextFormatting;
+  if (Object.keys(formatting).length > 0)
+    data.formatting = formatting as TextFormatting;
   return RehearsalSchema.parse(data);
 };
 
@@ -1694,9 +1700,7 @@ const mapNotationsElement = (element: Element): Notations => {
   const glissandoElements = Array.from(element.querySelectorAll("glissando"));
   const slideElements = Array.from(element.querySelectorAll("slide"));
   const tremoloElements = Array.from(element.querySelectorAll("tremolo"));
-  const arpeggiateElements = Array.from(
-    element.querySelectorAll("arpeggiate"),
-  );
+  const arpeggiateElements = Array.from(element.querySelectorAll("arpeggiate"));
   const nonArpeggiateElements = Array.from(
     element.querySelectorAll("non-arpeggiate"),
   );

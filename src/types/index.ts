@@ -74,9 +74,9 @@ export type {
   Mordent,
   Schleifer,
   OtherOrnament,
+  Technical,
   Arpeggiate,
   NonArpeggiate,
-  Technical,
 } from "../schemas/notations";
 export type { Barline, BarStyle, Repeat, Ending } from "../schemas/barline";
 export type { Fermata, FermataShape } from "../schemas/fermata";
@@ -162,8 +162,6 @@ export type {
   Slide,
   Tremolo,
   OtherNotation,
-  Arpeggiate,
-  NonArpeggiate,
 } from "../schemas/notations";
 export type { MidiDevice } from "../schemas/midiDevice";
 export type { TimeModification } from "../schemas/timeModification";

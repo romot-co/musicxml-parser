@@ -26,8 +26,7 @@ export async function readMusicXmlFile(filePath: string): Promise<string> {
     } catch (err) {
       const message =
         (err as NodeJS.ErrnoException)?.code === "ENOENT"
-          ?
-              "The 'unzip' command is required to read MXL files. Please install it or provide a compatible environment."
+          ? "The 'unzip' command is required to read MXL files. Please install it or provide a compatible environment."
           : `Failed to extract ${filePath}: ${(err as Error).message}`;
       throw new Error(message);
     }

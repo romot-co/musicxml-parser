@@ -50,16 +50,25 @@ describe("Backup and Forward mapping", () => {
     const el = createElement(measureXml);
     const measure = mapMeasureElement(el);
     expect(measure.content).toBeDefined();
-    const notes = measure.content?.filter(
-      (c): c is Note =>
-        (c as any)._type === "note" && NoteSchema.safeParse(c).success,
-    );
-    const backups = measure.content?.filter(
-      (c): c is Backup => (c as any)._type === "backup",
-    );
-    const forwards = measure.content?.filter(
-      (c): c is Forward => (c as any)._type === "forward",
-    );
+    const notes = measure.content?.filter((c): c is Note => {
+      if (typeof c === "object" && c !== null && "_type" in c) {
+        const currentType = (c as { _type: string })._type;
+        return currentType === "note" && NoteSchema.safeParse(c).success;
+      }
+      return false;
+    });
+    const backups = measure.content?.filter((c): c is Backup => {
+      if (typeof c === "object" && c !== null && "_type" in c) {
+        return (c as { _type: string })._type === "backup";
+      }
+      return false;
+    });
+    const forwards = measure.content?.filter((c): c is Forward => {
+      if (typeof c === "object" && c !== null && "_type" in c) {
+        return (c as { _type: string })._type === "forward";
+      }
+      return false;
+    });
     expect(notes?.length).toBe(3);
     expect(backups?.length).toBe(1);
     expect(forwards?.length).toBe(1);
@@ -81,22 +90,31 @@ describe("Backup and Forward mapping", () => {
     const measure = mapMeasureElement(el);
     expect(measure.content).toBeDefined();
     const content = measure.content!;
-    expect(content[4]._type).toBe("backup");
-    expect(content[6]._type).toBe("forward");
+    expect((content[4] as Backup)._type).toBe("backup");
+    expect((content[6] as Forward)._type).toBe("forward");
 
-    const backups = content.filter(
-      (c): c is Backup => (c as any)._type === "backup",
-    );
-    const forwards = content.filter(
-      (c): c is Forward => (c as any)._type === "forward",
-    );
+    const backups = content.filter((c): c is Backup => {
+      if (typeof c === "object" && c !== null && "_type" in c) {
+        return (c as { _type: string })._type === "backup";
+      }
+      return false;
+    });
+    const forwards = content.filter((c): c is Forward => {
+      if (typeof c === "object" && c !== null && "_type" in c) {
+        return (c as { _type: string })._type === "forward";
+      }
+      return false;
+    });
     expect(backups.length).toBe(1);
     expect(forwards.length).toBe(1);
 
-    const notes = content.filter(
-      (c): c is Note =>
-        (c as any)._type === "note" && NoteSchema.safeParse(c).success,
-    );
+    const notes = content.filter((c): c is Note => {
+      if (typeof c === "object" && c !== null && "_type" in c) {
+        const currentType = (c as { _type: string })._type;
+        return currentType === "note" && NoteSchema.safeParse(c).success;
+      }
+      return false;
+    });
     const voice1 = notes.filter((n) => n.voice === "1");
     const voice2 = notes.filter((n) => n.voice === "2");
     expect(voice1).toHaveLength(4);
