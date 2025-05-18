@@ -94,6 +94,7 @@ import type {
   CreditImage,
   Credit,
   TextFormatting,
+  LyricFormatting,
   SymbolFormatting, // Added
   Harmony,
   Backup,
@@ -376,8 +377,15 @@ export const mapUnpitchedElement = (element: Element): Unpitched => {
 
 // Helper function to map a <lyric> element
 export const mapLyricElement = (element: Element): Lyric => {
+  const textElement = element.querySelector("text");
+  const getAttr = (name: string): string | undefined => {
+    return (
+      getAttribute(textElement ?? element, name) || getAttribute(element, name)
+    );
+  };
+
   const lyricData: Partial<Lyric> = {
-    text: getTextContent(element, "text") ?? "",
+    text: textElement?.textContent?.trim() ?? "",
     syllabic: getTextContent(element, "syllabic") as
       | "single"
       | "begin"
@@ -385,6 +393,7 @@ export const mapLyricElement = (element: Element): Lyric => {
       | "middle"
       | undefined,
   };
+
   const numberAttr = getAttribute(element, "number");
   const nameAttr = getAttribute(element, "name");
   if (numberAttr) lyricData.number = numberAttr;
@@ -407,6 +416,48 @@ export const mapLyricElement = (element: Element): Lyric => {
       text: elisionElement.textContent?.trim() || undefined,
     };
   }
+
+  const xmlLang = getAttr("xml:lang");
+  if (xmlLang) lyricData.xmlLang = xmlLang;
+
+  const formatting: Partial<Lyric["formatting"]> = {};
+  const justify = getAttr("justify");
+  if (justify === "left" || justify === "center" || justify === "right") {
+    formatting.justify = justify;
+  }
+  const fontStyle = getAttr("font-style");
+  if (fontStyle === "normal" || fontStyle === "italic") {
+    formatting.fontStyle = fontStyle;
+  }
+  const fontFamily = getAttr("font-family");
+  if (fontFamily) formatting.fontFamily = fontFamily;
+  const fontSize = getAttr("font-size");
+  if (fontSize) formatting.fontSize = fontSize;
+  const fontWeight = getAttr("font-weight");
+  if (fontWeight === "normal" || fontWeight === "bold") {
+    formatting.fontWeight = fontWeight;
+  }
+  const underlineAttr = getAttr("underline");
+  const overlineAttr = getAttr("overline");
+  const lineThroughAttr = getAttr("line-through");
+  const parseLines = (v: string | undefined): number | undefined => {
+    if (!v) return undefined;
+    const n = parseInt(v, 10);
+    return isNaN(n) ? undefined : n;
+  };
+  const underline = parseLines(underlineAttr);
+  if (underline !== undefined) formatting.underline = underline;
+  const overline = parseLines(overlineAttr);
+  if (overline !== undefined) formatting.overline = overline;
+  const lineThrough = parseLines(lineThroughAttr);
+  if (lineThrough !== undefined) formatting.lineThrough = lineThrough;
+  const color = getAttr("color");
+  if (color) formatting.color = color;
+
+  if (Object.keys(formatting).length > 0) {
+    lyricData.formatting = formatting as Lyric["formatting"];
+  }
+
   return LyricSchema.parse(lyricData);
 };
 
