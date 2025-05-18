@@ -124,6 +124,11 @@ import type {
   Feature,
   Link,
   Bookmark,
+  Rehearsal,
+  OctaveShift,
+  Dashes,
+  Bracket,
+  Image,
 } from "../../types";
 import {
   PitchSchema,
@@ -228,6 +233,11 @@ import {
   WedgeSchema,
   SegnoSchema,
   CodaSchema,
+  RehearsalSchema,
+  OctaveShiftSchema,
+  DashesSchema,
+  BracketSchema,
+  ImageSchema,
   GroupSymbolValueEnum,
   RootSchema,
   KindSchema,
@@ -1120,6 +1130,235 @@ const mapWordsElement = (element: Element): Words => {
   }
 };
 
+const mapRehearsalElement = (element: Element): Rehearsal => {
+  const text = element.textContent?.trim() ?? "";
+  const formatting: Partial<TextFormatting> = {};
+  const fontFamily = getAttribute(element, "font-family");
+  const fontStyleAttr = getAttribute(element, "font-style");
+  const fontSize = getAttribute(element, "font-size");
+  const fontWeightAttr = getAttribute(element, "font-weight");
+  const justifyAttr = getAttribute(element, "justify");
+  const defaultX = parseOptionalNumberAttribute(element, "default-x");
+  const defaultY = parseOptionalNumberAttribute(element, "default-y");
+  const valignAttr = getAttribute(element, "valign");
+  const colorAttr = getAttribute(element, "color");
+
+  if (fontFamily) formatting.fontFamily = fontFamily;
+  if (fontSize) formatting.fontSize = fontSize;
+  if (defaultX !== undefined) formatting.defaultX = defaultX;
+  if (defaultY !== undefined) formatting.defaultY = defaultY;
+  if (colorAttr) formatting.color = colorAttr;
+  if (fontStyleAttr === "normal" || fontStyleAttr === "italic") {
+    formatting.fontStyle = fontStyleAttr;
+  }
+  if (fontWeightAttr === "normal" || fontWeightAttr === "bold") {
+    formatting.fontWeight = fontWeightAttr;
+  }
+  if (justifyAttr === "left" || justifyAttr === "center" || justifyAttr === "right") {
+    formatting.justify = justifyAttr;
+  }
+  if (
+    valignAttr === "top" ||
+    valignAttr === "middle" ||
+    valignAttr === "bottom" ||
+    valignAttr === "baseline"
+  ) {
+    formatting.valign = valignAttr;
+  }
+
+  const data: Partial<Rehearsal> = { text };
+  if (Object.keys(formatting).length > 0) data.formatting = formatting as TextFormatting;
+  return RehearsalSchema.parse(data);
+};
+
+const mapOctaveShiftElement = (element: Element): OctaveShift => {
+  const data: Partial<OctaveShift> = {
+    type: getAttribute(element, "type") as
+      | "up"
+      | "down"
+      | "stop"
+      | "continue"
+      | undefined,
+  };
+  const numAttr = getAttribute(element, "number");
+  if (numAttr) {
+    const n = parseOptionalInt(numAttr);
+    if (n !== undefined) data.number = n;
+  }
+  const sizeAttr = getAttribute(element, "size");
+  if (sizeAttr) {
+    const s = parseOptionalInt(sizeAttr);
+    if (s !== undefined) data.size = s;
+  }
+  const dashLenAttr = getAttribute(element, "dash-length");
+  if (dashLenAttr) {
+    const dl = parseOptionalFloat(dashLenAttr);
+    if (dl !== undefined) data.dashLength = dl;
+  }
+  const spaceLenAttr = getAttribute(element, "space-length");
+  if (spaceLenAttr) {
+    const sl = parseOptionalFloat(spaceLenAttr);
+    if (sl !== undefined) data.spaceLength = sl;
+  }
+  const defaultXAttr = getAttribute(element, "default-x");
+  if (defaultXAttr) {
+    const dx = parseOptionalFloat(defaultXAttr);
+    if (dx !== undefined) data.defaultX = dx;
+  }
+  const defaultYAttr = getAttribute(element, "default-y");
+  if (defaultYAttr) {
+    const dy = parseOptionalFloat(defaultYAttr);
+    if (dy !== undefined) data.defaultY = dy;
+  }
+  const relativeXAttr = getAttribute(element, "relative-x");
+  if (relativeXAttr) {
+    const rx = parseOptionalFloat(relativeXAttr);
+    if (rx !== undefined) data.relativeX = rx;
+  }
+  const relativeYAttr = getAttribute(element, "relative-y");
+  if (relativeYAttr) {
+    const ry = parseOptionalFloat(relativeYAttr);
+    if (ry !== undefined) data.relativeY = ry;
+  }
+  const colorAttr = getAttribute(element, "color");
+  if (colorAttr) data.color = colorAttr;
+  const idAttr = getAttribute(element, "id");
+  if (idAttr) data.id = idAttr;
+  return OctaveShiftSchema.parse(data);
+};
+
+const mapDashesElement = (element: Element): Dashes => {
+  const data: Partial<Dashes> = {
+    type: getAttribute(element, "type") as
+      | "start"
+      | "stop"
+      | "continue"
+      | undefined,
+  };
+  const numAttr = getAttribute(element, "number");
+  if (numAttr) {
+    const n = parseOptionalInt(numAttr);
+    if (n !== undefined) data.number = n;
+  }
+  const dashLenAttr = getAttribute(element, "dash-length");
+  if (dashLenAttr) {
+    const dl = parseOptionalFloat(dashLenAttr);
+    if (dl !== undefined) data.dashLength = dl;
+  }
+  const spaceLenAttr = getAttribute(element, "space-length");
+  if (spaceLenAttr) {
+    const sl = parseOptionalFloat(spaceLenAttr);
+    if (sl !== undefined) data.spaceLength = sl;
+  }
+  const defaultXAttr = getAttribute(element, "default-x");
+  if (defaultXAttr) {
+    const dx = parseOptionalFloat(defaultXAttr);
+    if (dx !== undefined) data.defaultX = dx;
+  }
+  const defaultYAttr = getAttribute(element, "default-y");
+  if (defaultYAttr) {
+    const dy = parseOptionalFloat(defaultYAttr);
+    if (dy !== undefined) data.defaultY = dy;
+  }
+  const relativeXAttr = getAttribute(element, "relative-x");
+  if (relativeXAttr) {
+    const rx = parseOptionalFloat(relativeXAttr);
+    if (rx !== undefined) data.relativeX = rx;
+  }
+  const relativeYAttr = getAttribute(element, "relative-y");
+  if (relativeYAttr) {
+    const ry = parseOptionalFloat(relativeYAttr);
+    if (ry !== undefined) data.relativeY = ry;
+  }
+  const colorAttr = getAttribute(element, "color");
+  if (colorAttr) data.color = colorAttr;
+  const idAttr = getAttribute(element, "id");
+  if (idAttr) data.id = idAttr;
+  return DashesSchema.parse(data);
+};
+
+const mapBracketElement = (element: Element): Bracket => {
+  const data: Partial<Bracket> = {
+    type: getAttribute(element, "type") as
+      | "start"
+      | "stop"
+      | "continue"
+      | undefined,
+  };
+  const numAttr = getAttribute(element, "number");
+  if (numAttr) {
+    const n = parseOptionalInt(numAttr);
+    if (n !== undefined) data.number = n;
+  }
+  const lineEndAttr = getAttribute(element, "line-end");
+  if (lineEndAttr)
+    data.lineEnd = lineEndAttr as "up" | "down" | "both" | "arrow" | "none";
+  const endLenAttr = getAttribute(element, "end-length");
+  if (endLenAttr) {
+    const el = parseOptionalFloat(endLenAttr);
+    if (el !== undefined) data.endLength = el;
+  }
+  const lineTypeAttr = getAttribute(element, "line-type");
+  if (lineTypeAttr) data.lineType = lineTypeAttr;
+  const dashLenAttr = getAttribute(element, "dash-length");
+  if (dashLenAttr) {
+    const dl = parseOptionalFloat(dashLenAttr);
+    if (dl !== undefined) data.dashLength = dl;
+  }
+  const spaceLenAttr = getAttribute(element, "space-length");
+  if (spaceLenAttr) {
+    const sl = parseOptionalFloat(spaceLenAttr);
+    if (sl !== undefined) data.spaceLength = sl;
+  }
+  const defaultXAttr = getAttribute(element, "default-x");
+  if (defaultXAttr) {
+    const dx = parseOptionalFloat(defaultXAttr);
+    if (dx !== undefined) data.defaultX = dx;
+  }
+  const defaultYAttr = getAttribute(element, "default-y");
+  if (defaultYAttr) {
+    const dy = parseOptionalFloat(defaultYAttr);
+    if (dy !== undefined) data.defaultY = dy;
+  }
+  const relativeXAttr = getAttribute(element, "relative-x");
+  if (relativeXAttr) {
+    const rx = parseOptionalFloat(relativeXAttr);
+    if (rx !== undefined) data.relativeX = rx;
+  }
+  const relativeYAttr = getAttribute(element, "relative-y");
+  if (relativeYAttr) {
+    const ry = parseOptionalFloat(relativeYAttr);
+    if (ry !== undefined) data.relativeY = ry;
+  }
+  const colorAttr = getAttribute(element, "color");
+  if (colorAttr) data.color = colorAttr;
+  const idAttr = getAttribute(element, "id");
+  if (idAttr) data.id = idAttr;
+  return BracketSchema.parse(data);
+};
+
+const mapImageElement = (element: Element): Image | undefined => {
+  const source = getAttribute(element, "source");
+  const typeAttr = getAttribute(element, "type");
+  if (!source || !typeAttr) return undefined;
+  const data: Partial<Image> = { source, type: typeAttr };
+  const h = parseOptionalFloat(getAttribute(element, "height"));
+  if (h !== undefined) data.height = h;
+  const w = parseOptionalFloat(getAttribute(element, "width"));
+  if (w !== undefined) data.width = w;
+  const dx = parseOptionalFloat(getAttribute(element, "default-x"));
+  if (dx !== undefined) data.defaultX = dx;
+  const dy = parseOptionalFloat(getAttribute(element, "default-y"));
+  if (dy !== undefined) data.defaultY = dy;
+  const ha = getAttribute(element, "halign");
+  if (ha && ["left", "center", "right"].includes(ha))
+    data.halign = ha as "left" | "center" | "right";
+  const va = getAttribute(element, "valign");
+  if (va && ["top", "middle", "bottom"].includes(va))
+    data.valign = va as "top" | "middle" | "bottom";
+  return ImageSchema.parse(data);
+};
+
 // Helper function to map a <beat-unit> element (within <metronome>)
 const mapMetronomeBeatUnitElement = (element: Element): MetronomeBeatUnit => {
   const beatUnitDotElements = Array.from(
@@ -1212,6 +1451,11 @@ const mapDirectionTypeElement = (element: Element): DirectionType => {
   const wedgeElement = element.querySelector("wedge");
   const segnoElement = element.querySelector("segno");
   const codaElement = element.querySelector("coda");
+  const rehearsalElement = element.querySelector("rehearsal");
+  const octaveShiftElement = element.querySelector("octave-shift");
+  const dashesElement = element.querySelector("dashes");
+  const bracketElement = element.querySelector("bracket");
+  const imageElement = element.querySelector("image");
   const directionTypeData: Partial<DirectionType> = {};
   if (wordsElement) {
     directionTypeData.words = mapWordsElement(wordsElement);
@@ -1304,6 +1548,22 @@ const mapDirectionTypeElement = (element: Element): DirectionType => {
     const idAttr = getAttribute(wedgeElement, "id");
     if (idAttr) wedgeData.id = idAttr;
     directionTypeData.wedge = WedgeSchema.parse(wedgeData);
+  }
+  if (rehearsalElement) {
+    directionTypeData.rehearsal = mapRehearsalElement(rehearsalElement);
+  }
+  if (octaveShiftElement) {
+    directionTypeData.octaveShift = mapOctaveShiftElement(octaveShiftElement);
+  }
+  if (dashesElement) {
+    directionTypeData.dashes = mapDashesElement(dashesElement);
+  }
+  if (bracketElement) {
+    directionTypeData.bracket = mapBracketElement(bracketElement);
+  }
+  if (imageElement) {
+    const img = mapImageElement(imageElement);
+    if (img) directionTypeData.image = img;
   }
   if (segnoElement) {
     directionTypeData.segno = SegnoSchema.parse({});

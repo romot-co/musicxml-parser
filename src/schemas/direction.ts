@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { TextFormattingSchema } from "./credit"; // Assuming TextFormattingSchema includes font attributes
+import { TextFormattingSchema, CreditImageSchema } from "./credit"; // Assuming TextFormattingSchema includes font attributes
 import { YesNoEnum } from "./common";
 import { SoundSchema } from "./sound";
 
@@ -14,6 +14,13 @@ export const WordsSchema = z.object({
   formatting: TextFormattingSchema.optional(), // Includes font and color attributes
 });
 export type Words = z.infer<typeof WordsSchema>;
+
+/** Representation of a <rehearsal> element. */
+export const RehearsalSchema = z.object({
+  text: z.string(),
+  formatting: TextFormattingSchema.optional(),
+});
+export type Rehearsal = z.infer<typeof RehearsalSchema>;
 
 export const MetronomeBeatUnitSchema = z.object({
   "beat-unit": z.string(), // e.g., "quarter", "eighth"
@@ -84,6 +91,55 @@ export type Segno = z.infer<typeof SegnoSchema>;
 export const CodaSchema = z.object({});
 export type Coda = z.infer<typeof CodaSchema>;
 
+export const OctaveShiftSchema = z.object({
+  type: z.enum(["up", "down", "stop", "continue"]).optional(),
+  number: z.number().int().optional(),
+  size: z.number().int().optional(),
+  dashLength: z.number().optional(),
+  spaceLength: z.number().optional(),
+  defaultX: z.number().optional(),
+  defaultY: z.number().optional(),
+  relativeX: z.number().optional(),
+  relativeY: z.number().optional(),
+  color: z.string().optional(),
+  id: z.string().optional(),
+});
+export type OctaveShift = z.infer<typeof OctaveShiftSchema>;
+
+export const DashesSchema = z.object({
+  type: z.enum(["start", "stop", "continue"]).optional(),
+  number: z.number().int().optional(),
+  dashLength: z.number().optional(),
+  spaceLength: z.number().optional(),
+  defaultX: z.number().optional(),
+  defaultY: z.number().optional(),
+  relativeX: z.number().optional(),
+  relativeY: z.number().optional(),
+  color: z.string().optional(),
+  id: z.string().optional(),
+});
+export type Dashes = z.infer<typeof DashesSchema>;
+
+export const BracketSchema = z.object({
+  type: z.enum(["start", "stop", "continue"]).optional(),
+  number: z.number().int().optional(),
+  lineEnd: z.enum(["up", "down", "both", "arrow", "none"]).optional(),
+  endLength: z.number().optional(),
+  lineType: z.string().optional(),
+  dashLength: z.number().optional(),
+  spaceLength: z.number().optional(),
+  defaultX: z.number().optional(),
+  defaultY: z.number().optional(),
+  relativeX: z.number().optional(),
+  relativeY: z.number().optional(),
+  color: z.string().optional(),
+  id: z.string().optional(),
+});
+export type Bracket = z.infer<typeof BracketSchema>;
+
+export const ImageSchema = CreditImageSchema;
+export type Image = z.infer<typeof ImageSchema>;
+
 /**
  * Represents the <direction-type> element, which contains the actual content of a direction.
  */
@@ -95,6 +151,11 @@ export const DirectionTypeSchema = z.object({
   wedge: WedgeSchema.optional(),
   segno: SegnoSchema.optional(),
   coda: CodaSchema.optional(),
+  rehearsal: RehearsalSchema.optional(),
+  octaveShift: OctaveShiftSchema.optional(),
+  dashes: DashesSchema.optional(),
+  bracket: BracketSchema.optional(),
+  image: ImageSchema.optional(),
 });
 export type DirectionType = z.infer<typeof DirectionTypeSchema>;
 

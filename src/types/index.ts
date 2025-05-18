@@ -30,6 +30,11 @@ export type {
   Wedge,
   Segno,
   Coda,
+  Rehearsal,
+  OctaveShift,
+  Dashes,
+  Bracket,
+  Image,
 } from "../schemas/direction";
 
 export type {
