@@ -46,7 +46,21 @@ export const EndingSchema = z.object({
   type: z.enum(["start", "stop", "discontinue"]),
   text: z.string().optional(), // The text of the ending, e.g., "1.", "To Coda"
   "print-object": z.enum(["yes", "no"]).optional(),
-  // TODO: Add other attributes like text-x, text-y, end-length, etc.
+  // Position and font attributes from %print-style
+  defaultX: z.number().optional(),
+  defaultY: z.number().optional(),
+  relativeX: z.number().optional(),
+  relativeY: z.number().optional(),
+  fontFamily: z.string().optional(),
+  fontStyle: z.enum(["normal", "italic"]).optional(),
+  fontSize: z.string().optional(),
+  fontWeight: z.enum(["normal", "bold"]).optional(),
+  color: z.string().optional(),
+  // System relation and additional positioning attributes
+  system: z.enum(["none", "only-top", "also-top"]).optional(),
+  endLength: z.number().optional(),
+  textX: z.number().optional(),
+  textY: z.number().optional(),
 });
 export type Ending = z.infer<typeof EndingSchema>;
 
