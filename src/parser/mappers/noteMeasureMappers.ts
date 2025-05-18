@@ -480,16 +480,7 @@ export const mapNoteElement = (element: Element): Note => {
   }
 
   if (tieElements.length > 0) {
-    // Assuming TieSchema and mapTieElement exist and handle the 'type' attribute
-    // For now, storing them as simple objects if mapTieElement is not defined
-    noteData.ties = tieElements
-      .map((el) => ({
-        type: getAttribute(el, "type") as "start" | "stop" | undefined,
-      }))
-      .filter((t) => t.type) as { type: "start" | "stop" }[];
-    // This needs to be mapTieElement if complex tie objects are needed.
-    // For now, it's a simplified placeholder.
-    // Example: noteData.ties = tieElements.map(mapTieElement).filter(Boolean) as Tie[];
+    noteData.ties = tieElements.map(mapTieElement);
   }
 
   if (dotElements.length > 0) {
@@ -715,6 +706,15 @@ const mapTiedElement = (element: Element): Tie => {
   const type = getAttribute(element, "type") as "start" | "stop" | undefined;
   if (!type) {
     throw new Error('<tied> element requires a "type" attribute.');
+  }
+  return TieSchema.parse({ type });
+};
+
+// Helper to map a <tie> element
+const mapTieElement = (element: Element): Tie => {
+  const type = getAttribute(element, "type") as "start" | "stop" | undefined;
+  if (!type) {
+    throw new Error('<tie> element requires a "type" attribute.');
   }
   return TieSchema.parse({ type });
 };
@@ -1301,7 +1301,6 @@ export const mapBarlineElement = (element: Element): Barline => {
   }
   const idAttr = getAttribute(element, "id");
   if (idAttr) barlineData.id = idAttr;
-  // TODO: Parse other barline children and attributes
 
   return BarlineSchema.parse(barlineData);
 };

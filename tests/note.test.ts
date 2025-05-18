@@ -279,6 +279,12 @@ describe("Note Schema Tests (note.mod)", () => {
       expect(t2.type).toBe("stop");
     });
 
+    it("throws on tie without type attribute", () => {
+      const xml = '<note><pitch><step>C</step><octave>4</octave></pitch><duration>4</duration><tie/></note>';
+      const element = createElement(xml);
+      expect(() => mapNoteElement(element)).toThrow();
+    });
+
     it("parses minimal <time-modification>", () => {
       const xml =
         "<note><pitch><step>A</step><octave>4</octave></pitch><duration>2</duration><time-modification><actual-notes>5</actual-notes><normal-notes>4</normal-notes></time-modification></note>";
