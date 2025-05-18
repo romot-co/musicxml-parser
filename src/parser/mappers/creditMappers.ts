@@ -338,7 +338,6 @@ export const mapCreditSymbolElement = (
   }
 };
 
-
 export const mapCreditImageElement = (
   element: Element,
 ): CreditImage | undefined => {
