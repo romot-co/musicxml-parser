@@ -23,6 +23,8 @@ export type {
   Metronome,
   MetronomeBeatUnit,
   MetronomePerMinute,
+  MetronomeNote,
+  MetronomeRelation,
   Dynamics,
   Pedal,
   Wedge,
@@ -67,6 +69,7 @@ export type {
 export type { Barline, BarStyle, Repeat, Ending } from "../schemas/barline";
 export type { Fermata, FermataShape } from "../schemas/fermata";
 export type { Work } from "../schemas/work";
+export type { Opus } from "../schemas/opus";
 export type {
   Identification,
   Creator,
@@ -105,6 +108,10 @@ export type {
   SystemLayout,
   StaffLayout,
   Appearance,
+  NoteSize,
+  Distance,
+  Glyph,
+  OtherAppearance,
   ConcertScore,
   MusicFont,
   WordFont,
@@ -137,6 +144,9 @@ export type {
   Tremolo,
   OtherNotation,
 } from "../schemas/notations";
+export type { ScoreInstrument } from "../schemas/scoreInstrument";
+export type { MidiDevice } from "../schemas/midiDevice";
+export type { MidiInstrument } from "../schemas/midiInstrument";
 export type { TimeModification } from "../schemas/timeModification";
 // Add other inferred types from Zod schemas here as they are created.
 

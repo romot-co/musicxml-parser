@@ -26,10 +26,22 @@ export const MetronomePerMinuteSchema = z.object({
 });
 export type MetronomePerMinute = z.infer<typeof MetronomePerMinuteSchema>;
 
+export const MetronomeNoteSchema = z.object({
+  "metronome-type": z.string().optional(),
+  "metronome-dot": z.array(z.object({})).optional(),
+});
+export type MetronomeNote = z.infer<typeof MetronomeNoteSchema>;
+
+export const MetronomeRelationSchema = z.object({
+  "metronome-relation": z.string().optional(),
+});
+export type MetronomeRelation = z.infer<typeof MetronomeRelationSchema>;
+
 export const MetronomeSchema = z.object({
   "beat-unit": MetronomeBeatUnitSchema.optional(),
   "per-minute": MetronomePerMinuteSchema.optional(),
-  // TODO: Add other metronome children like <metronome-note>, <metronome-relation>
+  "metronome-note": z.array(MetronomeNoteSchema).optional(),
+  "metronome-relation": z.string().optional(),
   // parentheses: z.boolean().optional(), // Example attribute
 });
 export type Metronome = z.infer<typeof MetronomeSchema>;
@@ -105,6 +117,6 @@ export const DirectionSchema = z.object({
    * If absent, the direction applies to all staves in the part (e.g., for a Grand Staff).
    */
   staff: z.number().int().optional(),
-  // TODO: Add other <direction> attributes like `directive`
+  directive: YesNoEnum.optional(),
 });
 export type Direction = z.infer<typeof DirectionSchema>;

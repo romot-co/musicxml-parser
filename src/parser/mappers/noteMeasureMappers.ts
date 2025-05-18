@@ -18,6 +18,8 @@ import type {
   Metronome,
   MetronomeBeatUnit,
   MetronomePerMinute,
+  MetronomeNote,
+  MetronomeRelation,
   // Dynamics,
   Wedge,
   // Segno,
@@ -63,6 +65,7 @@ import type {
   Footnote,
   Level,
   Work,
+  Opus,
   Identification,
   Creator,
   Rights,
@@ -130,6 +133,7 @@ import {
   MetronomeSchema,
   MetronomeBeatUnitSchema,
   MetronomePerMinuteSchema,
+  MetronomeNoteSchema,
   TransposeSchema,
   // DiatonicSchema,
   // ChromaticSchema,
@@ -169,6 +173,7 @@ import {
   EndingSchema,
   FermataSchema,
   WorkSchema,
+  OpusSchema,
   IdentificationSchema,
   CreatorSchema,
   RightsSchema,
@@ -224,6 +229,9 @@ import {
   FrameSchema,
   FrameNoteSchema,
   FirstFretSchema,
+  ScoreInstrumentSchema,
+  MidiDeviceSchema,
+  MidiInstrumentSchema,
 } from "../../schemas";
 
 // Re-exported mappers from other modules
@@ -270,6 +278,12 @@ export const mapAccidentalElement = (element: Element): Accidental => {
     | "yes"
     | "no"
     | undefined;
+  const parentheses = getAttribute(element, "parentheses") as
+    | "yes"
+    | "no"
+    | undefined;
+  const bracket = getAttribute(element, "bracket") as "yes" | "no" | undefined;
+  const size = getAttribute(element, "size") || undefined;
 
   if (!value) {
     throw new Error(
@@ -281,6 +295,9 @@ export const mapAccidentalElement = (element: Element): Accidental => {
     value: value,
     cautionary: cautionary,
     editorial: editorial,
+    parentheses: parentheses,
+    bracket: bracket,
+    size: size,
   };
   return AccidentalSchema.parse(accidentalData);
 };
@@ -523,15 +540,44 @@ const mapClefElement = (element: Element): Clef => {
 
 // Helper function to map a <slur> element
 const mapSlurElement = (element: Element): Slur => {
-  const slurData = {
+  const slurData: Partial<Slur> = {
     type: getAttribute(element, "type") as "start" | "stop" | "continue",
     number: parseOptionalNumberAttribute(element, "number"),
     placement: getAttribute(element, "placement") as
       | "above"
       | "below"
       | undefined,
-    // TODO: Map other slur attributes
   };
+
+  const orientation = getAttribute(element, "orientation");
+  if (orientation === "over" || orientation === "under")
+    slurData.orientation = orientation;
+
+  const colorAttr = getAttribute(element, "color");
+  if (colorAttr) slurData.color = colorAttr;
+
+  const lineTypeAttr = getAttribute(element, "line-type");
+  if (lineTypeAttr) slurData.lineType = lineTypeAttr;
+
+  const bezierXAttr = getAttribute(element, "bezier-x");
+  if (bezierXAttr) slurData.bezierX = parseOptionalFloat(bezierXAttr);
+
+  const bezierYAttr = getAttribute(element, "bezier-y");
+  if (bezierYAttr) slurData.bezierY = parseOptionalFloat(bezierYAttr);
+
+  const bezierX2Attr = getAttribute(element, "bezier-x2");
+  if (bezierX2Attr) slurData.bezierX2 = parseOptionalFloat(bezierX2Attr);
+
+  const bezierY2Attr = getAttribute(element, "bezier-y2");
+  if (bezierY2Attr) slurData.bezierY2 = parseOptionalFloat(bezierY2Attr);
+
+  const bezierOffsetAttr = getAttribute(element, "bezier-offset");
+  if (bezierOffsetAttr)
+    slurData.bezierOffset = parseOptionalFloat(bezierOffsetAttr);
+
+  const bezierOffset2Attr = getAttribute(element, "bezier-offset2");
+  if (bezierOffset2Attr)
+    slurData.bezierOffset2 = parseOptionalFloat(bezierOffset2Attr);
   // Validate that type is one of the expected values before parsing
   if (!["start", "stop", "continue"].includes(slurData.type)) {
     throw new Error(`Invalid slur type: ${slurData.type}`);
@@ -837,10 +883,24 @@ const mapMetronomePerMinuteElement = (element: Element): MetronomePerMinute => {
   return MetronomePerMinuteSchema.parse(perMinuteData);
 };
 
+// Helper to map <metronome-note>
+const mapMetronomeNoteElement = (element: Element): MetronomeNote => {
+  const typeElement = element.querySelector("metronome-type");
+  const dotElements = Array.from(element.querySelectorAll("metronome-dot"));
+  const noteData: Partial<MetronomeNote> = {};
+  if (typeElement) noteData["metronome-type"] = typeElement.textContent?.trim() ?? "";
+  if (dotElements.length > 0) noteData["metronome-dot"] = dotElements.map(() => ({}));
+  return MetronomeNoteSchema.parse(noteData);
+};
+
 // Helper function to map a <metronome> element (within <direction-type>)
 const mapMetronomeElement = (element: Element): Metronome => {
   const beatUnitElement = element.querySelector("beat-unit");
   const perMinuteElement = element.querySelector("per-minute");
+  const metronomeNoteElements = Array.from(
+    element.querySelectorAll("metronome-note"),
+  );
+  const relationElement = element.querySelector("metronome-relation");
   const metronomeData: Partial<Metronome> = {};
   if (beatUnitElement) {
     metronomeData["beat-unit"] = mapMetronomeBeatUnitElement(beatUnitElement);
@@ -848,6 +908,14 @@ const mapMetronomeElement = (element: Element): Metronome => {
   if (perMinuteElement) {
     metronomeData["per-minute"] =
       mapMetronomePerMinuteElement(perMinuteElement);
+  }
+  if (metronomeNoteElements.length > 0) {
+    metronomeData["metronome-note"] = metronomeNoteElements.map(
+      mapMetronomeNoteElement,
+    );
+  }
+  if (relationElement) {
+    metronomeData["metronome-relation"] = relationElement.textContent?.trim() ?? "";
   }
   return MetronomeSchema.parse(metronomeData);
 };
@@ -974,11 +1042,16 @@ export const mapDirectionElement = (element: Element): Direction => {
     | "between"
     | undefined;
   const staff = parseOptionalNumberAttribute(element, "staff");
+  const directiveAttr = getAttribute(element, "directive") as
+    | "yes"
+    | "no"
+    | undefined;
   const directionData: Partial<Direction> = {
     _type: "direction",
     direction_type: directionTypeElements.map(mapDirectionTypeElement),
     placement: placement,
     staff: staff,
+    directive: directiveAttr,
   };
   return DirectionSchema.parse(directionData);
 };
@@ -1210,10 +1283,30 @@ export const mapBarlineElement = (element: Element): Barline => {
 
 // Helper function to map a <work> element
 const mapWorkElement = (element: Element): Work => {
-  const workData = {
+  const workData: Partial<Work> = {
     "work-number": getTextContent(element, "work-number"),
     "work-title": getTextContent(element, "work-title"),
   };
+
+  const opusElement = element.querySelector("opus");
+  if (opusElement) {
+    const opusData: Partial<Opus> = {
+      href: getAttribute(opusElement, "xlink:href") ?? "",
+    };
+    const typeAttr = getAttribute(opusElement, "xlink:type");
+    if (typeAttr) opusData.type = typeAttr;
+    const roleAttr = getAttribute(opusElement, "xlink:role");
+    if (roleAttr) opusData.role = roleAttr;
+    const titleAttr = getAttribute(opusElement, "xlink:title");
+    if (titleAttr) opusData.title = titleAttr;
+    const showAttr = getAttribute(opusElement, "xlink:show");
+    if (showAttr) opusData.show = showAttr;
+    const actuateAttr = getAttribute(opusElement, "xlink:actuate");
+    if (actuateAttr) opusData.actuate = actuateAttr;
+
+    workData.opus = OpusSchema.parse(opusData);
+  }
+
   return WorkSchema.parse(workData);
 };
 
@@ -1379,6 +1472,7 @@ const mapBeamElement = (element: Element): Beam | undefined => {
     number: parseOptionalNumberAttribute(element, "number") ?? 1,
     repeater: getAttribute(element, "repeater") as "yes" | "no" | undefined,
     fan: getAttribute(element, "fan") as "accel" | "rit" | "none" | undefined,
+    color: getAttribute(element, "color") || undefined,
   };
   return BeamSchema.parse(beamData);
 };
@@ -2227,13 +2321,89 @@ export const mapTimewiseMeasureElement = (
   return TimewiseMeasureSchema.parse(measureData);
 };
 
+// Map a <score-instrument> element
+export const mapScoreInstrumentElement = (element: Element): ScoreInstrument => {
+  const data: Partial<ScoreInstrument> = {
+    id: getAttribute(element, "id") ?? "",
+    instrumentName: getTextContent(element, "instrument-name") ?? "",
+  };
+  const abbr = getTextContent(element, "instrument-abbreviation");
+  if (abbr) data.instrumentAbbreviation = abbr;
+  const sound = getTextContent(element, "instrument-sound");
+  if (sound) data.instrumentSound = sound;
+  if (element.querySelector("solo")) data.solo = true;
+  const ensemble = element.querySelector("ensemble");
+  if (ensemble) {
+    const size = parseInt(ensemble.textContent ?? "", 10);
+    if (!isNaN(size)) data.ensemble = size;
+  }
+  const midiInstr = element.querySelector("midi-instrument");
+  if (midiInstr) data.midiInstrument = mapMidiInstrumentElement(midiInstr);
+  return ScoreInstrumentSchema.parse(data);
+};
+
+// Map a <midi-device> element
+export const mapMidiDeviceElement = (element: Element): MidiDevice => {
+  const data: Partial<MidiDevice> = {
+    value: element.textContent?.trim() ?? "",
+    port: parseOptionalNumberAttribute(element, "port"),
+  };
+  const id = getAttribute(element, "id");
+  if (id) data.id = id;
+  return MidiDeviceSchema.parse(data);
+};
+
+// Map a <midi-instrument> element
+export const mapMidiInstrumentElement = (
+  element: Element,
+): MidiInstrument => {
+  const data: Partial<MidiInstrument> = {
+    id: getAttribute(element, "id") ?? "",
+    midiChannel: parseNumberContent(element, "midi-channel"),
+    midiName: getTextContent(element, "midi-name"),
+    midiBank: parseNumberContent(element, "midi-bank"),
+    midiProgram: parseNumberContent(element, "midi-program"),
+    midiUnpitched: parseNumberContent(element, "midi-unpitched"),
+    volume: parseFloatContent(element, "volume"),
+    pan: parseFloatContent(element, "pan"),
+    elevation: parseFloatContent(element, "elevation"),
+  };
+  return MidiInstrumentSchema.parse(data);
+};
+
 // Mapper for <score-part> element (from <part-list>)
 export const mapScorePartElement = (element: Element): ScorePart => {
-  const scorePartData = {
+  const scoreInstrumentElements = Array.from(
+    element.querySelectorAll("score-instrument"),
+  );
+  const midiDeviceElements = Array.from(
+    element.querySelectorAll("midi-device"),
+  );
+  const midiInstrumentElements = Array.from(
+    element.querySelectorAll("midi-instrument"),
+  );
+
+  const scorePartData: Partial<ScorePart> = {
     id: getAttribute(element, "id") ?? "",
-    partName: getTextContent(element, "part-name") ?? "",
-    // Add other <score-part> children like <part-abbreviation>, <score-instrument>, <midi-device>, etc.
+    partName: getTextContent(element, "part-name") ?? undefined,
   };
+
+  const partAbbrev = getTextContent(element, "part-abbreviation");
+  if (partAbbrev) scorePartData.partAbbreviation = partAbbrev;
+  if (scoreInstrumentElements.length > 0) {
+    scorePartData.scoreInstruments = scoreInstrumentElements.map(
+      mapScoreInstrumentElement,
+    );
+  }
+  if (midiDeviceElements.length > 0) {
+    scorePartData.midiDevices = midiDeviceElements.map(mapMidiDeviceElement);
+  }
+  if (midiInstrumentElements.length > 0) {
+    scorePartData.midiInstruments = midiInstrumentElements.map(
+      mapMidiInstrumentElement,
+    );
+  }
+
   return ScorePartSchema.parse(scorePartData);
 };
 

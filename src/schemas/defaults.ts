@@ -1,9 +1,11 @@
 import { z } from "zod";
 import { FontSchema, MarginsSchema, LineWidthSchema } from "./common";
 
-// Placeholders for complex layout and appearance types
+/**
+ * Defines the scaling from global tenths to physical units.
+ * Both millimeters and tenths are required in MusicXML.
+ */
 export const ScalingSchema = z.object({
-  // TODO: Define scaling details (millimeters, tenths)
   /** Distance in millimeters between one tenth and the next. */
   millimeters: z.number(),
   /** Number of tenths per staff space. */
@@ -34,8 +36,34 @@ export const StaffLayoutSchema = z.object({
   /** Distance from the previous staff in tenths. */
   staffDistance: z.number().optional(),
 });
+export const NoteSizeTypeEnum = z.enum(["cue", "grace", "grace-cue", "large"]);
+
+export const NoteSizeSchema = z.object({
+  type: NoteSizeTypeEnum,
+  value: z.number(),
+});
+
+export const DistanceSchema = z.object({
+  type: z.string(),
+  value: z.number(),
+});
+
+export const GlyphSchema = z.object({
+  type: z.string(),
+  value: z.string(),
+});
+
+export const OtherAppearanceSchema = z.object({
+  type: z.string(),
+  value: z.string(),
+});
+
 export const AppearanceSchema = z.object({
   lineWidths: z.array(LineWidthSchema).optional(),
+  noteSizes: z.array(NoteSizeSchema).optional(),
+  distances: z.array(DistanceSchema).optional(),
+  glyphs: z.array(GlyphSchema).optional(),
+  otherAppearances: z.array(OtherAppearanceSchema).optional(),
 });
 
 export const ConcertScoreSchema = z.object({}); // Empty element
@@ -73,6 +101,10 @@ export type SystemLayout = z.infer<typeof SystemLayoutSchema>;
 export type SystemDividers = z.infer<typeof SystemDividersSchema>;
 export type StaffLayout = z.infer<typeof StaffLayoutSchema>;
 export type Appearance = z.infer<typeof AppearanceSchema>;
+export type NoteSize = z.infer<typeof NoteSizeSchema>;
+export type Distance = z.infer<typeof DistanceSchema>;
+export type Glyph = z.infer<typeof GlyphSchema>;
+export type OtherAppearance = z.infer<typeof OtherAppearanceSchema>;
 export type ConcertScore = z.infer<typeof ConcertScoreSchema>;
 export type MusicFont = z.infer<typeof MusicFontSchema>;
 export type WordFont = z.infer<typeof WordFontSchema>;

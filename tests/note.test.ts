@@ -102,6 +102,19 @@ describe("Note Schema Tests (note.mod)", () => {
       expect(beam2.value).toBe("begin");
     });
 
+    it('parses a <beam> with color attribute', () => {
+      const xml =
+        '<note><pitch><step>A</step><octave>4</octave></pitch><duration>1</duration><type>16th</type><beam number="1" color="red">begin</beam></note>';
+      const element = createElement(xml);
+      const note = mapNoteElement(element);
+      expect(note.beams).toBeDefined();
+      expect(note.beams).toHaveLength(1);
+      const beam = note.beams?.[0] as Beam;
+      expect(beam.number).toBe(1);
+      expect(beam.value).toBe("begin");
+      expect(beam.color).toBe("red");
+    });
+
     it("should parse a <note> with <notations> and <slur>", () => {
       const xml =
         '<note><pitch><step>D</step><octave>5</octave></pitch><duration>2</duration><notations><slur type="start" number="1" placement="above"/></notations></note>';
@@ -116,6 +129,23 @@ describe("Note Schema Tests (note.mod)", () => {
       expect(slur.placement).toBe("above");
     });
 
+    it("parses slur with orientation, color, line-type, and bezier attributes", () => {
+      const xml =
+        '<note><pitch><step>E</step><octave>4</octave></pitch><duration>4</duration><notations><slur type="start" orientation="over" color="red" line-type="dashed" bezier-x="1" bezier-y="2" bezier-x2="3" bezier-y2="4" bezier-offset="5" bezier-offset2="6"/></notations></note>';
+      const el = createElement(xml);
+      const note = mapNoteElement(el);
+      const slur = note.notations?.slurs?.[0] as Slur;
+      expect(slur.orientation).toBe("over");
+      expect(slur.color).toBe("red");
+      expect(slur.lineType).toBe("dashed");
+      expect(slur.bezierX).toBe(1);
+      expect(slur.bezierY).toBe(2);
+      expect(slur.bezierX2).toBe(3);
+      expect(slur.bezierY2).toBe(4);
+      expect(slur.bezierOffset).toBe(5);
+      expect(slur.bezierOffset2).toBe(6);
+    });
+
     it("should parse a <note> with <accidental>", () => {
       const xml =
         "<note><pitch><step>F</step><alter>1</alter><octave>4</octave></pitch><duration>4</duration><accidental>sharp</accidental></note>";
@@ -124,6 +154,19 @@ describe("Note Schema Tests (note.mod)", () => {
       expect(note.accidental).toBeDefined();
       expect(note.accidental?.value).toBe("sharp");
       expect(note.pitch?.alter).toBe(1);
+    });
+
+    it("parses accidental attributes parentheses, bracket and size", () => {
+      const xml =
+        '<note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration><accidental parentheses="yes" bracket="no" size="cue">natural</accidental></note>';
+      const element = createElement(xml);
+      const note = mapNoteElement(element);
+      expect(note.accidental).toBeDefined();
+      const acc = note.accidental!;
+      expect(acc.value).toBe("natural");
+      expect(acc.parentheses).toBe("yes");
+      expect(acc.bracket).toBe("no");
+      expect(acc.size).toBe("cue");
     });
 
     it("should parse a <note> with <dot>", () => {
