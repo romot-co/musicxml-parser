@@ -38,6 +38,14 @@ import type {
   Articulations,
   Staccato,
   Accent,
+  Tenuto,
+  Spiccato,
+  Staccatissimo,
+  StrongAccent,
+  Tuplet,
+  Ornaments,
+  Technical,
+  Tie,
   Barline,
   BarStyle,
   Repeat,
@@ -114,6 +122,14 @@ import {
   ArticulationsSchema,
   StaccatoSchema,
   AccentSchema,
+  TenutoSchema,
+  SpiccatoSchema,
+  StaccatissimoSchema,
+  StrongAccentSchema,
+  TupletSchema,
+  OrnamentsSchema,
+  TechnicalSchema,
+  TieSchema,
   BarlineSchema,
   RepeatSchema,
   EndingSchema,
@@ -436,7 +452,10 @@ const mapSlurElement = (element: Element): Slur => {
 const mapArticulationsElement = (element: Element): Articulations => {
   const staccatoElement = element.querySelector('staccato');
   const accentElement = element.querySelector('accent');
-  // TODO: Query for other articulation types
+  const tenutoElement = element.querySelector('tenuto');
+  const spiccatoElement = element.querySelector('spiccato');
+  const staccatissimoElement = element.querySelector('staccatissimo');
+  const strongAccentElement = element.querySelector('strong-accent');
 
   const articulationsData: Partial<Articulations> = {
     placement: getAttribute(element, 'placement') as 'above' | 'below' | undefined,
@@ -448,9 +467,52 @@ const mapArticulationsElement = (element: Element): Articulations => {
   if (accentElement) {
     articulationsData.accent = {}; // AccentSchema is an empty object
   }
-  // TODO: Map other articulations
+  if (tenutoElement) {
+    articulationsData.tenuto = {};
+  }
+  if (spiccatoElement) {
+    articulationsData.spiccato = {};
+  }
+  if (staccatissimoElement) {
+    articulationsData.staccatissimo = {};
+  }
+  if (strongAccentElement) {
+    articulationsData.strongAccent = {};
+  }
 
   return ArticulationsSchema.parse(articulationsData);
+};
+
+// Helper to map a <tied> element
+const mapTiedElement = (element: Element): Tie => {
+  const type = getAttribute(element, 'type') as 'start' | 'stop' | undefined;
+  if (!type) {
+    throw new Error('<tied> element requires a "type" attribute.');
+  }
+  return TieSchema.parse({ type });
+};
+
+// Helper to map a <tuplet> element
+const mapTupletElement = (element: Element): Tuplet => {
+  const type = getAttribute(element, 'type') as 'start' | 'stop' | undefined;
+  if (!type) {
+    throw new Error('<tuplet> element requires a "type" attribute.');
+  }
+  const tupletData: Partial<Tuplet> = {
+    type,
+    number: parseOptionalNumberAttribute(element, 'number'),
+  };
+  return TupletSchema.parse(tupletData);
+};
+
+// Helper to map an <ornaments> element
+const mapOrnamentsElement = (_element: Element): Ornaments => {
+  return OrnamentsSchema.parse({});
+};
+
+// Helper to map a <technical> element
+const mapTechnicalElement = (_element: Element): Technical => {
+  return TechnicalSchema.parse({});
 };
 
 // Helper function to map a <words> element (within <direction-type>)
@@ -567,7 +629,10 @@ export const mapDirectionElement = (element: Element): Direction => {
 const mapNotationsElement = (element: Element): Notations => {
   const slurElements = Array.from(element.querySelectorAll('slur'));
   const articulationsElements = Array.from(element.querySelectorAll('articulations'));
-  // TODO: Query for other notation types like <tied>, <tuplet>, <ornaments>, <technical>
+  const tiedElements = Array.from(element.querySelectorAll('tied'));
+  const tupletElements = Array.from(element.querySelectorAll('tuplet'));
+  const ornamentsElements = Array.from(element.querySelectorAll('ornaments'));
+  const technicalElements = Array.from(element.querySelectorAll('technical'));
 
   const notationsData: Partial<Notations> = {};
 
@@ -576,6 +641,18 @@ const mapNotationsElement = (element: Element): Notations => {
   }
   if (articulationsElements.length > 0) {
     notationsData.articulations = articulationsElements.map(mapArticulationsElement);
+  }
+  if (tiedElements.length > 0) {
+    notationsData.tied = tiedElements.map(mapTiedElement);
+  }
+  if (tupletElements.length > 0) {
+    notationsData.tuplets = tupletElements.map(mapTupletElement);
+  }
+  if (ornamentsElements.length > 0) {
+    notationsData.ornaments = ornamentsElements.map(mapOrnamentsElement);
+  }
+  if (technicalElements.length > 0) {
+    notationsData.technical = technicalElements.map(mapTechnicalElement);
   }
 
   return NotationsSchema.parse(notationsData);

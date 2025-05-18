@@ -135,6 +135,28 @@ describe('Note Schema Tests (note.mod)', () => {
       expect(note.printLeger).toBe('no');
     });
 
+    it('maps articulations like tenuto and spiccato', () => {
+      const xml = '<note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration><notations><articulations placement="above"><tenuto/><spiccato/></articulations></notations></note>';
+      const element = createElement(xml);
+      const note = mapNoteElement(element);
+      expect(note.notations?.articulations).toBeDefined();
+      const arts = note.notations?.articulations?.[0];
+      expect(arts?.tenuto).toBeDefined();
+      expect(arts?.spiccato).toBeDefined();
+      expect(arts?.placement).toBe('above');
+    });
+
+    it('maps tied, tuplet, ornaments and technical elements', () => {
+      const xml = '<note><pitch><step>D</step><octave>4</octave></pitch><duration>2</duration><notations><tied type="start"/><tuplet type="start" number="3"/><ornaments/><technical/></notations></note>';
+      const element = createElement(xml);
+      const note = mapNoteElement(element);
+      expect(note.notations?.tied).toHaveLength(1);
+      expect(note.notations?.tuplets).toHaveLength(1);
+      expect(note.notations?.ornaments).toHaveLength(1);
+      expect(note.notations?.technical).toHaveLength(1);
+      expect(note.notations?.tuplets?.[0].number).toBe(3);
+    });
+
     // TODO: Add tests for tie, time-modification, notations (articulations, ornaments, technical), etc.
   });
 }); 
