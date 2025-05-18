@@ -93,6 +93,8 @@ if (doc) {
     *   `index.ts`: Main entry point exporting public API.
 *   `tests/`: Unit tests (using Vitest).
 *   `dist/`: Compiled JavaScript output.
+*   `reference/`: Reference materials including the MusicXML 4.0 specification and example scores.
+    *   `xmlsamples/` contains sample MusicXML files from the official MusicXML 4.0 distribution (see <https://github.com/w3c/musicxml> for the source). Copyright notices within those files remain in effect.
 
 ## Development
 
