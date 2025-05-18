@@ -259,9 +259,15 @@ export const mapLinkElement = (element: Element): Link | undefined => {
 
 export const mapBookmarkElement = (element: Element): Bookmark | undefined => {
   const id = getAttribute(element, "id");
-  if (!id) return undefined;
+  if (!id) {
+    // console.warn("Bookmark element is missing an 'id' attribute.", element.outerHTML);
+    return undefined;
+  }
 
-  const data: Partial<Bookmark> = { id };
+  const data: Partial<Bookmark> = {
+    _type: "bookmark",
+    id,
+  };
   const name = getAttribute(element, "name");
   if (name) data.name = name;
   const elementAttr = getAttribute(element, "element");
@@ -271,10 +277,19 @@ export const mapBookmarkElement = (element: Element): Bookmark | undefined => {
 
   try {
     return BookmarkSchema.parse(data);
-  } catch {
+  } catch (e) {
+    console.error(
+      "BookmarkSchema.parse error in mapBookmarkElement. Data:",
+      JSON.stringify(data, null, 2),
+      "Error:",
+      e instanceof z.ZodError ? e.errors : e,
+      "Element:",
+      element.outerHTML,
+    );
     return undefined;
   }
 };
+
 export const mapCreditWordsElement = (
   element: Element,
 ): CreditWords | undefined => {
@@ -473,30 +488,17 @@ export const mapCreditElement = (element: Element): Credit | undefined => {
   if (creditTypes.length > 0) data.creditTypes = creditTypes;
   if (links.length > 0) data.links = links;
   if (bookmarks.length > 0) data.bookmarks = bookmarks;
-
   if (creditWords.length > 0) data.creditWords = creditWords;
-  // MusicXML DTD implies credit-words, credit-symbol, credit-image are choices,
-  // but common usage might mix them. For stricter parsing, you might need a refine on CreditSchema.
-  // For now, we allow them to coexist if mapped.
   if (creditSymbols.length > 0) data.creditSymbols = creditSymbols;
   if (creditImage) data.creditImage = creditImage;
 
-  // If nothing was mapped besides potentially a page number, it might not be a valid credit element.
-  if (
-    Object.keys(data).length === 0 ||
-    (Object.keys(data).length === 1 && data.page)
-  ) {
-    if (
-      creditWords.length === 0 &&
-      creditSymbols.length === 0 &&
-      !creditImage &&
-      creditTypes.length === 0 &&
-      links.length === 0 &&
-      bookmarks.length === 0
-    ) {
-      // console.warn("Credit element is empty or only has page number, returning undefined.", element.outerHTML);
-      return undefined;
-    }
+  // If, after attempting to populate 'data' from all parts of the <credit> element,
+  // the 'data' object is still empty, it means the <credit> element
+  // had no parsable content (not even a 'page' attribute or any recognized children).
+  // In such a truly empty case, return undefined.
+  if (Object.keys(data).length === 0) {
+    // console.warn("Credit element resulted in an empty data object, returning undefined.", element.outerHTML);
+    return undefined;
   }
 
   try {

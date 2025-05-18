@@ -28,4 +28,3 @@ describe("Work element parsing", () => {
     expect(score.work?.opus?.title).toBe("Album");
   });
 });
-

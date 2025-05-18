@@ -464,7 +464,9 @@ const mapAppearanceElement = (element: Element): Appearance | undefined => {
   }
   const glyphElements = Array.from(element.querySelectorAll("glyph"));
   if (glyphElements.length > 0) {
-    const mapped = glyphElements.map(mapGlyphElement).filter(Boolean) as Glyph[];
+    const mapped = glyphElements
+      .map(mapGlyphElement)
+      .filter(Boolean) as Glyph[];
     if (mapped.length > 0) appearanceData.glyphs = mapped;
   }
   const otherElements = Array.from(

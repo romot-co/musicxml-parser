@@ -111,7 +111,7 @@ describe("Note Schema Tests (note.mod)", () => {
       expect(beam2.value).toBe("begin");
     });
 
-    it('parses a <beam> with color attribute', () => {
+    it("parses a <beam> with color attribute", () => {
       const xml =
         '<note><pitch><step>A</step><octave>4</octave></pitch><duration>1</duration><type>16th</type><beam number="1" color="red">begin</beam></note>';
       const element = createElement(xml);
@@ -281,7 +281,7 @@ describe("Note Schema Tests (note.mod)", () => {
 
     it("parses minimal <time-modification>", () => {
       const xml =
-        '<note><pitch><step>A</step><octave>4</octave></pitch><duration>2</duration><time-modification><actual-notes>5</actual-notes><normal-notes>4</normal-notes></time-modification></note>';
+        "<note><pitch><step>A</step><octave>4</octave></pitch><duration>2</duration><time-modification><actual-notes>5</actual-notes><normal-notes>4</normal-notes></time-modification></note>";
       const element = createElement(xml);
       const note = mapNoteElement(element);
       const tm = note.timeModification as TimeModification;
@@ -293,7 +293,7 @@ describe("Note Schema Tests (note.mod)", () => {
 
     it("parses multiple normal-dot elements in <time-modification>", () => {
       const xml =
-        '<note><pitch><step>B</step><octave>4</octave></pitch><duration>1</duration><time-modification><actual-notes>3</actual-notes><normal-notes>2</normal-notes><normal-dot/><normal-dot/></time-modification></note>';
+        "<note><pitch><step>B</step><octave>4</octave></pitch><duration>1</duration><time-modification><actual-notes>3</actual-notes><normal-notes>2</normal-notes><normal-dot/><normal-dot/></time-modification></note>";
       const element = createElement(xml);
       const note = mapNoteElement(element);
       expect(note.timeModification?.normalDots).toHaveLength(2);

@@ -51,7 +51,7 @@ describe("Barline Schema Tests", () => {
       expect(repeat.times).toBe(2);
     });
 
-    it('should parse repeat attributes winged and after-jump', () => {
+    it("should parse repeat attributes winged and after-jump", () => {
       const xml = `<barline><repeat direction="backward" winged="curved" after-jump="yes"/></barline>`;
       const element = createElement(xml);
       const barline = mapBarlineElement(element);

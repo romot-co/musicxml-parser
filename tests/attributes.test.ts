@@ -215,7 +215,8 @@ describe("Attributes Schema Tests", () => {
       const xml = `<attributes><measure-style><beat-repeat type="start"><slash-type>quarter</slash-type><slash-dot/><slash-dot/></beat-repeat></measure-style></attributes>`;
       const element = createElement(xml);
       const attributes = mapAttributesElement(element);
-      const br = (attributes.measureStyle?.[0] as MeasureStyle).beatRepeat as BeatRepeat;
+      const br = (attributes.measureStyle?.[0] as MeasureStyle)
+        .beatRepeat as BeatRepeat;
       expect(br.slashType).toBe("quarter");
       expect(br.slashDot).toBeDefined();
       expect(br.slashDot?.length).toBe(2);

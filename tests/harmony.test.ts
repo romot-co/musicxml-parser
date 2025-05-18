@@ -7,7 +7,9 @@ function createElement(xmlString: string): Element {
   const dom = new JSDOM(xmlString, { contentType: "application/xml" });
   const parsererror = dom.window.document.querySelector("parsererror");
   if (parsererror) {
-    throw new Error(`Failed to parse XML string snippet: ${parsererror.textContent}`);
+    throw new Error(
+      `Failed to parse XML string snippet: ${parsererror.textContent}`,
+    );
   }
   if (!dom.window.document.documentElement) {
     throw new Error("No document element found in XML string snippet.");
