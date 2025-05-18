@@ -64,4 +64,44 @@ describe("Backup and Forward mapping", () => {
     expect(backups?.length).toBe(1);
     expect(forwards?.length).toBe(1);
   });
+
+  it("maintains order for multiple voices with backups and forwards", () => {
+    const xml = `
+      <measure number="1">
+        <note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration><voice>1</voice><type>quarter</type></note>
+        <note><pitch><step>D</step><octave>4</octave></pitch><duration>1</duration><voice>1</voice><type>quarter</type></note>
+        <note><pitch><step>E</step><octave>4</octave></pitch><duration>1</duration><voice>1</voice><type>quarter</type></note>
+        <note><pitch><step>F</step><octave>4</octave></pitch><duration>1</duration><voice>1</voice><type>quarter</type></note>
+        <backup><duration>4</duration></backup>
+        <note><pitch><step>E</step><octave>3</octave></pitch><duration>2</duration><voice>2</voice><type>half</type></note>
+        <forward><duration>1</duration></forward>
+        <note><pitch><step>G</step><octave>3</octave></pitch><duration>1</duration><voice>2</voice><type>quarter</type></note>
+      </measure>`;
+    const el = createElement(xml);
+    const measure = mapMeasureElement(el);
+    expect(measure.content).toBeDefined();
+    const content = measure.content!;
+    expect(content[4]._type).toBe("backup");
+    expect(content[6]._type).toBe("forward");
+
+    const backups = content.filter(
+      (c): c is Backup => (c as any)._type === "backup",
+    );
+    const forwards = content.filter(
+      (c): c is Forward => (c as any)._type === "forward",
+    );
+    expect(backups.length).toBe(1);
+    expect(forwards.length).toBe(1);
+
+    const notes = content.filter(
+      (c): c is Note =>
+        (c as any)._type === "note" && NoteSchema.safeParse(c).success,
+    );
+    const voice1 = notes.filter((n) => n.voice === "1");
+    const voice2 = notes.filter((n) => n.voice === "2");
+    expect(voice1).toHaveLength(4);
+    expect(voice2).toHaveLength(2);
+    expect(voice1.map((n) => n.pitch?.step)).toEqual(["C", "D", "E", "F"]);
+    expect(voice2.map((n) => n.duration)).toEqual([2, 1]);
+  });
 });

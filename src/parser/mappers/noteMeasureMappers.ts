@@ -442,6 +442,7 @@ export const mapNoteElement = (element: Element): Note => {
   const lyricElements = Array.from(element.querySelectorAll("lyric"));
   const tieElements = Array.from(element.querySelectorAll("tie"));
   const timeModElement = element.querySelector("time-modification");
+  const voiceContent = getTextContent(element, "voice");
 
   const noteData: Partial<Note> = {
     _type: "note",
@@ -518,6 +519,9 @@ export const mapNoteElement = (element: Element): Note => {
   }
   if (lyricElements.length > 0) {
     noteData.lyrics = lyricElements.map(mapLyricElement);
+  }
+  if (voiceContent) {
+    noteData.voice = voiceContent;
   }
 
   try {
