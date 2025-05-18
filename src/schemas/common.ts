@@ -23,6 +23,8 @@ export const MarginsSchema = z.object({
   rightMargin: z.number().optional(),
   topMargin: z.number().optional(),
   bottomMargin: z.number().optional(),
+  /** Used by page-margins to distinguish odd, even, or both pages. */
+  type: z.enum(["odd", "even", "both"]).optional(),
 });
 export type Margins = z.infer<typeof MarginsSchema>;
 

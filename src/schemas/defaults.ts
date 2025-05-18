@@ -14,10 +14,18 @@ export const PageLayoutSchema = z.object({
   pageWidth: z.number().optional(),
   pageMargins: z.array(MarginsSchema).optional(),
 });
+export const SystemDividersSchema = z.object({
+  /** Presence of a left-divider element. */
+  leftDivider: z.boolean().optional(),
+  /** Presence of a right-divider element. */
+  rightDivider: z.boolean().optional(),
+});
+
 export const SystemLayoutSchema = z.object({
   systemMargins: MarginsSchema.optional(),
   systemDistance: z.number().optional(),
   topSystemDistance: z.number().optional(),
+  systemDividers: SystemDividersSchema.optional(),
 });
 export const StaffLayoutSchema = z.object({
   /** Optional staff number this layout applies to. Staves are numbered from top
@@ -62,6 +70,7 @@ export const DefaultsSchema = z.object({
 export type Scaling = z.infer<typeof ScalingSchema>;
 export type PageLayout = z.infer<typeof PageLayoutSchema>;
 export type SystemLayout = z.infer<typeof SystemLayoutSchema>;
+export type SystemDividers = z.infer<typeof SystemDividersSchema>;
 export type StaffLayout = z.infer<typeof StaffLayoutSchema>;
 export type Appearance = z.infer<typeof AppearanceSchema>;
 export type ConcertScore = z.infer<typeof ConcertScoreSchema>;
