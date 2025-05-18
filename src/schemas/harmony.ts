@@ -2,13 +2,37 @@ import { z } from "zod";
 import { TextFormattingSchema } from "./credit"; // Assuming similar formatting needs
 import { YesNoEnum } from "./common";
 
-// Forward declaration for FrameSchema as it's a child of Harmony
-// We will define a placeholder schema for now and replace it later.
-const PlaceholderFrameSchema = z.object({
-  placeholder: z.string().optional(), // This will be replaced by the actual FrameSchema
+/** Location attribute used by first-fret. */
+const LeftRightEnum = z.enum(["left", "right"]);
+
+/** Individual note information within a frame diagram. */
+export const FrameNoteSchema = z.object({
+  string: z.number().int().positive(),
+  fret: z.number().int().nonnegative(),
+  fingering: z.string().optional(),
+  barre: z.enum(["start", "stop"]).optional(),
 });
-export type Frame = z.infer<typeof PlaceholderFrameSchema>; // Temporary type
-export const FrameSchema = z.lazy(() => PlaceholderFrameSchema); // Use placeholder
+export type FrameNote = z.infer<typeof FrameNoteSchema>;
+
+/** Information about the first displayed fret of the diagram. */
+export const FirstFretSchema = z.object({
+  value: z.number().int().positive(),
+  text: z.string().optional(),
+  location: LeftRightEnum.optional(),
+});
+export type FirstFret = z.infer<typeof FirstFretSchema>;
+
+/** Guitar frame / chord diagram schema used inside harmony elements. */
+export const FrameSchema = z.object({
+  frameStrings: z.number().int().positive(),
+  frameFrets: z.number().int().positive(),
+  firstFret: FirstFretSchema.optional(),
+  frameNotes: z.array(FrameNoteSchema).optional(),
+  height: z.number().optional(),
+  width: z.number().optional(),
+  unplayed: z.string().optional(),
+});
+export type Frame = z.infer<typeof FrameSchema>;
 
 export const RootStepSchema = z.enum(["A", "B", "C", "D", "E", "F", "G"]);
 const AlterSchema = z.number().int().min(-2).max(2); // Assuming double-flat to double-sharp
@@ -100,10 +124,3 @@ export const HarmonySchema = z.object({
 });
 
 export type Harmony = z.infer<typeof HarmonySchema>;
-
-// Placeholder for FrameSchemaInternal to avoid circular dependencies for now
-// This will be properly defined in frame.ts and imported/used here.
-// const FrameSchemaInternal = z.object({  // This can be removed for now
-//   // Define Frame properties here later
-//   placeholder: z.string().optional(),
-// });

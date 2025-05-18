@@ -221,6 +221,9 @@ import {
   MiscellaneousFieldSchema,
   FermataShapeEnum,
   PedalSchema,
+  FrameSchema,
+  FrameNoteSchema,
+  FirstFretSchema,
 } from "../../schemas";
 
 // Re-exported mappers from other modules
@@ -2579,6 +2582,73 @@ export function mapDegreeElement(
   return undefined;
 }
 
+export function mapFrameElement(
+  element: Element,
+): z.infer<typeof FrameSchema> | undefined {
+  if (!element) return undefined;
+
+  const stringsText = element
+    .querySelector("frame-strings")
+    ?.textContent?.trim();
+  const fretsText = element
+    .querySelector("frame-frets")
+    ?.textContent?.trim();
+
+  const frameData: Partial<z.infer<typeof FrameSchema>> = {};
+
+  if (stringsText) frameData.frameStrings = parseOptionalInt(stringsText);
+  if (fretsText) frameData.frameFrets = parseOptionalInt(fretsText);
+
+  const firstFretEl = element.querySelector("first-fret");
+  if (firstFretEl) {
+    const value = parseOptionalInt(firstFretEl.textContent?.trim());
+    const firstFretData: Partial<z.infer<typeof FirstFretSchema>> = {};
+    if (value !== undefined) firstFretData.value = value;
+    const textAttr = getAttribute(firstFretEl, "text");
+    if (textAttr) firstFretData.text = textAttr;
+    const locAttr = getAttribute(firstFretEl, "location");
+    if (locAttr === "left" || locAttr === "right")
+      firstFretData.location = locAttr as "left" | "right";
+    const parsedFirst = FirstFretSchema.safeParse(firstFretData);
+    if (parsedFirst.success) frameData.firstFret = parsedFirst.data;
+  }
+
+  const noteElements = Array.from(element.querySelectorAll("frame-note"));
+  if (noteElements.length > 0) {
+    const notes = noteElements
+      .map((n) => {
+        const stringText = n.querySelector("string")?.textContent?.trim();
+        const fretText = n.querySelector("fret")?.textContent?.trim();
+        if (!stringText || !fretText) return undefined;
+        const noteData: Partial<z.infer<typeof FrameNoteSchema>> = {
+          string: parseOptionalInt(stringText),
+          fret: parseOptionalInt(fretText),
+        };
+        const fingeringText = n.querySelector("fingering")?.textContent?.trim();
+        if (fingeringText) noteData.fingering = fingeringText;
+        const barreEl = n.querySelector("barre");
+        if (barreEl) {
+          const typeAttr = getAttribute(barreEl, "type");
+          if (typeAttr === "start" || typeAttr === "stop") noteData.barre = typeAttr as "start" | "stop";
+        }
+        const parsed = FrameNoteSchema.safeParse(noteData);
+        return parsed.success ? parsed.data : undefined;
+      })
+      .filter(Boolean) as z.infer<typeof FrameNoteSchema>[];
+    if (notes.length > 0) frameData.frameNotes = notes;
+  }
+
+  const heightAttr = getAttribute(element, "height");
+  const widthAttr = getAttribute(element, "width");
+  const unplayedAttr = getAttribute(element, "unplayed");
+  if (heightAttr) frameData.height = parseOptionalFloat(heightAttr);
+  if (widthAttr) frameData.width = parseOptionalFloat(widthAttr);
+  if (unplayedAttr) frameData.unplayed = unplayedAttr;
+
+  const validation = FrameSchema.safeParse(frameData);
+  return validation.success ? validation.data : undefined;
+}
+
 export function mapHarmonyElement(
   harmonyElement: Element,
 ): Harmony | undefined {
@@ -2628,11 +2698,10 @@ export function mapHarmonyElement(
   if (mappedDegrees && mappedDegrees.length > 0)
     harmony.degrees = mappedDegrees;
 
-  // Frame mapping (placeholder for now, needs actual FrameSchema and mapper)
   const frameNode = harmonyElement.querySelector("frame");
   if (frameNode) {
-    // harmony.frame = mapFrameElement(frameNode); // This will be the call when mapFrameElement exists
-    // For now, if FrameSchema is just a placeholder, we might not map anything or map a placeholder
+    const mappedFrame = mapFrameElement(frameNode);
+    if (mappedFrame) harmony.frame = mappedFrame;
   }
 
   if (staffText) harmony.staff = parseOptionalInt(staffText);
