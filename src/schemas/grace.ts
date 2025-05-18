@@ -1,5 +1,5 @@
-import { z } from 'zod';
-import { YesNoEnum } from './common';
+import { z } from "zod";
+import { YesNoEnum } from "./common";
 
 export const GraceSchema = z.object({
   stealTimePrevious: z.number().optional(), // CDATA, percentage
@@ -8,4 +8,4 @@ export const GraceSchema = z.object({
   slash: YesNoEnum.optional(),
 });
 
-export type Grace = z.infer<typeof GraceSchema>; 
+export type Grace = z.infer<typeof GraceSchema>;

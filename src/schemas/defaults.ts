@@ -1,5 +1,5 @@
-import { z } from 'zod';
-import { FontSchema, MarginsSchema, LineWidthSchema } from './common';
+import { z } from "zod";
+import { FontSchema, MarginsSchema, LineWidthSchema } from "./common";
 
 // Placeholders for complex layout and appearance types
 export const ScalingSchema = z.object({ // TODO: Define scaling details (millimeters, tenths)
@@ -12,12 +12,12 @@ export const PageLayoutSchema = z.object({
   pageHeight: z.number().optional(),
   pageWidth: z.number().optional(),
   pageMargins: z.array(MarginsSchema).optional(),
-}); 
+});
 export const SystemLayoutSchema = z.object({
   systemMargins: MarginsSchema.optional(),
   systemDistance: z.number().optional(),
   topSystemDistance: z.number().optional(),
-}); 
+});
 export const StaffLayoutSchema = z.object({
   /** Optional staff number this layout applies to. Staves are numbered from top
    *  to bottom starting at 1. */
@@ -27,7 +27,7 @@ export const StaffLayoutSchema = z.object({
 });
 export const AppearanceSchema = z.object({
   lineWidths: z.array(LineWidthSchema).optional(),
-}); 
+});
 
 export const ConcertScoreSchema = z.object({}); // Empty element
 
@@ -36,13 +36,13 @@ export const WordFontSchema = FontSchema;
 
 export const LyricFontSchema = FontSchema.extend({
   number: z.string().optional(), // NMTOKEN
-  name: z.string().optional(),   // CDATA
+  name: z.string().optional(), // CDATA
 });
 
 export const LyricLanguageSchema = z.object({
   number: z.string().optional(), // NMTOKEN
-  name: z.string().optional(),   // CDATA
-  xmlLang: z.string(),           // CDATA #REQUIRED
+  name: z.string().optional(), // CDATA
+  xmlLang: z.string(), // CDATA #REQUIRED
 });
 
 export const DefaultsSchema = z.object({
@@ -68,4 +68,4 @@ export type MusicFont = z.infer<typeof MusicFontSchema>;
 export type WordFont = z.infer<typeof WordFontSchema>;
 export type LyricFont = z.infer<typeof LyricFontSchema>;
 export type LyricLanguage = z.infer<typeof LyricLanguageSchema>;
-export type Defaults = z.infer<typeof DefaultsSchema>; 
+export type Defaults = z.infer<typeof DefaultsSchema>;

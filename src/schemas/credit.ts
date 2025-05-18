@@ -1,5 +1,5 @@
-import { z } from 'zod';
-import { FontSchema } from './common'; // Assuming ColorSchema might be added here later
+import { z } from "zod";
+import { FontSchema } from "./common"; // Assuming ColorSchema might be added here later
 
 // Placeholder for text formatting attributes (simplified)
 export const TextFormattingSchema = z.object({
@@ -8,15 +8,16 @@ export const TextFormattingSchema = z.object({
   defaultX: z.number().optional(),
   defaultY: z.number().optional(),
   valign: z.enum(['top', 'middle', 'bottom', 'baseline']).optional(),
-  // ... other attributes like Smufl, color, text-decoration etc.
+  // ... other attributes like Smufl, text-decoration etc.
+  color: z.string().optional(),
 }).merge(FontSchema); // Include font attributes
 
 // Placeholder for symbol formatting attributes (simplified)
 export const SymbolFormattingSchema = z.object({
   defaultX: z.number().optional(),
   defaultY: z.number().optional(),
-  halign: z.enum(['left', 'center', 'right']).optional(),
-  valign: z.enum(['top', 'middle', 'bottom']).optional(),
+  halign: z.enum(["left", "center", "right"]).optional(),
+  valign: z.enum(["top", "middle", "bottom"]).optional(),
   // ... color, etc.
 });
 
@@ -34,13 +35,13 @@ export const CreditSymbolSchema = z.object({
 
 export const CreditImageSchema = z.object({
   source: z.string(), // CDATA #REQUIRED
-  type: z.string(),   // CDATA #REQUIRED
+  type: z.string(), // CDATA #REQUIRED
   height: z.number().optional(),
   width: z.number().optional(),
   defaultX: z.number().optional(),
   defaultY: z.number().optional(),
-  halign: z.enum(['left', 'center', 'right']).optional(),
-  valign: z.enum(['top', 'middle', 'bottom']).optional(), 
+  halign: z.enum(["left", "center", "right"]).optional(),
+  valign: z.enum(["top", "middle", "bottom"]).optional(),
 });
 
 export const CreditSchema = z.object({
@@ -60,4 +61,4 @@ export type CreditType = z.infer<typeof CreditTypeSchema>;
 export type CreditWords = z.infer<typeof CreditWordsSchema>;
 export type CreditSymbol = z.infer<typeof CreditSymbolSchema>;
 export type CreditImage = z.infer<typeof CreditImageSchema>;
-export type Credit = z.infer<typeof CreditSchema>; 
+export type Credit = z.infer<typeof CreditSchema>;

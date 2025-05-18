@@ -1,5 +1,5 @@
-import { z } from 'zod';
-import { YesNoEnum } from './common';
+import { z } from "zod";
+import { YesNoEnum } from "./common";
 
 /**
  * The staff-details element is used to indicate editorial information for a staff.
@@ -18,7 +18,7 @@ export const LineDetailSchema = z.object({
 
 // Schema for <staff-tuning> element
 export const StaffTuningSchema = z.object({
-  tuningStep: z.enum(['A', 'B', 'C', 'D', 'E', 'F', 'G']),
+  tuningStep: z.enum(["A", "B", "C", "D", "E", "F", "G"]),
   tuningAlter: z.number().optional(),
   tuningOctave: z.number().int(),
   line: z.number().int(),
@@ -42,10 +42,13 @@ export const StaffDetailsSchema = z.object({
    * This is typically a number.
    */
   capo: z.number().int().optional(), // capo is PCDATA (number)
-  staffSize: z.object({ // staff-size has PCDATA content and a 'scaling' attribute
-    value: z.number(), // Assuming PCDATA is a number
-    scaling: z.number().optional(),
-  }).optional(),
+  staffSize: z
+    .object({
+      // staff-size has PCDATA content and a 'scaling' attribute
+      value: z.number(), // Assuming PCDATA is a number
+      scaling: z.number().optional(),
+    })
+    .optional(),
   /**
    * The number attribute indicates the staff number this detail applies to.
    * Staff numbers are 1-based.
@@ -55,7 +58,7 @@ export const StaffDetailsSchema = z.object({
    * The show-frets attribute indicates whether to show fret numbers on this staff.
    * This is typically one of "numbers" or "letters".
    */
-  showFrets: z.enum(['numbers', 'letters']).optional(), // attribute
+  showFrets: z.enum(["numbers", "letters"]).optional(), // attribute
   /**
    * The print-object attribute indicates whether to print this staff detail information.
    * Typically "yes" or "no".
@@ -70,4 +73,4 @@ export const StaffDetailsSchema = z.object({
 
 export type StaffDetails = z.infer<typeof StaffDetailsSchema>;
 export type StaffTuning = z.infer<typeof StaffTuningSchema>;
-export type LineDetail = z.infer<typeof LineDetailSchema>; 
+export type LineDetail = z.infer<typeof LineDetailSchema>;
