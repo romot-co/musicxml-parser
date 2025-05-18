@@ -1447,7 +1447,9 @@ export const mapImageElement = (element: Element): Image | undefined => {
 };
 
 // Helper function to map a <beat-unit> element (within <metronome>)
-export const mapMetronomeBeatUnitElement = (element: Element): MetronomeBeatUnit => {
+export const mapMetronomeBeatUnitElement = (
+  element: Element,
+): MetronomeBeatUnit => {
   const beatUnitDotElements = Array.from(
     element.querySelectorAll("beat-unit-dot"),
   );
@@ -1462,7 +1464,9 @@ export const mapMetronomeBeatUnitElement = (element: Element): MetronomeBeatUnit
 };
 
 // Helper function to map a <per-minute> element (within <metronome>)
-export const mapMetronomePerMinuteElement = (element: Element): MetronomePerMinute => {
+export const mapMetronomePerMinuteElement = (
+  element: Element,
+): MetronomePerMinute => {
   const formatting: Partial<TextFormatting> = {};
   const fontFamily = getAttribute(element, "font-family");
   const fontStyleAttr = getAttribute(element, "font-style");

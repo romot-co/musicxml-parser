@@ -48,7 +48,8 @@ export const parseOptionalNumberAttribute = (
 export const parseOptionalInt = (
   value: string | null | undefined,
 ): number | undefined => {
-  if (value === null || value === undefined || value.trim() === "") return undefined;
+  if (value === null || value === undefined || value.trim() === "")
+    return undefined;
   const num = parseInt(value, 10);
   return isNaN(num) ? undefined : num;
 };
@@ -56,7 +57,8 @@ export const parseOptionalInt = (
 export const parseOptionalFloat = (
   value: string | null | undefined,
 ): number | undefined => {
-  if (value === null || value === undefined || value.trim() === "") return undefined;
+  if (value === null || value === undefined || value.trim() === "")
+    return undefined;
   const num = parseFloat(value);
   return isNaN(num) ? undefined : num;
 };
