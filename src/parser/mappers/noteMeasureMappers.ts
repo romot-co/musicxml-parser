@@ -6,6 +6,7 @@ import type {
   Part,
   ScorePart,
   PartList,
+  PartGroup,
   ScorePartwise,
   Key,
   Time,
@@ -69,6 +70,7 @@ import type {
   Beam,
   BeamValue,
   PartSymbol,
+  GroupSymbolValue,
   Lyric,
   Grace,
   Cue,
@@ -113,6 +115,7 @@ import {
   PartSchema,
   ScorePartSchema,
   PartListSchema,
+  PartGroupSchema,
   ScorePartwiseSchema,
   ScoreTimewiseSchema,
   TimewisePartSchema,
@@ -2187,13 +2190,35 @@ export const mapScorePartElement = (element: Element): ScorePart => {
   return ScorePartSchema.parse(scorePartData);
 };
 
+// Mapper for <part-group> element within <part-list>
+export const mapPartGroupElement = (element: Element): PartGroup => {
+  const groupData: Partial<PartGroup> = {
+    number: getAttribute(element, "number") ?? undefined,
+    type: (getAttribute(element, "type") as "start" | "stop") ?? "start",
+  };
+
+  const name = getTextContent(element, "group-name");
+  if (name) groupData.groupName = name;
+  const abbr = getTextContent(element, "group-abbreviation");
+  if (abbr) groupData.groupAbbreviation = abbr;
+  const symbol = getTextContent(element, "group-symbol");
+  if (symbol && GroupSymbolValueEnum.safeParse(symbol).success) {
+    groupData.groupSymbol = symbol as GroupSymbolValue;
+  }
+  const barline = getTextContent(element, "group-barline");
+  if (barline === "yes" || barline === "no") groupData.groupBarline = barline;
+
+  return PartGroupSchema.parse(groupData);
+};
+
 // Mapper for <part-list> element
 export const mapPartListElement = (element: Element): PartList => {
   const scorePartElements = Array.from(element.querySelectorAll("score-part"));
+  const partGroupElements = Array.from(element.querySelectorAll("part-group"));
   // console.log('Mapping PartList, found scorePartElements:', scorePartElements.length);
   const partListData = {
     scoreParts: scorePartElements.map(mapScorePartElement),
-    // Potentially handle <part-group> elements here as well
+    partGroups: partGroupElements.map(mapPartGroupElement),
   };
   // console.log('Parsed partListData:', JSON.stringify(partListData, null, 2));
 

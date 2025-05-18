@@ -4,6 +4,7 @@ export type { Note } from "../schemas/note";
 export type { Measure } from "../schemas/measure";
 export type { Part } from "../schemas/part";
 export type { ScorePart } from "../schemas/scorePart";
+export type { PartGroup } from "../schemas/partGroup";
 export type { PartList } from "../schemas/partList";
 export type { ScorePartwise } from "../schemas/scorePartwise";
 export type { ScoreTimewise } from "../schemas/scoreTimewise";
