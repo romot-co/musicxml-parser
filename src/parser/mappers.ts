@@ -799,11 +799,22 @@ const mapDirectionTypeElement = (element: Element): DirectionType => {
     }
   }
   if (pedalElement) {
-    directionTypeData.pedal = PedalSchema.parse({ type: getAttribute(pedalElement, 'type') as any });
+    const pedalType = getAttribute(pedalElement, 'type') as
+      | 'start'
+      | 'stop'
+      | 'change'
+      | 'continue'
+      | undefined;
+    directionTypeData.pedal = PedalSchema.parse({ type: pedalType });
   }
   if (wedgeElement) {
     const wedgeData: Partial<Wedge> = {
-      type: getAttribute(wedgeElement, 'type') as any,
+      type: getAttribute(wedgeElement, 'type') as
+        | 'crescendo'
+        | 'diminuendo'
+        | 'stop'
+        | 'continue'
+        | undefined,
     };
     const spread = getAttribute(wedgeElement, 'spread');
     if (spread) {
