@@ -22,13 +22,14 @@ function createElement(xmlString: string): Element {
 describe("Barline Schema Tests", () => {
   describe("mapBarlineElement", () => {
     it("should parse a basic <barline> element with <bar-style>", () => {
-      const xml = `<barline location="right"><bar-style>light-heavy</bar-style></barline>`;
+      const xml = `<barline location="right"><bar-style color="#000000">light-heavy</bar-style></barline>`;
       const element = createElement(xml);
       const barline = mapBarlineElement(element);
       expect(barline).toBeDefined();
       expect(barline._type).toBe("barline");
       expect(barline.location).toBe("right");
       expect(barline.barStyle).toBe("light-heavy");
+      expect(barline.barStyleColor).toBe("#000000");
     });
 
     it('should parse <barline> with <repeat direction="forward">', () => {
@@ -48,6 +49,15 @@ describe("Barline Schema Tests", () => {
       const repeat = barline.repeat as Repeat;
       expect(repeat.direction).toBe("backward");
       expect(repeat.times).toBe(2);
+    });
+
+    it('should parse repeat attributes winged and after-jump', () => {
+      const xml = `<barline><repeat direction="backward" winged="curved" after-jump="yes"/></barline>`;
+      const element = createElement(xml);
+      const barline = mapBarlineElement(element);
+      const repeat = barline.repeat as Repeat;
+      expect(repeat.winged).toBe("curved");
+      expect(repeat.afterJump).toBe("yes");
     });
 
     it('should parse <barline> with <ending type="start" number="1">', () => {

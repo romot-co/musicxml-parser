@@ -1055,6 +1055,7 @@ const mapRepeatElement = (element: Element): Repeat => {
       | "double-straight"
       | "double-curved"
       | undefined,
+    afterJump: getAttribute(element, "after-jump") as "yes" | "no" | undefined,
   };
   return RepeatSchema.parse(repeatData);
 };
@@ -1166,6 +1167,8 @@ export const mapBarlineElement = (element: Element): Barline => {
     barlineData.barStyle = barStyleElement.textContent?.trim() as
       | BarStyle
       | undefined;
+    const color = getAttribute(barStyleElement, "color");
+    if (color) barlineData.barStyleColor = color;
   }
   if (repeatElement) {
     barlineData.repeat = mapRepeatElement(repeatElement);
