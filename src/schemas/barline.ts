@@ -8,8 +8,17 @@ import { FootnoteSchema, LevelSchema } from './editorial';
  * Standard values are regular, dotted, dashed, heavy, light-light, light-heavy, heavy-light, heavy-heavy, tick, short, and none.
  */
 export const BarStyleEnum = z.enum([
-  'regular', 'dotted', 'dashed', 'heavy', 'light-light', 'light-heavy',
-  'heavy-light', 'heavy-heavy', 'tick', 'short', 'none',
+  "regular",
+  "dotted",
+  "dashed",
+  "heavy",
+  "light-light",
+  "light-heavy",
+  "heavy-light",
+  "heavy-heavy",
+  "tick",
+  "short",
+  "none",
 ]);
 export type BarStyle = z.infer<typeof BarStyleEnum>;
 
@@ -18,11 +27,13 @@ export type BarStyle = z.infer<typeof BarStyleEnum>;
  * The direction attribute indicates forward or backward repeats.
  */
 export const RepeatSchema = z.object({
-  direction: z.enum(['forward', 'backward']),
+  direction: z.enum(["forward", "backward"]),
   /** MusicXML 4.0: The times attribute indicates the number of times the repeated section is played. */
   times: z.number().int().positive().optional(),
   /** MusicXML 4.0: The winged attribute indicates the style of winged repeats. */
-  winged: z.enum(['none', 'straight', 'curved', 'double-straight', 'double-curved']).optional(),
+  winged: z
+    .enum(["none", "straight", "curved", "double-straight", "double-curved"])
+    .optional(),
 });
 export type Repeat = z.infer<typeof RepeatSchema>;
 
@@ -32,9 +43,9 @@ export type Repeat = z.infer<typeof RepeatSchema>;
  */
 export const EndingSchema = z.object({
   number: z.string(), // Comma-separated list of ending numbers, e.g., "1", "2,5"
-  type: z.enum(['start', 'stop', 'discontinue']),
+  type: z.enum(["start", "stop", "discontinue"]),
   text: z.string().optional(), // The text of the ending, e.g., "1.", "To Coda"
-  'print-object': z.enum(['yes', 'no']).optional(),
+  "print-object": z.enum(["yes", "no"]).optional(),
   // TODO: Add other attributes like text-x, text-y, end-length, etc.
 });
 export type Ending = z.infer<typeof EndingSchema>;
@@ -43,12 +54,12 @@ export type Ending = z.infer<typeof EndingSchema>;
  * The barline element is used to represent barlines, including repeats and endings.
  */
 export const BarlineSchema = z.object({
-  _type: z.literal('barline'),
+  _type: z.literal("barline"),
   /**
    * The location attribute indicates whether the barline appears to the left, right, or center of the measure.
    * Defaults to right if not specified.
    */
-  location: z.enum(['left', 'right', 'middle']).optional(),
+  location: z.enum(["left", "right", "middle"]).optional(),
   /**
    * The bar-style element indicates the style of the barline (e.g., heavy, light-light, none).
    */
@@ -90,4 +101,4 @@ export const BarlineSchema = z.object({
   /** Optional unique ID value. */
   id: z.string().optional(),
 });
-export type Barline = z.infer<typeof BarlineSchema>; 
+export type Barline = z.infer<typeof BarlineSchema>;

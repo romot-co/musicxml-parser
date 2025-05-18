@@ -1,13 +1,13 @@
-import { z } from 'zod';
-import { NoteSchema } from './note';
-import { AttributesSchema } from './attributes';
-import { DirectionSchema } from './direction';
-import { BarlineSchema } from './barline';
-import { HarmonySchema } from './harmony';
-import { BackupSchema } from './backup';
-import { ForwardSchema } from './forward';
-import { PrintSchema } from './print';
-import { SoundSchema } from './sound';
+import { z } from "zod";
+import { NoteSchema } from "./note";
+import { AttributesSchema } from "./attributes";
+import { DirectionSchema } from "./direction";
+import { BarlineSchema } from "./barline";
+import { HarmonySchema } from "./harmony";
+import { BackupSchema } from "./backup";
+import { ForwardSchema } from "./forward";
+import { PrintSchema } from "./print";
+import { SoundSchema } from "./sound";
 // Import other implemented schemas that can be direct children of <measure>
 // For example, if ForwardSchema, BackupSchema are implemented, import them here.
 

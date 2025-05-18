@@ -1,14 +1,14 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 // Common types and utility schemas can be defined here.
 // For example, a schema for positive numbers, specific string formats, etc.
 
-export const YesNoEnum = z.enum(['yes', 'no']);
+export const YesNoEnum = z.enum(["yes", "no"]);
 
 export type YesNo = z.infer<typeof YesNoEnum>;
 
-export const FontStyleEnum = z.enum(['normal', 'italic']);
-export const FontWeightEnum = z.enum(['normal', 'bold']);
+export const FontStyleEnum = z.enum(["normal", "italic"]);
+export const FontWeightEnum = z.enum(["normal", "bold"]);
 
 export const FontSchema = z.object({
   fontFamily: z.string().optional(), // Comma-separated list of font names

@@ -1,5 +1,5 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 export const CueSchema = z.object({}); // Empty element
 
-export type Cue = z.infer<typeof CueSchema>; 
+export type Cue = z.infer<typeof CueSchema>;
