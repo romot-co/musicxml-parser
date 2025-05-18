@@ -29,6 +29,7 @@ export const NoteSchema = z
     duration: z.number().int().optional(),
     timeModification: TimeModificationSchema.optional(),
     ties: z.array(TieSchema).max(2).optional(),
+    voice: z.string().optional(),
     type: z.string().optional(),
     dots: z.array(z.object({})).optional(),
     accidental: AccidentalSchema.optional(),
