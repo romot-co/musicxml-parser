@@ -35,8 +35,8 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "lint": "eslint src/**/*.ts",
-    "lint:fix": "eslint src/**/*.ts --fix",
+    "lint": "eslint \"src/**/*.ts\" \"tests/**/*.ts\"",
+    "lint:fix": "eslint \"src/**/*.ts\" \"tests/**/*.ts\" --fix",
     "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\"",
     "format:check": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\"",
     "test": "vitest run",

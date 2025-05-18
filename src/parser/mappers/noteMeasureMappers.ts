@@ -875,7 +875,7 @@ const mapOtherOrnamentElement = (el: Element): OtherOrnament => {
 
 const mapAccidentalMarkElement = (el: Element): Accidental => {
   const value = el.textContent?.trim() || "";
-  return AccidentalSchema.parse({ value: value as any });
+  return AccidentalSchema.parse({ value: value as AccidentalValue });
 };
 
 const mapOrnamentsElement = (element: Element): Ornaments => {

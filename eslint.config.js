@@ -30,6 +30,14 @@ export default [
   },
   ...tseslint.configs.recommended, // Apply recommended TypeScript rules
   {
+    files: ["tests/**/*.ts"],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-non-null-asserted-optional-chain": "off",
+      "@typescript-eslint/ban-ts-comment": "off",
+    },
+  },
+  {
     // Prettierとの連携設定
     // Prettier関連の設定は一番最後に配置することが推奨されます
     // (他のルール設定を上書きできるようにするため)
