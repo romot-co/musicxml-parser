@@ -39,10 +39,10 @@ For Node.js environments, install `jsdom` (or another DOM implementation) so tha
 
 ## Usage
 
-The main parsing functionality is exposed through the `parseMusicXmlString` and `mapDocumentToScorePartwise` functions.
+The main parsing functionality is exposed through the `parseMusicXmlString` and `mapDocumentToScorePartwise` functions. Because `parseMusicXmlString` may dynamically load `jsdom` in Node.js, it is asynchronous and returns a `Promise<Document | null>`, so be sure to call it with `await` inside an async context.
 
 ```typescript
-import { parseMusicXmlString, mapDocumentToScorePartwise, ScorePartwise } from 'your-musicxml-parser-package-name'; // Adjust import path
+import { parseMusicXmlString, mapDocumentToScorePartwise, ScorePartwise, Note } from 'your-musicxml-parser-package-name'; // Adjust import path
 
 const musicXmlString = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
@@ -63,28 +63,42 @@ const musicXmlString = `<?xml version="1.0" encoding="UTF-8"?>
         <type>whole</type>
       </note>
     </measure>
-  </part>
+</part>
 </score-partwise>`;
 
-// 1. Parse the XML string into a DOM Document
-const doc = parseMusicXmlString(musicXmlString);
+async function run() {
+  // 1. Parse the XML string into a DOM Document
+  const doc = await parseMusicXmlString(musicXmlString);
 
-if (doc) {
+  if (!doc) {
+    console.error("Failed to parse MusicXML string.");
+    return;
+  }
+
   // 2. Map the DOM Document to the ScorePartwise JavaScript object
   const score: ScorePartwise | null = mapDocumentToScorePartwise(doc);
 
-  if (score) {
-    console.log("Successfully parsed MusicXML!");
-    console.log("Version:", score.version);
-    console.log("First part ID:", score.parts[0]?.id);
-    console.log("First note in first measure of first part:", score.parts[0]?.measures[0]?.notes[0]);
-    // You can now work with the typed 'score' object
-  } else {
+  if (!score) {
     console.error("Failed to map Document to ScorePartwise object.");
+    return;
   }
-} else {
-  console.error("Failed to parse MusicXML string.");
+
+  console.log("Successfully parsed MusicXML!");
+  console.log("Version:", score.version);
+  console.log("First part ID:", score.parts[0]?.id);
+
+  const measure = score.parts[0]?.measures[0];
+  const notes = measure?.content?.filter(
+    (item): item is Note => (item as any)._type === "note",
+  );
+  console.log(
+    "First note in first measure of first part:",
+    notes?.[0],
+  );
+  // You can now work with the typed 'score' object
 }
+
+run().catch((e) => console.error(e));
 ```
 
 ### Conversion Utilities
