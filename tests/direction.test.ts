@@ -86,4 +86,18 @@ describe("Direction parsing", () => {
     const direction = mapDirectionElement(el);
     expect(direction.directive).toBe("yes");
   });
+
+  it("extracts tempo from sound child", () => {
+    const xml = `<direction><direction-type><words>Tempo</words></direction-type><sound tempo="144"/></direction>`;
+    const el = createElement(xml);
+    const direction = mapDirectionElement(el);
+    expect(direction.sound?.tempo).toBe(144);
+  });
+
+  it("parses offset value", () => {
+    const xml = `<direction><direction-type><words>Offset</words></direction-type><offset>2.5</offset></direction>`;
+    const el = createElement(xml);
+    const direction = mapDirectionElement(el);
+    expect(direction.offset).toBe(2.5);
+  });
 });
