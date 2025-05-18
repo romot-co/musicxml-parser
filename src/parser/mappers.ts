@@ -68,6 +68,8 @@ import type {
   Harmony,
   Backup,
   Forward,
+  Print,
+  Sound,
   MeasureContent,
   PageLayout,
   SystemLayout,
@@ -154,6 +156,8 @@ import {
   SystemLayoutSchema,
   BackupSchema,
   ForwardSchema,
+  PrintSchema,
+  SoundSchema,
 } from '../schemas';
 
 // Helper function to get text content of a child element
@@ -1038,6 +1042,44 @@ export const mapMeasureStyleElement = (element: Element): MeasureStyle | undefin
   }
 };
 
+// Function to map a <print> element
+export const mapPrintElement = (element: Element): Print => {
+  const printData: Partial<Print> = { _type: 'print' };
+  const newSystemAttr = getAttribute(element, 'new-system');
+  const newPageAttr = getAttribute(element, 'new-page');
+  const pageNumber = getAttribute(element, 'page-number');
+
+  if (newSystemAttr === 'yes' || newSystemAttr === 'no') {
+    printData.newSystem = newSystemAttr;
+  }
+  if (newPageAttr === 'yes' || newPageAttr === 'no') {
+    printData.newPage = newPageAttr;
+  }
+  if (pageNumber) {
+    printData.pageNumber = pageNumber;
+  }
+
+  return PrintSchema.parse(printData);
+};
+
+// Function to map a <sound> element
+export const mapSoundElement = (element: Element): Sound => {
+  const soundData: Partial<Sound> = { _type: 'sound' };
+  const tempoAttr = getAttribute(element, 'tempo');
+  const dynamicsAttr = getAttribute(element, 'dynamics');
+
+  if (tempoAttr) {
+    const tempo = parseFloat(tempoAttr);
+    if (!isNaN(tempo)) soundData.tempo = tempo;
+  }
+  if (dynamicsAttr) {
+    const dyn = parseFloat(dynamicsAttr);
+    if (!isNaN(dyn)) soundData.dynamics = dyn;
+  }
+
+  return SoundSchema.parse(soundData);
+};
+
 // Function to map an <attributes> element
 export const mapAttributesElement = (element: Element): Attributes => {
   const divisions = parseNumberContent(element, 'divisions');
@@ -1131,12 +1173,12 @@ export function mapMeasureElement(measureElement: Element): Measure {
         case 'forward':
           mappedElement = mapForwardElement(childElement);
           break;
-        // case 'print':
-        //   mappedElement = mapPrintElement(childElement);
-        //   break;
-        // case 'sound':
-        //   mappedElement = mapSoundElement(childElement);
-        //   break;
+        case 'print':
+          mappedElement = mapPrintElement(childElement);
+          break;
+        case 'sound':
+          mappedElement = mapSoundElement(childElement);
+          break;
       }
       if (mappedElement) {
         // Before pushing, validate with the specific schema if possible (optional)

@@ -33,3 +33,5 @@ export * from './credit';
 export * from './harmony';
 export * from './backup';
 export * from './forward';
+export * from './print';
+export * from './sound';
