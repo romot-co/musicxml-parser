@@ -1,0 +1,536 @@
+import { z } from "zod";
+import type {
+  Pitch,
+  Note,
+  Measure,
+  Part,
+  ScorePart,
+  PartList,
+  ScorePartwise,
+  Key,
+  Time,
+  Clef,
+  Attributes,
+  Direction,
+  DirectionType,
+  Words,
+  Metronome,
+  MetronomeBeatUnit,
+  MetronomePerMinute,
+  // Dynamics,
+  Wedge,
+  // Segno,
+  //Coda,
+  Transpose,
+  // Diatonic,
+  // Chromatic,
+  // OctaveChange,
+  // Double,
+  StaffDetails,
+  StaffTuning,
+  LineDetail,
+  MeasureStyle,
+  MultipleRest,
+  MeasureRepeat,
+  BeatRepeat,
+  Slash,
+  Accidental,
+  AccidentalValue,
+  Notations,
+  Slur,
+  Articulations,
+  // Staccato,
+  //Accent,
+  //Tenuto,
+  //Spiccato,
+  //Staccatissimo,
+  //StrongAccent,
+  Tuplet,
+  Ornaments,
+  Technical,
+  Tie,
+  Barline,
+  BarStyle,
+  Repeat,
+  Ending,
+  Fermata,
+  WavyLine,
+  Footnote,
+  Level,
+  Work,
+  Identification,
+  Creator,
+  Rights,
+  Encoding,
+  Beam,
+  BeamValue,
+  PartSymbol,
+  Lyric,
+  Grace,
+  Cue,
+  Unpitched,
+  Font,
+  Scaling,
+  LyricFont,
+  LyricLanguage,
+  Defaults,
+  CreditWords,
+  CreditSymbol,
+  CreditImage,
+  Credit,
+  TextFormatting,
+  SymbolFormatting, // Added
+  Harmony,
+  Backup,
+  Forward,
+  Print,
+  Sound,
+  MeasureContent,
+  PageLayout,
+  SystemLayout,
+  StaffLayout,
+  Margins,
+  LineWidth,
+  Appearance,
+  TimewisePart,
+  TimewiseMeasure,
+  ScoreTimewise,
+  Supports,
+  Relation,
+  Miscellaneous,
+  MiscellaneousField,
+  FermataShape, // FermataShape を追加
+} from "../../types";
+import {
+  PitchSchema,
+  NoteSchema,
+  MeasureSchema,
+  PartSchema,
+  ScorePartSchema,
+  PartListSchema,
+  ScorePartwiseSchema,
+  ScoreTimewiseSchema,
+  TimewisePartSchema,
+  TimewiseMeasureSchema,
+  KeySchema,
+  TimeSchema,
+  ClefSchema,
+  AttributesSchema,
+  DirectionSchema,
+  DirectionTypeSchema,
+  WordsSchema,
+  MetronomeSchema,
+  MetronomeBeatUnitSchema,
+  MetronomePerMinuteSchema,
+  TransposeSchema,
+  // DiatonicSchema,
+  // ChromaticSchema,
+  // OctaveChangeSchema,
+  // DoubleSchema,
+  StaffDetailsSchema,
+  StaffTuningSchema,
+  LineDetailSchema,
+  MeasureStyleSchema,
+  MultipleRestSchema,
+  MeasureRepeatSchema,
+  BeatRepeatSchema,
+  SlashSchema,
+  AccidentalSchema,
+  NotationsSchema,
+  SlurSchema,
+  ArticulationsSchema,
+  // StaccatoSchema,
+  // AccentSchema,
+  // TenutoSchema,
+  // SpiccatoSchema,
+  // StaccatissimoSchema,
+  // StrongAccentSchema,
+  TupletSchema,
+  OrnamentsSchema,
+  TechnicalSchema,
+  TieSchema,
+  BarlineSchema,
+  WavyLineSchema,
+  FootnoteSchema,
+  LevelSchema,
+  RepeatSchema,
+  EndingSchema,
+  FermataSchema,
+  WorkSchema,
+  IdentificationSchema,
+  CreatorSchema,
+  RightsSchema,
+  EncodingSchema,
+  BeamSchema,
+  PartSymbolSchema,
+  LyricSchema,
+  GraceSchema,
+  CueSchema,
+  UnpitchedSchema,
+  FontSchema,
+  ScalingSchema,
+  LyricFontSchema,
+  LyricLanguageSchema,
+  DefaultsSchema,
+  CreditWordsSchema,
+  CreditSymbolSchema, // Added
+  CreditImageSchema,
+  CreditSchema,
+  // TextFormattingSchema,
+  // SymbolFormattingSchema,
+  HarmonySchema,
+  DynamicsSchema,
+  WedgeSchema,
+  SegnoSchema,
+  CodaSchema,
+  GroupSymbolValueEnum,
+  RootSchema,
+  KindSchema,
+  BassSchema,
+  DegreeSchema,
+  RootStepSchema,
+  KindValueEnum,
+  BassStepSchema,
+  DegreeTypeEnum,
+  PageLayoutSchema,
+  MarginsSchema,
+  LineWidthSchema,
+  AppearanceSchema,
+  SystemLayoutSchema,
+  StaffLayoutSchema,
+  BackupSchema,
+  ForwardSchema,
+  PrintSchema,
+  SoundSchema,
+  SupportsSchema,
+  RelationSchema,
+  MiscellaneousSchema,
+  MiscellaneousFieldSchema,
+  FermataShapeEnum,
+  PedalSchema,
+} from "../../schemas";
+
+import {
+  getTextContent,
+  parseNumberContent,
+  parseFloatContent,
+  getAttribute,
+  parseOptionalNumberAttribute,
+} from "./utils";
+// Helper to parse <margins> element (common for page and system layout)
+const mapMarginsElement = (element: Element): Margins | undefined => {
+  if (!element) return undefined;
+  const marginsData: Partial<Margins> = {
+    leftMargin: parseFloatContent(element, "left-margin"),
+    rightMargin: parseFloatContent(element, "right-margin"),
+    topMargin: parseFloatContent(element, "top-margin"),
+    bottomMargin: parseFloatContent(element, "bottom-margin"),
+  };
+  // Remove undefined to allow Zod to correctly validate optional fields
+  Object.keys(marginsData).forEach(
+    (key) =>
+      marginsData[key as keyof Margins] === undefined &&
+      delete marginsData[key as keyof Margins],
+  );
+  if (Object.keys(marginsData).length === 0) return undefined;
+  try {
+    return MarginsSchema.parse(marginsData);
+  } catch {
+    // console.warn("Failed to parse margins element:", JSON.stringify(marginsData, null, 2), (e as z.ZodError).errors);
+    return undefined;
+  }
+};
+
+// Helper to parse <page-layout> element
+const mapPageLayoutElement = (element: Element): PageLayout | undefined => {
+  if (!element) return undefined;
+  const pageLayoutData: Partial<PageLayout> = {
+    pageHeight: parseFloatContent(element, "page-height"),
+    pageWidth: parseFloatContent(element, "page-width"),
+  };
+  const pageMarginsElements = Array.from(
+    element.querySelectorAll("page-margins"),
+  );
+  if (pageMarginsElements.length > 0) {
+    const mappedMargins = pageMarginsElements
+      .map(mapMarginsElement)
+      .filter(Boolean) as Margins[];
+    if (mappedMargins.length > 0) pageLayoutData.pageMargins = mappedMargins;
+  }
+  Object.keys(pageLayoutData).forEach(
+    (key) =>
+      pageLayoutData[key as keyof PageLayout] === undefined &&
+      delete pageLayoutData[key as keyof PageLayout],
+  );
+  if (Object.keys(pageLayoutData).length === 0) return undefined;
+  try {
+    return PageLayoutSchema.parse(pageLayoutData);
+  } catch {
+    // console.warn("Failed to parse page-layout element:", JSON.stringify(pageLayoutData, null, 2), (e as z.ZodError).errors);
+    return undefined;
+  }
+};
+
+// Helper to parse <system-layout> element
+const mapSystemLayoutElement = (element: Element): SystemLayout | undefined => {
+  if (!element) return undefined;
+  const systemLayoutData: Partial<SystemLayout> = {
+    systemDistance: parseFloatContent(element, "system-distance"),
+    topSystemDistance: parseFloatContent(element, "top-system-distance"),
+  };
+  const systemMarginsElement = element.querySelector("system-margins");
+  if (systemMarginsElement) {
+    const mappedMargins = mapMarginsElement(systemMarginsElement);
+    if (mappedMargins) systemLayoutData.systemMargins = mappedMargins;
+  }
+  Object.keys(systemLayoutData).forEach(
+    (key) =>
+      systemLayoutData[key as keyof SystemLayout] === undefined &&
+      delete systemLayoutData[key as keyof SystemLayout],
+  );
+  if (Object.keys(systemLayoutData).length === 0) return undefined;
+  try {
+    return SystemLayoutSchema.parse(systemLayoutData);
+  } catch {
+    // console.warn("Failed to parse system-layout element:", JSON.stringify(systemLayoutData, null, 2), (e as z.ZodError).errors);
+    return undefined;
+  }
+};
+
+// Helper to parse <staff-layout> element
+const mapStaffLayoutElement = (element: Element): StaffLayout | undefined => {
+  if (!element) return undefined;
+  const staffLayoutData: Partial<StaffLayout> = {
+    number: parseOptionalNumberAttribute(element, "number"),
+    staffDistance: parseFloatContent(element, "staff-distance"),
+  };
+  Object.keys(staffLayoutData).forEach(
+    (key) =>
+      staffLayoutData[key as keyof StaffLayout] === undefined &&
+      delete staffLayoutData[key as keyof StaffLayout],
+  );
+  if (Object.keys(staffLayoutData).length === 0) return undefined;
+  try {
+    return StaffLayoutSchema.parse(staffLayoutData);
+  } catch {
+    // console.warn('Failed to parse staff-layout element:', JSON.stringify(staffLayoutData, null, 2), (e as z.ZodError).errors);
+    return undefined;
+  }
+};
+
+// Helper to parse <line-width> element
+const mapLineWidthElement = (element: Element): LineWidth | undefined => {
+  if (!element) return undefined;
+  const lineWidthData: Partial<LineWidth> = {
+    type: getAttribute(element, "type"),
+    value: element.textContent
+      ? parseFloat(element.textContent.trim())
+      : undefined,
+  };
+  Object.keys(lineWidthData).forEach(
+    (key) =>
+      lineWidthData[key as keyof LineWidth] === undefined &&
+      delete lineWidthData[key as keyof LineWidth],
+  );
+  if (
+    Object.keys(lineWidthData).length === 0 ||
+    lineWidthData.type === undefined
+  )
+    return undefined; // type is often crucial
+  try {
+    return LineWidthSchema.parse(lineWidthData);
+  } catch {
+    // console.warn("Failed to parse line-width element:", JSON.stringify(lineWidthData, null, 2), (e as z.ZodError).errors);
+    return undefined;
+  }
+};
+
+// Helper to parse <appearance> element
+const mapAppearanceElement = (element: Element): Appearance | undefined => {
+  if (!element) return undefined;
+  const appearanceData: Partial<Appearance> = {};
+  const lineWidthElements = Array.from(element.querySelectorAll("line-width"));
+  if (lineWidthElements.length > 0) {
+    const mappedLineWidths = lineWidthElements
+      .map(mapLineWidthElement)
+      .filter(Boolean) as LineWidth[];
+    if (mappedLineWidths.length > 0)
+      appearanceData.lineWidths = mappedLineWidths;
+  }
+  // Add other appearance properties here (e.g., note-size)
+  if (Object.keys(appearanceData).length === 0) return undefined;
+  try {
+    return AppearanceSchema.parse(appearanceData);
+  } catch {
+    // console.warn("Failed to parse appearance element:", JSON.stringify(appearanceData, null, 2), (e as z.ZodError).errors);
+    return undefined;
+  }
+};
+
+// Helper to parse font attributes, assuming FontSchema structure
+export const mapFontAttributes = (element: Element): Font => {
+  const fontFamily = getAttribute(element, "font-family");
+  const fontStyleAttr = getAttribute(element, "font-style");
+  const fontSize = getAttribute(element, "font-size");
+  const fontWeightAttr = getAttribute(element, "font-weight");
+
+  const fontData: Partial<Font> = {};
+
+  if (fontFamily) fontData.fontFamily = fontFamily;
+  if (fontSize) fontData.fontSize = fontSize;
+
+  if (fontStyleAttr === "normal" || fontStyleAttr === "italic") {
+    fontData.fontStyle = fontStyleAttr;
+  }
+
+  if (fontWeightAttr === "normal" || fontWeightAttr === "bold") {
+    fontData.fontWeight = fontWeightAttr;
+  }
+  return FontSchema.parse(fontData);
+};
+
+export const mapScalingElement = (element: Element): Scaling | undefined => {
+  if (!element) return undefined;
+  const millimeters = parseFloatContent(element, "millimeters");
+  const tenths = parseNumberContent(element, "tenths");
+  if (millimeters === undefined || tenths === undefined) return undefined;
+  const scalingData: Scaling = {
+    millimeters,
+    tenths,
+  };
+  if (Object.values(scalingData).every((v) => v === undefined))
+    return undefined;
+  return ScalingSchema.parse(scalingData);
+};
+
+export const mapLyricFontElement = (
+  element: Element,
+): LyricFont | undefined => {
+  if (!element) return undefined;
+  const fontAttrs = mapFontAttributes(element);
+  const lyricFontData: Partial<LyricFont> = {
+    ...fontAttrs,
+    number: getAttribute(element, "number"),
+    name: getAttribute(element, "name"),
+  };
+  Object.keys(lyricFontData).forEach(
+    (key) =>
+      lyricFontData[key as keyof LyricFont] === undefined &&
+      delete lyricFontData[key as keyof LyricFont],
+  );
+  if (Object.keys(lyricFontData).length === 0) return undefined;
+  return LyricFontSchema.parse(lyricFontData);
+};
+
+export const mapDefaultsElement = (element: Element): Defaults | undefined => {
+  if (!element) return undefined;
+
+  const scalingElement = element.querySelector("scaling");
+  const concertScoreElement = element.querySelector("concert-score");
+  const pageLayoutElement = element.querySelector("page-layout"); // Added
+  const systemLayoutElement = element.querySelector("system-layout"); // Added
+  const appearanceElement = element.querySelector("appearance"); // Added
+  const musicFontElement = element.querySelector("music-font");
+  const wordFontElement = element.querySelector("word-font");
+  const lyricFontElements = Array.from(element.querySelectorAll("lyric-font"));
+  const lyricLanguageElements = Array.from(
+    element.querySelectorAll("lyric-language"),
+  );
+  const staffLayoutElements = Array.from(
+    element.querySelectorAll("staff-layout"),
+  );
+
+  const defaultsData: Partial<Defaults> = {};
+
+  if (scalingElement) {
+    const mappedScaling = mapScalingElement(scalingElement);
+    if (mappedScaling) defaultsData.scaling = mappedScaling;
+  }
+  if (concertScoreElement) {
+    defaultsData.concertScore = {};
+  }
+  if (pageLayoutElement) {
+    // Added
+    const mappedPageLayout = mapPageLayoutElement(pageLayoutElement);
+    if (mappedPageLayout) defaultsData.pageLayout = mappedPageLayout;
+  }
+  if (systemLayoutElement) {
+    // Added
+    const mappedSystemLayout = mapSystemLayoutElement(systemLayoutElement);
+    if (mappedSystemLayout) defaultsData.systemLayout = mappedSystemLayout;
+  }
+  if (staffLayoutElements.length > 0) {
+    const mappedStaffLayouts = staffLayoutElements
+      .map(mapStaffLayoutElement)
+      .filter(Boolean) as StaffLayout[];
+    if (mappedStaffLayouts.length > 0)
+      defaultsData.staffLayout = mappedStaffLayouts;
+  }
+  if (appearanceElement) {
+    // Added
+    const mappedAppearance = mapAppearanceElement(appearanceElement);
+    if (mappedAppearance) defaultsData.appearance = mappedAppearance;
+  }
+  if (musicFontElement) {
+    try {
+      defaultsData.musicFont = mapFontAttributes(musicFontElement);
+    } catch (e) {
+      console.warn("Failed to parse music-font attributes", e);
+    }
+  }
+  if (wordFontElement) {
+    try {
+      defaultsData.wordFont = mapFontAttributes(wordFontElement);
+    } catch (e) {
+      console.warn("Failed to parse word-font attributes", e);
+    }
+  }
+  if (lyricFontElements.length > 0) {
+    const mappedFonts = lyricFontElements
+      .map(mapLyricFontElement)
+      .filter(Boolean) as LyricFont[];
+    if (mappedFonts.length > 0) defaultsData.lyricFonts = mappedFonts;
+  }
+  if (lyricLanguageElements.length > 0) {
+    const mappedLanguages = lyricLanguageElements
+      .map(mapLyricLanguageElement)
+      .filter(Boolean) as LyricLanguage[];
+    if (mappedLanguages.length > 0)
+      defaultsData.lyricLanguages = mappedLanguages;
+  }
+
+  if (Object.keys(defaultsData).length === 0) {
+    return undefined;
+  }
+  try {
+    return DefaultsSchema.parse(defaultsData);
+  } catch (e) {
+    console.error(
+      "Failed to parse defaults element:",
+      JSON.stringify(defaultsData, null, 2),
+    );
+    console.error("Validation errors:", (e as z.ZodError).errors);
+    return undefined;
+  }
+};
+export const mapLyricLanguageElement = (
+  element: Element,
+): LyricLanguage | undefined => {
+  if (!element) return undefined;
+  const xmlLang = getAttribute(element, "xml:lang");
+  if (!xmlLang) {
+    console.warn("<lyric-language> is missing required 'xml:lang' attribute.");
+    return undefined;
+  }
+  const lyricLanguageData: Partial<LyricLanguage> = {
+    number: getAttribute(element, "number"),
+    name: getAttribute(element, "name"),
+    xmlLang: xmlLang,
+  };
+  Object.keys(lyricLanguageData).forEach(
+    (key) =>
+      lyricLanguageData[key as keyof LyricLanguage] === undefined &&
+      delete lyricLanguageData[key as keyof LyricLanguage],
+  );
+  return LyricLanguageSchema.parse(lyricLanguageData);
+};
