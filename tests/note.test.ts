@@ -314,5 +314,34 @@ describe("Note Schema Tests (note.mod)", () => {
       expect(note.notations?.ornaments).toHaveLength(1);
       expect(note.notations?.technical).toHaveLength(1);
     });
+
+    it("parses ornament details", () => {
+      const xml =
+        '<note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration><notations><ornaments><trill-mark accelerate="yes" beats="2"/><mordent long="yes"/><wavy-line type="start"/><other-ornament smufl="ornamentHaydn">h</other-ornament><accidental-mark>sharp</accidental-mark></ornaments></notations></note>';
+      const element = createElement(xml);
+      const note = mapNoteElement(element);
+      const orn = note.notations?.ornaments?.[0];
+      expect(orn).toBeDefined();
+      expect(orn?.trillMarks?.[0].accelerate).toBe("yes");
+      expect(orn?.trillMarks?.[0].beats).toBe(2);
+      expect(orn?.mordents?.[0].long).toBe("yes");
+      expect(orn?.wavyLines?.[0].type).toBe("start");
+      expect(orn?.otherOrnaments?.[0].smufl).toBe("ornamentHaydn");
+      expect(orn?.accidentalMarks?.[0].value).toBe("sharp");
+    });
+
+    it("parses technical notation details", () => {
+      const xml =
+        '<note><pitch><step>D</step><octave>4</octave></pitch><duration>1</duration><notations><technical><up-bow/><fingering substitution="yes">1</fingering><string>2</string><hammer-on type="start" number="1"/><bend><bend-alter>1</bend-alter><release/></bend></technical></notations></note>';
+      const element = createElement(xml);
+      const note = mapNoteElement(element);
+      const tech = note.notations?.technical?.[0];
+      expect(tech).toBeDefined();
+      expect(tech?.upBows?.length).toBe(1);
+      expect(tech?.fingerings?.[0].substitution).toBe("yes");
+      expect(tech?.strings?.[0].value).toBe(2);
+      expect(tech?.hammerOns?.[0].type).toBe("start");
+      expect(tech?.bends?.[0].release).toBe(true);
+    });
   });
 });
