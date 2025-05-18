@@ -4,6 +4,8 @@ import { AttributesSchema } from './attributes';
 import { DirectionSchema } from './direction';
 import { BarlineSchema } from './barline';
 import { HarmonySchema } from './harmony';
+import { BackupSchema } from './backup';
+import { ForwardSchema } from './forward';
 import { PrintSchema } from './print';
 import { SoundSchema } from './sound';
 // Import other implemented schemas that can be direct children of <measure>
@@ -23,8 +25,8 @@ export const MeasureContentSchema = z.union([
   // GroupingSchema,    // Add when implemented
   // LinkSchema,        // Add when implemented
   // BookmarkSchema,    // Add when implemented
-  // BackupSchema,      // Add when implemented
-  // ForwardSchema,     // Add when implemented
+  BackupSchema,
+  ForwardSchema,
 ]);
 
 export const MeasureSchema = z.object({
