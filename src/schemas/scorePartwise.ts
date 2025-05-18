@@ -10,10 +10,10 @@ import { CreditSchema } from "./credit";
 // const WorkSchemaPlaceholder = z.object({ title: z.string().optional() }).passthrough().optional();
 // const MovementTitleSchemaPlaceholder = z.string().optional();
 // const IdentificationSchemaPlaceholder = z.object({ composer: z.string().optional() }).passthrough().optional();
-const DefaultsSchemaPlaceholder = z.object({}).passthrough().optional(); // Complex, placeholder for now
-const CreditSchemaPlaceholder = z
-  .object({ creditWords: z.string().optional() })
-  .passthrough();
+// const DefaultsSchemaPlaceholder = z.object({}).passthrough().optional(); // Complex, placeholder for now
+// const CreditSchemaPlaceholder = z
+//  .object({ creditWords: z.string().optional() })
+//  .passthrough();
 
 /**
  * Represents the <score-partwise> element, the root element for a partwise MusicXML score.

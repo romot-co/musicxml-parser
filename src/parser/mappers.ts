@@ -17,15 +17,15 @@ import type {
   Metronome,
   MetronomeBeatUnit,
   MetronomePerMinute,
-  Dynamics,
+  // Dynamics,
   Wedge,
-  Segno,
-  Coda,
+  // Segno,
+  //Coda,
   Transpose,
-  Diatonic,
-  Chromatic,
-  OctaveChange,
-  Double,
+  // Diatonic,
+  // Chromatic,
+  // OctaveChange,
+  // Double,
   StaffDetails,
   StaffTuning,
   LineDetail,
@@ -39,12 +39,12 @@ import type {
   Notations,
   Slur,
   Articulations,
-  Staccato,
-  Accent,
-  Tenuto,
-  Spiccato,
-  Staccatissimo,
-  StrongAccent,
+  // Staccato,
+  //Accent,
+  //Tenuto,
+  //Spiccato,
+  //Staccatissimo,
+  //StrongAccent,
   Tuplet,
   Ornaments,
   Technical,
@@ -79,7 +79,7 @@ import type {
   CreditImage,
   Credit,
   TextFormatting,
-  SymbolFormatting,
+  // SymbolFormatting,
   Harmony,
   Backup,
   Forward,
@@ -123,10 +123,10 @@ import {
   MetronomeBeatUnitSchema,
   MetronomePerMinuteSchema,
   TransposeSchema,
-  DiatonicSchema,
-  ChromaticSchema,
-  OctaveChangeSchema,
-  DoubleSchema,
+  // DiatonicSchema,
+  // ChromaticSchema,
+  // OctaveChangeSchema,
+  // DoubleSchema,
   StaffDetailsSchema,
   StaffTuningSchema,
   LineDetailSchema,
@@ -139,12 +139,12 @@ import {
   NotationsSchema,
   SlurSchema,
   ArticulationsSchema,
-  StaccatoSchema,
-  AccentSchema,
-  TenutoSchema,
-  SpiccatoSchema,
-  StaccatissimoSchema,
-  StrongAccentSchema,
+  // StaccatoSchema,
+  // AccentSchema,
+  // TenutoSchema,
+  // SpiccatoSchema,
+  // StaccatissimoSchema,
+  // StrongAccentSchema,
   TupletSchema,
   OrnamentsSchema,
   TechnicalSchema,
@@ -173,11 +173,11 @@ import {
   LyricLanguageSchema,
   DefaultsSchema,
   CreditWordsSchema,
-  CreditSymbolSchema,
+  // CreditSymbolSchema,
   CreditImageSchema,
   CreditSchema,
-  TextFormattingSchema,
-  SymbolFormattingSchema,
+  // TextFormattingSchema,
+  // SymbolFormattingSchema,
   HarmonySchema,
   DynamicsSchema,
   WedgeSchema,
@@ -206,8 +206,8 @@ import {
   RelationSchema,
   MiscellaneousSchema,
   MiscellaneousFieldSchema,
-  FermataShapeEnum, // FermataShapeEnum を追加
-  PedalSchema, // Add PedalSchema back
+  FermataShapeEnum,
+  PedalSchema,
 } from "../schemas";
 
 // Helper function to get text content of a child element
@@ -715,7 +715,7 @@ const mapWordsElement = (element: Element): Words => {
 
   try {
     return WordsSchema.parse(wordsData);
-  } catch (e) {
+  } catch {
     // console.warn("Words parse error. Data:", JSON.stringify(wordsData, null, 2), "Error:", (e as z.ZodError).errors, element.outerHTML);
     // Fallback or rethrow if critical
     // For now, if parsing fails, return object without formatting or throw
@@ -1978,7 +1978,7 @@ const mapMarginsElement = (element: Element): Margins | undefined => {
   if (Object.keys(marginsData).length === 0) return undefined;
   try {
     return MarginsSchema.parse(marginsData);
-  } catch (e) {
+  } catch {
     // console.warn("Failed to parse margins element:", JSON.stringify(marginsData, null, 2), (e as z.ZodError).errors);
     return undefined;
   }
@@ -2008,7 +2008,7 @@ const mapPageLayoutElement = (element: Element): PageLayout | undefined => {
   if (Object.keys(pageLayoutData).length === 0) return undefined;
   try {
     return PageLayoutSchema.parse(pageLayoutData);
-  } catch (e) {
+  } catch {
     // console.warn("Failed to parse page-layout element:", JSON.stringify(pageLayoutData, null, 2), (e as z.ZodError).errors);
     return undefined;
   }
@@ -2034,7 +2034,7 @@ const mapSystemLayoutElement = (element: Element): SystemLayout | undefined => {
   if (Object.keys(systemLayoutData).length === 0) return undefined;
   try {
     return SystemLayoutSchema.parse(systemLayoutData);
-  } catch (e) {
+  } catch {
     // console.warn("Failed to parse system-layout element:", JSON.stringify(systemLayoutData, null, 2), (e as z.ZodError).errors);
     return undefined;
   }
@@ -2055,7 +2055,7 @@ const mapStaffLayoutElement = (element: Element): StaffLayout | undefined => {
   if (Object.keys(staffLayoutData).length === 0) return undefined;
   try {
     return StaffLayoutSchema.parse(staffLayoutData);
-  } catch (e) {
+  } catch {
     // console.warn('Failed to parse staff-layout element:', JSON.stringify(staffLayoutData, null, 2), (e as z.ZodError).errors);
     return undefined;
   }
@@ -2082,7 +2082,7 @@ const mapLineWidthElement = (element: Element): LineWidth | undefined => {
     return undefined; // type is often crucial
   try {
     return LineWidthSchema.parse(lineWidthData);
-  } catch (e) {
+  } catch {
     // console.warn("Failed to parse line-width element:", JSON.stringify(lineWidthData, null, 2), (e as z.ZodError).errors);
     return undefined;
   }
@@ -2104,7 +2104,7 @@ const mapAppearanceElement = (element: Element): Appearance | undefined => {
   if (Object.keys(appearanceData).length === 0) return undefined;
   try {
     return AppearanceSchema.parse(appearanceData);
-  } catch (e) {
+  } catch {
     // console.warn("Failed to parse appearance element:", JSON.stringify(appearanceData, null, 2), (e as z.ZodError).errors);
     return undefined;
   }
@@ -2331,13 +2331,15 @@ export const mapCreditWordsElement = (
 
   try {
     return CreditWordsSchema.parse(data);
-  } catch (e) {
+  } catch {
     // console.warn("CreditWords parse error. Data:", JSON.stringify(data, null, 2), "Error:", (e as z.ZodError).errors);
     return undefined;
   }
 };
 
-export const mapCreditSymbolElement = (_element: Element): CreditSymbol | undefined => {
+export const mapCreditSymbolElement = (
+  _element: Element,
+): CreditSymbol | undefined => {
   return undefined; // Add this line to satisfy the return type
 };
 
@@ -2650,7 +2652,7 @@ export const mapCreditImageElement = (
 
   try {
     return CreditImageSchema.parse(data);
-  } catch (e) {
+  } catch {
     // console.warn("CreditImage parse error", data, (e as z.ZodError).errors);
     return undefined;
   }
