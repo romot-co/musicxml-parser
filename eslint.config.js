@@ -40,7 +40,14 @@ export default [
     rules: {
       ...configPrettier.rules, // Prettierと競合するESLintルールを無効化
       "prettier/prettier": "error", // Prettierのルール違反をESLintエラーとして報告
-      "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        {
+          "argsIgnorePattern": "^_",
+          "varsIgnorePattern": "^_",
+          "caughtErrors": "all",
+        }
+      ],
       "@typescript-eslint/explicit-module-boundary-types": "off",
     },
   },

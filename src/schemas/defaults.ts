@@ -2,7 +2,8 @@ import { z } from "zod";
 import { FontSchema, MarginsSchema, LineWidthSchema } from "./common";
 
 // Placeholders for complex layout and appearance types
-export const ScalingSchema = z.object({ // TODO: Define scaling details (millimeters, tenths)
+export const ScalingSchema = z.object({
+  // TODO: Define scaling details (millimeters, tenths)
   /** Distance in millimeters between one tenth and the next. */
   millimeters: z.number(),
   /** Number of tenths per staff space. */

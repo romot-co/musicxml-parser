@@ -20,7 +20,7 @@ export const MetronomeBeatUnitSchema = z.object({
 export type MetronomeBeatUnit = z.infer<typeof MetronomeBeatUnitSchema>;
 
 export const MetronomePerMinuteSchema = z.object({
-  'per-minute': z.string(), // Number as string, e.g., "120"
+  "per-minute": z.string(), // Number as string, e.g., "120"
   formatting: TextFormattingSchema.optional(),
 });
 export type MetronomePerMinute = z.infer<typeof MetronomePerMinuteSchema>;
@@ -42,13 +42,13 @@ export type Dynamics = z.infer<typeof DynamicsSchema>;
 
 /** Basic pedal marking. */
 export const PedalSchema = z.object({
-  type: z.enum(['start', 'stop', 'change', 'continue']).optional(),
+  type: z.enum(["start", "stop", "change", "continue"]).optional(),
 });
 export type Pedal = z.infer<typeof PedalSchema>;
 
 /** Crescendo/diminuendo wedge. */
 export const WedgeSchema = z.object({
-  type: z.enum(['crescendo', 'diminuendo', 'stop', 'continue']).optional(),
+  type: z.enum(["crescendo", "diminuendo", "stop", "continue"]).optional(),
   spread: z.number().optional(),
 });
 export type Wedge = z.infer<typeof WedgeSchema>;

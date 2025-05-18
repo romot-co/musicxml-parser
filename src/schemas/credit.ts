@@ -2,15 +2,17 @@ import { z } from "zod";
 import { FontSchema } from "./common"; // Assuming ColorSchema might be added here later
 
 // Placeholder for text formatting attributes (simplified)
-export const TextFormattingSchema = z.object({
-  justify: z.enum(['left', 'center', 'right']).optional(),
-  halign: z.enum(['left', 'center', 'right']).optional(),
-  defaultX: z.number().optional(),
-  defaultY: z.number().optional(),
-  valign: z.enum(['top', 'middle', 'bottom', 'baseline']).optional(),
-  // ... other attributes like Smufl, text-decoration etc.
-  color: z.string().optional(),
-}).merge(FontSchema); // Include font attributes
+export const TextFormattingSchema = z
+  .object({
+    justify: z.enum(["left", "center", "right"]).optional(),
+    halign: z.enum(["left", "center", "right"]).optional(),
+    defaultX: z.number().optional(),
+    defaultY: z.number().optional(),
+    valign: z.enum(["top", "middle", "bottom", "baseline"]).optional(),
+    // ... other attributes like Smufl, text-decoration etc.
+    color: z.string().optional(),
+  })
+  .merge(FontSchema); // Include font attributes
 
 // Placeholder for symbol formatting attributes (simplified)
 export const SymbolFormattingSchema = z.object({

@@ -1,7 +1,7 @@
-import { z } from 'zod';
-import { FermataSchema } from './fermata';
-import { WavyLineSchema } from './wavyLine';
-import { FootnoteSchema, LevelSchema } from './editorial';
+import { z } from "zod";
+import { FermataSchema } from "./fermata";
+import { WavyLineSchema } from "./wavyLine";
+import { FootnoteSchema, LevelSchema } from "./editorial";
 
 /**
  * The bar-style simple type represents the graphic appearance of a barline.

@@ -1,5 +1,5 @@
-import { z } from 'zod';
-import { TimewisePartSchema } from './timewisePart';
+import { z } from "zod";
+import { TimewisePartSchema } from "./timewisePart";
 
 /**
  * Represents a measure in timewise format. Each measure contains the

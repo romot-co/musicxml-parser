@@ -1,5 +1,5 @@
-import { z } from 'zod';
-import { MeasureContentSchema } from './measure';
+import { z } from "zod";
+import { MeasureContentSchema } from "./measure";
 
 /**
  * Represents a <part> element within a timewise measure. It contains the

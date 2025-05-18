@@ -1,15 +1,15 @@
-import { z } from 'zod';
-import { YesNoEnum } from './common';
+import { z } from "zod";
+import { YesNoEnum } from "./common";
 
 /**
  * Represents a wavy-line element, often used for trills and vibrato.
  * This is a simplified representation covering the most common attributes.
  */
 export const WavyLineSchema = z.object({
-  type: z.enum(['start', 'stop', 'continue']),
+  type: z.enum(["start", "stop", "continue"]),
   number: z.number().int().optional(),
   smufl: z.string().optional(),
-  placement: z.enum(['above', 'below']).optional(),
+  placement: z.enum(["above", "below"]).optional(),
   color: z.string().optional(),
   // Trill-sound attributes
   accelerate: YesNoEnum.optional(),

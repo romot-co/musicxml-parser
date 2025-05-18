@@ -1,7 +1,6 @@
 import { z } from "zod";
 import type {
   Pitch,
-  Rest,
   Note,
   Measure,
   Part,
@@ -19,7 +18,6 @@ import type {
   MetronomeBeatUnit,
   MetronomePerMinute,
   Dynamics,
-  Pedal,
   Wedge,
   Segno,
   Coda,
@@ -182,7 +180,6 @@ import {
   SymbolFormattingSchema,
   HarmonySchema,
   DynamicsSchema,
-  PedalSchema,
   WedgeSchema,
   SegnoSchema,
   CodaSchema,
@@ -210,6 +207,7 @@ import {
   MiscellaneousSchema,
   MiscellaneousFieldSchema,
   FermataShapeEnum, // FermataShapeEnum を追加
+  PedalSchema, // Add PedalSchema back
 } from "../schemas";
 
 // Helper function to get text content of a child element
@@ -535,7 +533,10 @@ const mapFermataElement = (element: Element): Fermata => {
   const textContent = element.textContent?.trim();
 
   if (textContent !== undefined) {
-    if (FermataShapeEnum.options.includes(textContent as FermataShape) || textContent === "") {
+    if (
+      FermataShapeEnum.options.includes(textContent as FermataShape) ||
+      textContent === ""
+    ) {
       fermataData.value = textContent as FermataShape;
     } else {
       console.warn(`Invalid fermata value: ${textContent}`);
@@ -551,32 +552,46 @@ const mapFermataElement = (element: Element): Fermata => {
 
 const mapWavyLineElement = (element: Element): WavyLine => {
   const wavyLineData: Partial<WavyLine> = {
-    type: getAttribute(element, 'type') as 'start' | 'stop' | 'continue' | undefined,
-    number: parseOptionalNumberAttribute(element, 'number'),
-    smufl: getAttribute(element, 'smufl') || undefined,
-    placement: getAttribute(element, 'placement') as 'above' | 'below' | undefined,
-    color: getAttribute(element, 'color') || undefined,
-    accelerate: getAttribute(element, 'accelerate') as 'yes' | 'no' | undefined,
-    beats: parseOptionalNumberAttribute(element, 'beats'),
-    secondBeats: parseOptionalNumberAttribute(element, 'second-beats'),
-    lastBeat: parseOptionalNumberAttribute(element, 'last-beat'),
+    type: getAttribute(element, "type") as
+      | "start"
+      | "stop"
+      | "continue"
+      | undefined,
+    number: parseOptionalNumberAttribute(element, "number"),
+    smufl: getAttribute(element, "smufl") || undefined,
+    placement: getAttribute(element, "placement") as
+      | "above"
+      | "below"
+      | undefined,
+    color: getAttribute(element, "color") || undefined,
+    accelerate: getAttribute(element, "accelerate") as "yes" | "no" | undefined,
+    beats: parseOptionalNumberAttribute(element, "beats"),
+    secondBeats: parseOptionalNumberAttribute(element, "second-beats"),
+    lastBeat: parseOptionalNumberAttribute(element, "last-beat"),
   };
   return WavyLineSchema.parse(wavyLineData);
 };
 
 const mapFootnoteElement = (element: Element): Footnote => {
-  const data = { value: element.textContent?.trim() || '' };
+  const data = { value: element.textContent?.trim() || "" };
   return FootnoteSchema.parse(data);
 };
 
 const mapLevelElement = (element: Element): Level => {
   const levelData: Partial<Level> = {
     value: element.textContent?.trim() || undefined,
-    reference: getAttribute(element, 'reference') as 'yes' | 'no' | undefined,
-    type: getAttribute(element, 'type') as 'start' | 'stop' | 'single' | undefined,
-    parentheses: getAttribute(element, 'parentheses') as 'yes' | 'no' | undefined,
-    bracket: getAttribute(element, 'bracket') as 'yes' | 'no' | undefined,
-    size: getAttribute(element, 'size') || undefined,
+    reference: getAttribute(element, "reference") as "yes" | "no" | undefined,
+    type: getAttribute(element, "type") as
+      | "start"
+      | "stop"
+      | "single"
+      | undefined,
+    parentheses: getAttribute(element, "parentheses") as
+      | "yes"
+      | "no"
+      | undefined,
+    bracket: getAttribute(element, "bracket") as "yes" | "no" | undefined,
+    size: getAttribute(element, "size") || undefined,
   };
   return LevelSchema.parse(levelData);
 };
@@ -655,15 +670,15 @@ const mapTechnicalElement = (_element: Element): Technical => {
 const mapWordsElement = (element: Element): Words => {
   const text = element.textContent?.trim() ?? "";
   const formatting: Partial<TextFormatting> = {};
-  const fontFamily = getAttribute(element, 'font-family');
-  const fontStyleAttr = getAttribute(element, 'font-style');
-  const fontSize = getAttribute(element, 'font-size');
-  const fontWeightAttr = getAttribute(element, 'font-weight');
-  const justifyAttr = getAttribute(element, 'justify');
-  const defaultX = parseOptionalNumberAttribute(element, 'default-x');
-  const defaultY = parseOptionalNumberAttribute(element, 'default-y');
-  const valignAttr = getAttribute(element, 'valign');
-  const colorAttr = getAttribute(element, 'color');
+  const fontFamily = getAttribute(element, "font-family");
+  const fontStyleAttr = getAttribute(element, "font-style");
+  const fontSize = getAttribute(element, "font-size");
+  const fontWeightAttr = getAttribute(element, "font-weight");
+  const justifyAttr = getAttribute(element, "justify");
+  const defaultX = parseOptionalNumberAttribute(element, "default-x");
+  const defaultY = parseOptionalNumberAttribute(element, "default-y");
+  const valignAttr = getAttribute(element, "valign");
+  const colorAttr = getAttribute(element, "color");
 
   if (fontFamily) formatting.fontFamily = fontFamily;
   if (fontSize) formatting.fontSize = fontSize;
@@ -730,24 +745,24 @@ const mapMetronomeBeatUnitElement = (element: Element): MetronomeBeatUnit => {
 // Helper function to map a <per-minute> element (within <metronome>)
 const mapMetronomePerMinuteElement = (element: Element): MetronomePerMinute => {
   const formatting: Partial<TextFormatting> = {};
-  const fontFamily = getAttribute(element, 'font-family');
-  const fontStyleAttr = getAttribute(element, 'font-style');
-  const fontSize = getAttribute(element, 'font-size');
-  const fontWeightAttr = getAttribute(element, 'font-weight');
-  const colorAttr = getAttribute(element, 'color');
+  const fontFamily = getAttribute(element, "font-family");
+  const fontStyleAttr = getAttribute(element, "font-style");
+  const fontSize = getAttribute(element, "font-size");
+  const fontWeightAttr = getAttribute(element, "font-weight");
+  const colorAttr = getAttribute(element, "color");
 
   if (fontFamily) formatting.fontFamily = fontFamily;
   if (fontSize) formatting.fontSize = fontSize;
   if (colorAttr) formatting.color = colorAttr;
-  if (fontStyleAttr === 'normal' || fontStyleAttr === 'italic') {
+  if (fontStyleAttr === "normal" || fontStyleAttr === "italic") {
     formatting.fontStyle = fontStyleAttr;
   }
-  if (fontWeightAttr === 'normal' || fontWeightAttr === 'bold') {
+  if (fontWeightAttr === "normal" || fontWeightAttr === "bold") {
     formatting.fontWeight = fontWeightAttr;
   }
 
   const perMinuteData: Partial<MetronomePerMinute> = {
-    'per-minute': element.textContent?.trim() ?? '',
+    "per-minute": element.textContent?.trim() ?? "",
   };
   if (Object.keys(formatting).length > 0) {
     perMinuteData.formatting = formatting as TextFormatting;
@@ -772,13 +787,13 @@ const mapMetronomeElement = (element: Element): Metronome => {
 
 // Helper function to map a <direction-type> element (within <direction>)
 const mapDirectionTypeElement = (element: Element): DirectionType => {
-  const wordsElement = element.querySelector('words');
-  const metronomeElement = element.querySelector('metronome');
-  const dynamicsElement = element.querySelector('dynamics');
-  const pedalElement = element.querySelector('pedal');
-  const wedgeElement = element.querySelector('wedge');
-  const segnoElement = element.querySelector('segno');
-  const codaElement = element.querySelector('coda');
+  const wordsElement = element.querySelector("words");
+  const metronomeElement = element.querySelector("metronome");
+  const dynamicsElement = element.querySelector("dynamics");
+  const pedalElement = element.querySelector("pedal");
+  const wedgeElement = element.querySelector("wedge");
+  const segnoElement = element.querySelector("segno");
+  const codaElement = element.querySelector("coda");
   const directionTypeData: Partial<DirectionType> = {};
   if (wordsElement) {
     directionTypeData.words = mapWordsElement(wordsElement);
@@ -788,35 +803,40 @@ const mapDirectionTypeElement = (element: Element): DirectionType => {
   }
   if (dynamicsElement) {
     const dynChild = dynamicsElement.firstElementChild;
-    const dynValue = dynChild ? dynChild.tagName : dynamicsElement.textContent?.trim() ?? '';
+    const dynValue = dynChild
+      ? dynChild.tagName
+      : (dynamicsElement.textContent?.trim() ?? "");
     const formatting: Partial<TextFormatting> = {};
-    const colorAttr = getAttribute(dynamicsElement, 'color');
+    const colorAttr = getAttribute(dynamicsElement, "color");
     if (colorAttr) formatting.color = colorAttr;
     if (Object.keys(formatting).length > 0) {
-      directionTypeData.dynamics = DynamicsSchema.parse({ value: dynValue, formatting: formatting as TextFormatting });
+      directionTypeData.dynamics = DynamicsSchema.parse({
+        value: dynValue,
+        formatting: formatting as TextFormatting,
+      });
     } else {
       directionTypeData.dynamics = DynamicsSchema.parse({ value: dynValue });
     }
   }
   if (pedalElement) {
-    const pedalType = getAttribute(pedalElement, 'type') as
-      | 'start'
-      | 'stop'
-      | 'change'
-      | 'continue'
+    const pedalType = getAttribute(pedalElement, "type") as
+      | "start"
+      | "stop"
+      | "change"
+      | "continue"
       | undefined;
     directionTypeData.pedal = PedalSchema.parse({ type: pedalType });
   }
   if (wedgeElement) {
     const wedgeData: Partial<Wedge> = {
-      type: getAttribute(wedgeElement, 'type') as
-        | 'crescendo'
-        | 'diminuendo'
-        | 'stop'
-        | 'continue'
+      type: getAttribute(wedgeElement, "type") as
+        | "crescendo"
+        | "diminuendo"
+        | "stop"
+        | "continue"
         | undefined,
     };
-    const spread = getAttribute(wedgeElement, 'spread');
+    const spread = getAttribute(wedgeElement, "spread");
     if (spread) {
       const sp = parseFloat(spread);
       if (!isNaN(sp)) wedgeData.spread = sp;
@@ -937,15 +957,15 @@ const mapEndingElement = (element: Element): Ending => {
 
 // Helper function to map a <barline> element
 export const mapBarlineElement = (element: Element): Barline => {
-  const barStyleElement = element.querySelector('bar-style');
-  const repeatElement = element.querySelector('repeat');
-  const endingElement = element.querySelector('ending');
-  const codaElement = element.querySelector('coda');
-  const segnoElement = element.querySelector('segno');
-  const wavyLineElement = element.querySelector('wavy-line');
-  const footnoteElement = element.querySelector('footnote');
-  const levelElement = element.querySelector('level');
-  const fermataElements = Array.from(element.querySelectorAll('fermata'));
+  const barStyleElement = element.querySelector("bar-style");
+  const repeatElement = element.querySelector("repeat");
+  const endingElement = element.querySelector("ending");
+  const codaElement = element.querySelector("coda");
+  const segnoElement = element.querySelector("segno");
+  const wavyLineElement = element.querySelector("wavy-line");
+  const footnoteElement = element.querySelector("footnote");
+  const levelElement = element.querySelector("level");
+  const fermataElements = Array.from(element.querySelectorAll("fermata"));
 
   const barlineData: Partial<Barline> = {
     _type: "barline",
@@ -1847,36 +1867,36 @@ export const mapPartElement = (element: Element): Part => {
 // Mapper for <part> element inside a timewise <measure>
 export const mapTimewisePartElement = (element: Element): TimewisePart => {
   const content: MeasureContent[] = [];
-  element.childNodes.forEach(node => {
+  element.childNodes.forEach((node) => {
     if (node.nodeType === 1) {
       const child = node as Element;
       let mapped: MeasureContent | undefined;
       switch (child.nodeName.toLowerCase()) {
-        case 'note':
+        case "note":
           mapped = mapNoteElement(child);
           break;
-        case 'attributes':
+        case "attributes":
           mapped = mapAttributesElement(child);
           break;
-        case 'direction':
+        case "direction":
           mapped = mapDirectionElement(child);
           break;
-        case 'barline':
+        case "barline":
           mapped = mapBarlineElement(child);
           break;
-        case 'harmony':
+        case "harmony":
           mapped = mapHarmonyElement(child);
           break;
-        case 'backup':
+        case "backup":
           mapped = mapBackupElement(child);
           break;
-        case 'forward':
+        case "forward":
           mapped = mapForwardElement(child);
           break;
-        case 'print':
+        case "print":
           mapped = mapPrintElement(child);
           break;
-        case 'sound':
+        case "sound":
           mapped = mapSoundElement(child);
           break;
       }
@@ -1885,7 +1905,7 @@ export const mapTimewisePartElement = (element: Element): TimewisePart => {
   });
 
   const data: Partial<TimewisePart> = {
-    id: getAttribute(element, 'id') ?? '',
+    id: getAttribute(element, "id") ?? "",
   };
   if (content.length > 0) data.content = content;
   return TimewisePartSchema.parse(data);
@@ -1894,16 +1914,16 @@ export const mapTimewisePartElement = (element: Element): TimewisePart => {
 export const mapTimewiseMeasureElement = (
   measureElement: Element,
 ): TimewiseMeasure => {
-  const partElements = Array.from(measureElement.querySelectorAll('part'));
+  const partElements = Array.from(measureElement.querySelectorAll("part"));
   const measureData: Partial<TimewiseMeasure> = {
-    number: measureElement.getAttribute('number') || '',
+    number: measureElement.getAttribute("number") || "",
     parts: partElements.map(mapTimewisePartElement),
   };
-  const implicitAttr = measureElement.getAttribute('implicit');
-  if (implicitAttr === 'yes') measureData.implicit = true;
-  const nonControllingAttr = measureElement.getAttribute('non-controlling');
-  if (nonControllingAttr === 'yes') measureData.nonControlling = true;
-  const widthAttr = measureElement.getAttribute('width');
+  const implicitAttr = measureElement.getAttribute("implicit");
+  if (implicitAttr === "yes") measureData.implicit = true;
+  const nonControllingAttr = measureElement.getAttribute("non-controlling");
+  if (nonControllingAttr === "yes") measureData.nonControlling = true;
+  const widthAttr = measureElement.getAttribute("width");
   if (widthAttr) measureData.width = parseOptionalFloat(widthAttr);
   return TimewiseMeasureSchema.parse(measureData);
 };
@@ -2114,8 +2134,8 @@ export const mapFontAttributes = (element: Element): Font => {
 
 export const mapScalingElement = (element: Element): Scaling | undefined => {
   if (!element) return undefined;
-  const millimeters = parseFloatContent(element, 'millimeters');
-  const tenths = parseNumberContent(element, 'tenths');
+  const millimeters = parseFloatContent(element, "millimeters");
+  const tenths = parseNumberContent(element, "tenths");
   if (millimeters === undefined || tenths === undefined) return undefined;
   const scalingData: Scaling = {
     millimeters,
@@ -2317,9 +2337,7 @@ export const mapCreditWordsElement = (
   }
 };
 
-export const mapCreditSymbolElement = (
-  element: Element,
-): CreditSymbol | undefined => {
+export const mapCreditSymbolElement = (_element: Element): CreditSymbol | undefined => {
   return undefined; // Add this line to satisfy the return type
 };
 
@@ -2761,30 +2779,28 @@ export const mapDocumentToScorePartwise = (doc: XMLDocument): ScorePartwise => {
   return result.data;
 };
 
-export const mapDocumentToScoreTimewise = (
-  doc: XMLDocument,
-): ScoreTimewise => {
+export const mapDocumentToScoreTimewise = (doc: XMLDocument): ScoreTimewise => {
   const rootElement = doc.documentElement;
-  if (rootElement.nodeName !== 'score-timewise') {
+  if (rootElement.nodeName !== "score-timewise") {
     throw new Error(
       `Expected root element <score-timewise>, but got <${rootElement.nodeName}>`,
     );
   }
 
-  const workElement = rootElement.querySelector('work');
-  const movementTitleElement = rootElement.querySelector('movement-title');
-  const identificationElement = rootElement.querySelector('identification');
-  const defaultsElement = rootElement.querySelector('defaults');
-  const creditElements = Array.from(rootElement.querySelectorAll('credit'));
-  const partListElement = rootElement.querySelector('part-list');
-  const measureElements = Array.from(rootElement.querySelectorAll('measure'));
+  const workElement = rootElement.querySelector("work");
+  const movementTitleElement = rootElement.querySelector("movement-title");
+  const identificationElement = rootElement.querySelector("identification");
+  const defaultsElement = rootElement.querySelector("defaults");
+  const creditElements = Array.from(rootElement.querySelectorAll("credit"));
+  const partListElement = rootElement.querySelector("part-list");
+  const measureElements = Array.from(rootElement.querySelectorAll("measure"));
 
   if (!partListElement) {
-    throw new Error('<part-list> element not found in <score-timewise>');
+    throw new Error("<part-list> element not found in <score-timewise>");
   }
 
   const scoreTimewiseData: Partial<ScoreTimewise> = {
-    version: getAttribute(rootElement, 'version') || '1.0',
+    version: getAttribute(rootElement, "version") || "1.0",
     partList: mapPartListElement(partListElement),
     measures: measureElements.map(mapTimewiseMeasureElement),
   };
@@ -2814,16 +2830,18 @@ export const mapDocumentToScoreTimewise = (
   const result = ScoreTimewiseSchema.safeParse(scoreTimewiseData);
   if (!result.success) {
     console.error(
-      'Error parsing ScoreTimewise:',
+      "Error parsing ScoreTimewise:",
       JSON.stringify(scoreTimewiseData, null, 2),
     );
-    console.error('Validation Errors:', result.error.flatten());
-    throw new Error('ScoreTimewise parsing failed.');
+    console.error("Validation Errors:", result.error.flatten());
+    throw new Error("ScoreTimewise parsing failed.");
   }
   return result.data;
 };
 
-export const mapLyricLanguageElement = (element: Element): LyricLanguage | undefined => {
+export const mapLyricLanguageElement = (
+  element: Element,
+): LyricLanguage | undefined => {
   if (!element) return undefined;
   const xmlLang = getAttribute(element, "xml:lang");
   if (!xmlLang) {

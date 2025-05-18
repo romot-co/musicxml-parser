@@ -1,12 +1,15 @@
-import { describe, it, expect } from 'vitest';
-import { parseMusicXmlString } from '../src/parser/xmlParser';
-import { mapDocumentToScoreTimewise } from '../src/parser/mappers';
-import type { Note, MeasureContent } from '../src/types';
-import { NoteSchema } from '../src/schemas';
+import { describe, it, expect } from "vitest";
+import { parseMusicXmlString } from "../src/parser/xmlParser";
+import { mapDocumentToScoreTimewise } from "../src/parser/mappers";
+import type { Note, MeasureContent } from "../src/types";
+import { NoteSchema } from "../src/schemas";
 
 function getNotes(content: MeasureContent[] | undefined): Note[] {
   if (!content) return [];
-  return content.filter((c): c is Note => (c as any)._type === 'note' && NoteSchema.safeParse(c).success);
+  return content.filter(
+    (c): c is Note =>
+      (c as any)._type === "note" && NoteSchema.safeParse(c).success,
+  );
 }
 
 const sampleTimewiseXml = `
@@ -48,8 +51,8 @@ const sampleTimewiseXml = `
 </score-timewise>
 `;
 
-describe('Timewise MusicXML parsing', () => {
-  it('parses a simple timewise score', () => {
+describe("Timewise MusicXML parsing", () => {
+  it("parses a simple timewise score", () => {
     const doc = parseMusicXmlString(sampleTimewiseXml);
     expect(doc).not.toBeNull();
     if (!doc) return;
@@ -58,10 +61,10 @@ describe('Timewise MusicXML parsing', () => {
     const measure = score.measures[0];
     expect(measure.parts).toHaveLength(1);
     const part = measure.parts[0];
-    expect(part.id).toBe('P1');
+    expect(part.id).toBe("P1");
     const notes = getNotes(part.content);
     expect(notes).toHaveLength(2);
-    expect(notes[0].pitch?.step).toBe('C');
+    expect(notes[0].pitch?.step).toBe("C");
     expect(notes[1].rest).toBeDefined();
   });
 });

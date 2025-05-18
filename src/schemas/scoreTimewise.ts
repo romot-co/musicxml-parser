@@ -1,10 +1,10 @@
-import { z } from 'zod';
-import { PartListSchema } from './partList';
-import { TimewiseMeasureSchema } from './timewiseMeasure';
-import { WorkSchema } from './work';
-import { IdentificationSchema } from './identification';
-import { DefaultsSchema } from './defaults';
-import { CreditSchema } from './credit';
+import { z } from "zod";
+import { PartListSchema } from "./partList";
+import { TimewiseMeasureSchema } from "./timewiseMeasure";
+import { WorkSchema } from "./work";
+import { IdentificationSchema } from "./identification";
+import { DefaultsSchema } from "./defaults";
+import { CreditSchema } from "./credit";
 
 /**
  * Represents the <score-timewise> element, where measures contain parts.
@@ -13,10 +13,11 @@ import { CreditSchema } from './credit';
 // This is a temporary workaround to suppress the TypeScript error.
 // This complex type inference issue should be addressed by refactoring the underlying schemas
 // (e.g., TimewiseMeasureSchema and its components) to reduce complexity.
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore TS7056
-export const ScoreTimewiseSchema = (z
+export const ScoreTimewiseSchema = z
   .object({
-    version: z.string().optional().default('1.0'),
+    version: z.string().optional().default("1.0"),
     work: WorkSchema.optional(),
     movementTitle: z.string().optional(),
     identification: IdentificationSchema.optional(),
@@ -25,6 +26,7 @@ export const ScoreTimewiseSchema = (z
     partList: PartListSchema,
     measures: z.array(TimewiseMeasureSchema).min(1),
   })
-  .passthrough()) as any; // Add 'as any' cast here
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  .passthrough() as any;
 
 export type ScoreTimewise = z.infer<typeof ScoreTimewiseSchema>;
