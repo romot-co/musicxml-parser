@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { ScorePartSchema } from "./scorePart";
+import { PartGroupSchema } from "./partGroup";
 
 /**
  * Represents the <part-list> element in a MusicXML score.
@@ -13,7 +14,8 @@ export const PartListSchema = z
      * A score must have at least one part listed.
      */
     scoreParts: z.array(ScorePartSchema).min(1), // <score-part>
-    // partGroups: z.array(PartGroupSchema).optional(), // <part-group> - Requires PartGroupSchema
+    /** Optional array of <part-group> elements for grouping parts. */
+    partGroups: z.array(PartGroupSchema).optional(), // <part-group>
   })
   .passthrough(); // Allows other elements/attributes not explicitly defined
 
