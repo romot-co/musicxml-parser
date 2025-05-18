@@ -100,7 +100,7 @@ import type {
   Miscellaneous,
   MiscellaneousField,
   FermataShape, // FermataShape を追加
-} from "../types";
+} from "../../types";
 import {
   PitchSchema,
   NoteSchema,
@@ -208,59 +208,20 @@ import {
   MiscellaneousFieldSchema,
   FermataShapeEnum,
   PedalSchema,
-} from "../schemas";
+} from "../../schemas";
+
+// Re-exported mappers from other modules
+import { mapDefaultsElement } from "./defaultsMappers";
+import { mapCreditElement } from "./creditMappers";
+import {
+  getTextContent,
+  parseNumberContent,
+  parseFloatContent,
+  getAttribute,
+  parseOptionalNumberAttribute,
+} from "./utils";
 
 // Helper function to get text content of a child element
-export const getTextContent = (
-  element: Element,
-  tagName: string,
-): string | undefined => {
-  const child = element.querySelector(tagName);
-  return child?.textContent?.trim() || undefined;
-};
-
-// Helper function to parse numeric content of a child element
-export const parseNumberContent = (
-  element: Element,
-  tagName: string,
-): number | undefined => {
-  const textContent = getTextContent(element, tagName);
-  if (textContent === undefined) return undefined;
-  const num = parseInt(textContent, 10);
-  return isNaN(num) ? undefined : num;
-};
-
-// Helper function to parse floating point content of a child element
-export const parseFloatContent = (
-  element: Element,
-  tagName: string,
-): number | undefined => {
-  const textContent = getTextContent(element, tagName);
-  if (textContent === undefined) return undefined;
-  const num = parseFloat(textContent);
-  return isNaN(num) ? undefined : num;
-};
-
-// Helper function to get an attribute value
-export const getAttribute = (
-  element: Element,
-  attributeName: string,
-): string | undefined => {
-  return element.getAttribute(attributeName) || undefined;
-};
-
-// Helper function to get a numeric attribute value, or undefined if not present or not a number
-const parseOptionalNumberAttribute = (
-  element: Element,
-  attributeName: string,
-): number | undefined => {
-  const value = element.getAttribute(attributeName);
-  if (value === null) {
-    return undefined;
-  }
-  const num = parseInt(value, 10);
-  return isNaN(num) ? undefined : num;
-};
 
 // Mapper for <pitch> element
 export const mapPitchElement = (element: Element): Pitch => {
@@ -1959,425 +1920,126 @@ export const mapPartListElement = (element: Element): PartList => {
   }
   return result.data;
 };
-
-// Helper to parse <margins> element (common for page and system layout)
-const mapMarginsElement = (element: Element): Margins | undefined => {
-  if (!element) return undefined;
-  const marginsData: Partial<Margins> = {
-    leftMargin: parseFloatContent(element, "left-margin"),
-    rightMargin: parseFloatContent(element, "right-margin"),
-    topMargin: parseFloatContent(element, "top-margin"),
-    bottomMargin: parseFloatContent(element, "bottom-margin"),
-  };
-  // Remove undefined to allow Zod to correctly validate optional fields
-  Object.keys(marginsData).forEach(
-    (key) =>
-      marginsData[key as keyof Margins] === undefined &&
-      delete marginsData[key as keyof Margins],
-  );
-  if (Object.keys(marginsData).length === 0) return undefined;
-  try {
-    return MarginsSchema.parse(marginsData);
-  } catch {
-    // console.warn("Failed to parse margins element:", JSON.stringify(marginsData, null, 2), (e as z.ZodError).errors);
-    return undefined;
-  }
-};
-
-// Helper to parse <page-layout> element
-const mapPageLayoutElement = (element: Element): PageLayout | undefined => {
-  if (!element) return undefined;
-  const pageLayoutData: Partial<PageLayout> = {
-    pageHeight: parseFloatContent(element, "page-height"),
-    pageWidth: parseFloatContent(element, "page-width"),
-  };
-  const pageMarginsElements = Array.from(
-    element.querySelectorAll("page-margins"),
-  );
-  if (pageMarginsElements.length > 0) {
-    const mappedMargins = pageMarginsElements
-      .map(mapMarginsElement)
-      .filter(Boolean) as Margins[];
-    if (mappedMargins.length > 0) pageLayoutData.pageMargins = mappedMargins;
-  }
-  Object.keys(pageLayoutData).forEach(
-    (key) =>
-      pageLayoutData[key as keyof PageLayout] === undefined &&
-      delete pageLayoutData[key as keyof PageLayout],
-  );
-  if (Object.keys(pageLayoutData).length === 0) return undefined;
-  try {
-    return PageLayoutSchema.parse(pageLayoutData);
-  } catch {
-    // console.warn("Failed to parse page-layout element:", JSON.stringify(pageLayoutData, null, 2), (e as z.ZodError).errors);
-    return undefined;
-  }
-};
-
-// Helper to parse <system-layout> element
-const mapSystemLayoutElement = (element: Element): SystemLayout | undefined => {
-  if (!element) return undefined;
-  const systemLayoutData: Partial<SystemLayout> = {
-    systemDistance: parseFloatContent(element, "system-distance"),
-    topSystemDistance: parseFloatContent(element, "top-system-distance"),
-  };
-  const systemMarginsElement = element.querySelector("system-margins");
-  if (systemMarginsElement) {
-    const mappedMargins = mapMarginsElement(systemMarginsElement);
-    if (mappedMargins) systemLayoutData.systemMargins = mappedMargins;
-  }
-  Object.keys(systemLayoutData).forEach(
-    (key) =>
-      systemLayoutData[key as keyof SystemLayout] === undefined &&
-      delete systemLayoutData[key as keyof SystemLayout],
-  );
-  if (Object.keys(systemLayoutData).length === 0) return undefined;
-  try {
-    return SystemLayoutSchema.parse(systemLayoutData);
-  } catch {
-    // console.warn("Failed to parse system-layout element:", JSON.stringify(systemLayoutData, null, 2), (e as z.ZodError).errors);
-    return undefined;
-  }
-};
-
-// Helper to parse <staff-layout> element
-const mapStaffLayoutElement = (element: Element): StaffLayout | undefined => {
-  if (!element) return undefined;
-  const staffLayoutData: Partial<StaffLayout> = {
-    number: parseOptionalNumberAttribute(element, "number"),
-    staffDistance: parseFloatContent(element, "staff-distance"),
-  };
-  Object.keys(staffLayoutData).forEach(
-    (key) =>
-      staffLayoutData[key as keyof StaffLayout] === undefined &&
-      delete staffLayoutData[key as keyof StaffLayout],
-  );
-  if (Object.keys(staffLayoutData).length === 0) return undefined;
-  try {
-    return StaffLayoutSchema.parse(staffLayoutData);
-  } catch {
-    // console.warn('Failed to parse staff-layout element:', JSON.stringify(staffLayoutData, null, 2), (e as z.ZodError).errors);
-    return undefined;
-  }
-};
-
-// Helper to parse <line-width> element
-const mapLineWidthElement = (element: Element): LineWidth | undefined => {
-  if (!element) return undefined;
-  const lineWidthData: Partial<LineWidth> = {
-    type: getAttribute(element, "type"),
-    value: element.textContent
-      ? parseFloat(element.textContent.trim())
-      : undefined,
-  };
-  Object.keys(lineWidthData).forEach(
-    (key) =>
-      lineWidthData[key as keyof LineWidth] === undefined &&
-      delete lineWidthData[key as keyof LineWidth],
-  );
-  if (
-    Object.keys(lineWidthData).length === 0 ||
-    lineWidthData.type === undefined
-  )
-    return undefined; // type is often crucial
-  try {
-    return LineWidthSchema.parse(lineWidthData);
-  } catch {
-    // console.warn("Failed to parse line-width element:", JSON.stringify(lineWidthData, null, 2), (e as z.ZodError).errors);
-    return undefined;
-  }
-};
-
-// Helper to parse <appearance> element
-const mapAppearanceElement = (element: Element): Appearance | undefined => {
-  if (!element) return undefined;
-  const appearanceData: Partial<Appearance> = {};
-  const lineWidthElements = Array.from(element.querySelectorAll("line-width"));
-  if (lineWidthElements.length > 0) {
-    const mappedLineWidths = lineWidthElements
-      .map(mapLineWidthElement)
-      .filter(Boolean) as LineWidth[];
-    if (mappedLineWidths.length > 0)
-      appearanceData.lineWidths = mappedLineWidths;
-  }
-  // Add other appearance properties here (e.g., note-size)
-  if (Object.keys(appearanceData).length === 0) return undefined;
-  try {
-    return AppearanceSchema.parse(appearanceData);
-  } catch {
-    // console.warn("Failed to parse appearance element:", JSON.stringify(appearanceData, null, 2), (e as z.ZodError).errors);
-    return undefined;
-  }
-};
-
-// Helper to parse font attributes, assuming FontSchema structure
-export const mapFontAttributes = (element: Element): Font => {
-  const fontFamily = getAttribute(element, "font-family");
-  const fontStyleAttr = getAttribute(element, "font-style");
-  const fontSize = getAttribute(element, "font-size");
-  const fontWeightAttr = getAttribute(element, "font-weight");
-
-  const fontData: Partial<Font> = {};
-
-  if (fontFamily) fontData.fontFamily = fontFamily;
-  if (fontSize) fontData.fontSize = fontSize;
-
-  if (fontStyleAttr === "normal" || fontStyleAttr === "italic") {
-    fontData.fontStyle = fontStyleAttr;
-  }
-
-  if (fontWeightAttr === "normal" || fontWeightAttr === "bold") {
-    fontData.fontWeight = fontWeightAttr;
-  }
-  return FontSchema.parse(fontData);
-};
-
-export const mapScalingElement = (element: Element): Scaling | undefined => {
-  if (!element) return undefined;
-  const millimeters = parseFloatContent(element, "millimeters");
-  const tenths = parseNumberContent(element, "tenths");
-  if (millimeters === undefined || tenths === undefined) return undefined;
-  const scalingData: Scaling = {
-    millimeters,
-    tenths,
-  };
-  if (Object.values(scalingData).every((v) => v === undefined))
-    return undefined;
-  return ScalingSchema.parse(scalingData);
-};
-
-export const mapLyricFontElement = (
-  element: Element,
-): LyricFont | undefined => {
-  if (!element) return undefined;
-  const fontAttrs = mapFontAttributes(element);
-  const lyricFontData: Partial<LyricFont> = {
-    ...fontAttrs,
-    number: getAttribute(element, "number"),
-    name: getAttribute(element, "name"),
-  };
-  Object.keys(lyricFontData).forEach(
-    (key) =>
-      lyricFontData[key as keyof LyricFont] === undefined &&
-      delete lyricFontData[key as keyof LyricFont],
-  );
-  if (Object.keys(lyricFontData).length === 0) return undefined;
-  return LyricFontSchema.parse(lyricFontData);
-};
-
-export const mapDefaultsElement = (element: Element): Defaults | undefined => {
-  if (!element) return undefined;
-
-  const scalingElement = element.querySelector("scaling");
-  const concertScoreElement = element.querySelector("concert-score");
-  const pageLayoutElement = element.querySelector("page-layout"); // Added
-  const systemLayoutElement = element.querySelector("system-layout"); // Added
-  const appearanceElement = element.querySelector("appearance"); // Added
-  const musicFontElement = element.querySelector("music-font");
-  const wordFontElement = element.querySelector("word-font");
-  const lyricFontElements = Array.from(element.querySelectorAll("lyric-font"));
-  const lyricLanguageElements = Array.from(
-    element.querySelectorAll("lyric-language"),
-  );
-  const staffLayoutElements = Array.from(
-    element.querySelectorAll("staff-layout"),
-  );
-
-  const defaultsData: Partial<Defaults> = {};
-
-  if (scalingElement) {
-    const mappedScaling = mapScalingElement(scalingElement);
-    if (mappedScaling) defaultsData.scaling = mappedScaling;
-  }
-  if (concertScoreElement) {
-    defaultsData.concertScore = {};
-  }
-  if (pageLayoutElement) {
-    // Added
-    const mappedPageLayout = mapPageLayoutElement(pageLayoutElement);
-    if (mappedPageLayout) defaultsData.pageLayout = mappedPageLayout;
-  }
-  if (systemLayoutElement) {
-    // Added
-    const mappedSystemLayout = mapSystemLayoutElement(systemLayoutElement);
-    if (mappedSystemLayout) defaultsData.systemLayout = mappedSystemLayout;
-  }
-  if (staffLayoutElements.length > 0) {
-    const mappedStaffLayouts = staffLayoutElements
-      .map(mapStaffLayoutElement)
-      .filter(Boolean) as StaffLayout[];
-    if (mappedStaffLayouts.length > 0)
-      defaultsData.staffLayout = mappedStaffLayouts;
-  }
-  if (appearanceElement) {
-    // Added
-    const mappedAppearance = mapAppearanceElement(appearanceElement);
-    if (mappedAppearance) defaultsData.appearance = mappedAppearance;
-  }
-  if (musicFontElement) {
-    try {
-      defaultsData.musicFont = mapFontAttributes(musicFontElement);
-    } catch (e) {
-      console.warn("Failed to parse music-font attributes", e);
-    }
-  }
-  if (wordFontElement) {
-    try {
-      defaultsData.wordFont = mapFontAttributes(wordFontElement);
-    } catch (e) {
-      console.warn("Failed to parse word-font attributes", e);
-    }
-  }
-  if (lyricFontElements.length > 0) {
-    const mappedFonts = lyricFontElements
-      .map(mapLyricFontElement)
-      .filter(Boolean) as LyricFont[];
-    if (mappedFonts.length > 0) defaultsData.lyricFonts = mappedFonts;
-  }
-  if (lyricLanguageElements.length > 0) {
-    const mappedLanguages = lyricLanguageElements
-      .map(mapLyricLanguageElement)
-      .filter(Boolean) as LyricLanguage[];
-    if (mappedLanguages.length > 0)
-      defaultsData.lyricLanguages = mappedLanguages;
-  }
-
-  if (Object.keys(defaultsData).length === 0) {
-    return undefined;
-  }
-  try {
-    return DefaultsSchema.parse(defaultsData);
-  } catch (e) {
-    console.error(
-      "Failed to parse defaults element:",
-      JSON.stringify(defaultsData, null, 2),
+// Main mapper for the document
+export const mapDocumentToScorePartwise = (doc: XMLDocument): ScorePartwise => {
+  const rootElement = doc.documentElement;
+  if (rootElement.nodeName !== "score-partwise") {
+    throw new Error(
+      `Expected root element <score-partwise>, but got <${rootElement.nodeName}>`,
     );
-    console.error("Validation errors:", (e as z.ZodError).errors);
-    return undefined;
   }
+
+  const workElement = rootElement.querySelector("work");
+  const movementTitleElement = rootElement.querySelector("movement-title");
+  const identificationElement = rootElement.querySelector("identification");
+  const defaultsElement = rootElement.querySelector("defaults");
+  const creditElements = Array.from(rootElement.querySelectorAll("credit"));
+  const partListElement = rootElement.querySelector("part-list");
+  const partElements = Array.from(rootElement.querySelectorAll("part"));
+
+  if (!partListElement) {
+    throw new Error("<part-list> element not found in <score-partwise>");
+  }
+
+  const scorePartwiseData: Partial<ScorePartwise> = {
+    version: getAttribute(rootElement, "version") || "1.0", // Default to 1.0 if not specified
+    partList: mapPartListElement(partListElement),
+    parts: partElements.map(mapPartElement),
+  };
+
+  if (workElement) {
+    scorePartwiseData.work = mapWorkElement(workElement);
+  }
+  if (movementTitleElement) {
+    scorePartwiseData.movementTitle = movementTitleElement.textContent?.trim();
+  }
+  if (identificationElement) {
+    scorePartwiseData.identification = mapIdentificationElement(
+      identificationElement,
+    );
+  }
+  if (defaultsElement) {
+    const mappedDefaults = mapDefaultsElement(defaultsElement);
+    if (mappedDefaults) scorePartwiseData.defaults = mappedDefaults;
+  }
+  if (creditElements.length > 0) {
+    const mappedCredits = creditElements
+      .map(mapCreditElement)
+      .filter(Boolean) as Credit[];
+    if (mappedCredits.length > 0) scorePartwiseData.credit = mappedCredits;
+  }
+
+  const result = ScorePartwiseSchema.safeParse(scorePartwiseData);
+  if (!result.success) {
+    console.error(
+      "Error parsing ScorePartwise:",
+      JSON.stringify(scorePartwiseData, null, 2),
+    );
+    console.error("Validation Errors:", result.error.flatten());
+    throw new Error("ScorePartwise parsing failed.");
+  }
+  return result.data;
 };
 
-export const mapCreditWordsElement = (
-  element: Element,
-): CreditWords | undefined => {
-  const text = element.textContent?.trim();
-
-  const formatting: Partial<TextFormatting> = {};
-  const fontFamily = getAttribute(element, "font-family");
-  const fontStyleAttr = getAttribute(element, "font-style");
-  const fontSize = getAttribute(element, "font-size");
-  const fontWeightAttr = getAttribute(element, "font-weight");
-  const justifyAttr = getAttribute(element, "justify");
-  const defaultX = parseOptionalNumberAttribute(element, "default-x");
-  const defaultY = parseOptionalNumberAttribute(element, "default-y");
-  const valignAttr = getAttribute(element, "valign");
-  const halignAttr = getAttribute(element, "halign"); // Read halign
-
-  if (fontFamily) formatting.fontFamily = fontFamily;
-  if (fontSize) formatting.fontSize = fontSize;
-  if (defaultX !== undefined) formatting.defaultX = defaultX;
-  if (defaultY !== undefined) formatting.defaultY = defaultY;
-
-  if (fontStyleAttr === "normal" || fontStyleAttr === "italic") {
-    formatting.fontStyle = fontStyleAttr;
-  }
-  if (fontWeightAttr === "normal" || fontWeightAttr === "bold") {
-    formatting.fontWeight = fontWeightAttr;
-  }
-  if (
-    justifyAttr === "left" ||
-    justifyAttr === "center" ||
-    justifyAttr === "right"
-  ) {
-    formatting.justify = justifyAttr;
-  }
-  if (
-    valignAttr === "top" ||
-    valignAttr === "middle" ||
-    valignAttr === "bottom" ||
-    valignAttr === "baseline"
-  ) {
-    formatting.valign = valignAttr;
+export const mapDocumentToScoreTimewise = (doc: XMLDocument): ScoreTimewise => {
+  const rootElement = doc.documentElement;
+  if (rootElement.nodeName !== "score-timewise") {
+    throw new Error(
+      `Expected root element <score-timewise>, but got <${rootElement.nodeName}>`,
+    );
   }
 
-  let finalJustify = justifyAttr;
-  if (!finalJustify && halignAttr) {
-    finalJustify = halignAttr;
+  const workElement = rootElement.querySelector("work");
+  const movementTitleElement = rootElement.querySelector("movement-title");
+  const identificationElement = rootElement.querySelector("identification");
+  const defaultsElement = rootElement.querySelector("defaults");
+  const creditElements = Array.from(rootElement.querySelectorAll("credit"));
+  const partListElement = rootElement.querySelector("part-list");
+  const measureElements = Array.from(rootElement.querySelectorAll("measure"));
+
+  if (!partListElement) {
+    throw new Error("<part-list> element not found in <score-timewise>");
   }
 
-  if (
-    finalJustify === "left" ||
-    finalJustify === "center" ||
-    finalJustify === "right"
-  ) {
-    formatting.justify = finalJustify;
+  const scoreTimewiseData: Partial<ScoreTimewise> = {
+    version: getAttribute(rootElement, "version") || "1.0",
+    partList: mapPartListElement(partListElement),
+    measures: measureElements.map(mapTimewiseMeasureElement),
+  };
+
+  if (workElement) {
+    scoreTimewiseData.work = mapWorkElement(workElement);
+  }
+  if (movementTitleElement) {
+    scoreTimewiseData.movementTitle = movementTitleElement.textContent?.trim();
+  }
+  if (identificationElement) {
+    scoreTimewiseData.identification = mapIdentificationElement(
+      identificationElement,
+    );
+  }
+  if (defaultsElement) {
+    const mappedDefaults = mapDefaultsElement(defaultsElement);
+    if (mappedDefaults) scoreTimewiseData.defaults = mappedDefaults;
+  }
+  if (creditElements.length > 0) {
+    const mappedCredits = creditElements
+      .map(mapCreditElement)
+      .filter(Boolean) as Credit[];
+    if (mappedCredits.length > 0) scoreTimewiseData.credit = mappedCredits;
   }
 
-  const data: Partial<CreditWords> = { text: text || "" }; // Ensure text is always a string
-  if (Object.keys(formatting).length > 0) {
-    data.formatting = formatting as TextFormatting;
+  const result = ScoreTimewiseSchema.safeParse(scoreTimewiseData);
+  if (!result.success) {
+    console.error(
+      "Error parsing ScoreTimewise:",
+      JSON.stringify(scoreTimewiseData, null, 2),
+    );
+    console.error("Validation Errors:", result.error.flatten());
+    throw new Error("ScoreTimewise parsing failed.");
   }
-
-  // Only return undefined if there's no text AND no formatting attributes at all,
-  // unless the element itself has other attributes (which implies it's meaningful).
-  // An empty text string with formatting is valid.
-  if (
-    data.text === "" &&
-    Object.keys(formatting).length === 0 &&
-    !element.hasAttributes()
-  ) {
-    return undefined;
-  }
-
-  try {
-    return CreditWordsSchema.parse(data);
-  } catch {
-    // console.warn("CreditWords parse error. Data:", JSON.stringify(data, null, 2), "Error:", (e as z.ZodError).errors);
-    return undefined;
-  }
+  return result.data;
 };
-
-export const mapCreditSymbolElement = (
-  element: Element,
-): CreditSymbol | undefined => {
-  const smuflGlyphName = element.textContent?.trim() ?? "";
-
-  const formatting: Partial<SymbolFormatting> = {};
-  const dx = parseOptionalNumberAttribute(element, "default-x");
-  if (dx !== undefined) formatting.defaultX = dx;
-  const dy = parseOptionalNumberAttribute(element, "default-y");
-  if (dy !== undefined) formatting.defaultY = dy;
-  const haAttr = getAttribute(element, "halign");
-  if (haAttr && ["left", "center", "right"].includes(haAttr)) {
-    formatting.halign = haAttr as "left" | "center" | "right";
-  }
-  const vaAttr = getAttribute(element, "valign");
-  if (vaAttr && ["top", "middle", "bottom"].includes(vaAttr)) {
-    formatting.valign = vaAttr as "top" | "middle" | "bottom";
-  }
-
-  const data: Partial<CreditSymbol> = { smuflGlyphName };
-  if (Object.keys(formatting).length > 0) {
-    data.formatting = formatting as SymbolFormatting;
-  }
-
-  if (
-    data.smuflGlyphName === "" &&
-    Object.keys(formatting).length === 0 &&
-    !element.hasAttributes()
-  ) {
-    return undefined;
-  }
-
-  try {
-    return CreditSymbolSchema.parse(data);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (_e) {
-    // console.warn('CreditSymbol parse error', data, (_e as z.ZodError).errors);
-    return undefined;
-  }
-};
-
 export function mapRootElement(
   element: Element,
 ): z.infer<typeof RootSchema> | undefined {
@@ -2649,251 +2311,3 @@ export function mapHarmonyElement(
     return undefined;
   }
 }
-
-export const mapCreditImageElement = (
-  element: Element,
-): CreditImage | undefined => {
-  const source = getAttribute(element, "source");
-  const type = getAttribute(element, "type");
-  if (!source || !type) {
-    // console.warn("<credit-image> is missing required 'source' or 'type' attribute.");
-    return undefined;
-  }
-
-  const data: Partial<CreditImage> = { source, type };
-  const h = parseOptionalNumberAttribute(element, "height");
-  if (h !== undefined) data.height = h;
-  const w = parseOptionalNumberAttribute(element, "width");
-  if (w !== undefined) data.width = w;
-  const dx = parseOptionalNumberAttribute(element, "default-x");
-  if (dx !== undefined) data.defaultX = dx;
-  const dy = parseOptionalNumberAttribute(element, "default-y");
-  if (dy !== undefined) data.defaultY = dy;
-  const haAttr = getAttribute(element, "halign");
-  const vaAttr = getAttribute(element, "valign");
-
-  if (
-    haAttr &&
-    (haAttr === "left" || haAttr === "center" || haAttr === "right")
-  ) {
-    data.halign = haAttr as "left" | "center" | "right";
-  }
-  if (
-    vaAttr &&
-    (vaAttr === "top" || vaAttr === "middle" || vaAttr === "bottom")
-  ) {
-    data.valign = vaAttr as "top" | "middle" | "bottom";
-  }
-
-  try {
-    return CreditImageSchema.parse(data);
-  } catch {
-    // console.warn("CreditImage parse error", data, (e as z.ZodError).errors);
-    return undefined;
-  }
-};
-
-export const mapCreditElement = (element: Element): Credit | undefined => {
-  const page = getAttribute(element, "page");
-  const creditTypes = Array.from(element.querySelectorAll("credit-type"))
-    .map((el) => el.textContent?.trim())
-    .filter(Boolean) as string[];
-  const creditWordsElements = Array.from(
-    element.querySelectorAll("credit-words"),
-  );
-  const creditSymbolElements = Array.from(
-    element.querySelectorAll("credit-symbol"),
-  );
-  const creditImageEl = element.querySelector("credit-image");
-
-  const creditWords = creditWordsElements
-    .map(mapCreditWordsElement)
-    .filter(Boolean) as CreditWords[];
-  const creditSymbols = creditSymbolElements
-    .map(mapCreditSymbolElement)
-    .filter(Boolean) as CreditSymbol[];
-  const creditImage = creditImageEl
-    ? mapCreditImageElement(creditImageEl)
-    : undefined;
-
-  const data: Partial<Credit> = {};
-  if (page) data.page = page;
-  if (creditTypes.length > 0) data.creditTypes = creditTypes;
-
-  if (creditWords.length > 0) data.creditWords = creditWords;
-  // MusicXML DTD implies credit-words, credit-symbol, credit-image are choices,
-  // but common usage might mix them. For stricter parsing, you might need a refine on CreditSchema.
-  // For now, we allow them to coexist if mapped.
-  if (creditSymbols.length > 0) data.creditSymbols = creditSymbols;
-  if (creditImage) data.creditImage = creditImage;
-
-  // If nothing was mapped besides potentially a page number, it might not be a valid credit element.
-  if (
-    Object.keys(data).length === 0 ||
-    (Object.keys(data).length === 1 && data.page)
-  ) {
-    if (
-      creditWords.length === 0 &&
-      creditSymbols.length === 0 &&
-      !creditImage &&
-      creditTypes.length === 0
-    ) {
-      // console.warn("Credit element is empty or only has page number, returning undefined.", element.outerHTML);
-      return undefined;
-    }
-  }
-
-  try {
-    return CreditSchema.parse(data);
-  } catch (e) {
-    console.error(
-      "Credit parse error",
-      JSON.stringify(data, null, 2),
-      (e as z.ZodError).errors,
-    );
-    return undefined;
-  }
-};
-
-// Main mapper for the document
-export const mapDocumentToScorePartwise = (doc: XMLDocument): ScorePartwise => {
-  const rootElement = doc.documentElement;
-  if (rootElement.nodeName !== "score-partwise") {
-    throw new Error(
-      `Expected root element <score-partwise>, but got <${rootElement.nodeName}>`,
-    );
-  }
-
-  const workElement = rootElement.querySelector("work");
-  const movementTitleElement = rootElement.querySelector("movement-title");
-  const identificationElement = rootElement.querySelector("identification");
-  const defaultsElement = rootElement.querySelector("defaults");
-  const creditElements = Array.from(rootElement.querySelectorAll("credit"));
-  const partListElement = rootElement.querySelector("part-list");
-  const partElements = Array.from(rootElement.querySelectorAll("part"));
-
-  if (!partListElement) {
-    throw new Error("<part-list> element not found in <score-partwise>");
-  }
-
-  const scorePartwiseData: Partial<ScorePartwise> = {
-    version: getAttribute(rootElement, "version") || "1.0", // Default to 1.0 if not specified
-    partList: mapPartListElement(partListElement),
-    parts: partElements.map(mapPartElement),
-  };
-
-  if (workElement) {
-    scorePartwiseData.work = mapWorkElement(workElement);
-  }
-  if (movementTitleElement) {
-    scorePartwiseData.movementTitle = movementTitleElement.textContent?.trim();
-  }
-  if (identificationElement) {
-    scorePartwiseData.identification = mapIdentificationElement(
-      identificationElement,
-    );
-  }
-  if (defaultsElement) {
-    const mappedDefaults = mapDefaultsElement(defaultsElement);
-    if (mappedDefaults) scorePartwiseData.defaults = mappedDefaults;
-  }
-  if (creditElements.length > 0) {
-    const mappedCredits = creditElements
-      .map(mapCreditElement)
-      .filter(Boolean) as Credit[];
-    if (mappedCredits.length > 0) scorePartwiseData.credit = mappedCredits;
-  }
-
-  const result = ScorePartwiseSchema.safeParse(scorePartwiseData);
-  if (!result.success) {
-    console.error(
-      "Error parsing ScorePartwise:",
-      JSON.stringify(scorePartwiseData, null, 2),
-    );
-    console.error("Validation Errors:", result.error.flatten());
-    throw new Error("ScorePartwise parsing failed.");
-  }
-  return result.data;
-};
-
-export const mapDocumentToScoreTimewise = (doc: XMLDocument): ScoreTimewise => {
-  const rootElement = doc.documentElement;
-  if (rootElement.nodeName !== "score-timewise") {
-    throw new Error(
-      `Expected root element <score-timewise>, but got <${rootElement.nodeName}>`,
-    );
-  }
-
-  const workElement = rootElement.querySelector("work");
-  const movementTitleElement = rootElement.querySelector("movement-title");
-  const identificationElement = rootElement.querySelector("identification");
-  const defaultsElement = rootElement.querySelector("defaults");
-  const creditElements = Array.from(rootElement.querySelectorAll("credit"));
-  const partListElement = rootElement.querySelector("part-list");
-  const measureElements = Array.from(rootElement.querySelectorAll("measure"));
-
-  if (!partListElement) {
-    throw new Error("<part-list> element not found in <score-timewise>");
-  }
-
-  const scoreTimewiseData: Partial<ScoreTimewise> = {
-    version: getAttribute(rootElement, "version") || "1.0",
-    partList: mapPartListElement(partListElement),
-    measures: measureElements.map(mapTimewiseMeasureElement),
-  };
-
-  if (workElement) {
-    scoreTimewiseData.work = mapWorkElement(workElement);
-  }
-  if (movementTitleElement) {
-    scoreTimewiseData.movementTitle = movementTitleElement.textContent?.trim();
-  }
-  if (identificationElement) {
-    scoreTimewiseData.identification = mapIdentificationElement(
-      identificationElement,
-    );
-  }
-  if (defaultsElement) {
-    const mappedDefaults = mapDefaultsElement(defaultsElement);
-    if (mappedDefaults) scoreTimewiseData.defaults = mappedDefaults;
-  }
-  if (creditElements.length > 0) {
-    const mappedCredits = creditElements
-      .map(mapCreditElement)
-      .filter(Boolean) as Credit[];
-    if (mappedCredits.length > 0) scoreTimewiseData.credit = mappedCredits;
-  }
-
-  const result = ScoreTimewiseSchema.safeParse(scoreTimewiseData);
-  if (!result.success) {
-    console.error(
-      "Error parsing ScoreTimewise:",
-      JSON.stringify(scoreTimewiseData, null, 2),
-    );
-    console.error("Validation Errors:", result.error.flatten());
-    throw new Error("ScoreTimewise parsing failed.");
-  }
-  return result.data;
-};
-
-export const mapLyricLanguageElement = (
-  element: Element,
-): LyricLanguage | undefined => {
-  if (!element) return undefined;
-  const xmlLang = getAttribute(element, "xml:lang");
-  if (!xmlLang) {
-    console.warn("<lyric-language> is missing required 'xml:lang' attribute.");
-    return undefined;
-  }
-  const lyricLanguageData: Partial<LyricLanguage> = {
-    number: getAttribute(element, "number"),
-    name: getAttribute(element, "name"),
-    xmlLang: xmlLang,
-  };
-  Object.keys(lyricLanguageData).forEach(
-    (key) =>
-      lyricLanguageData[key as keyof LyricLanguage] === undefined &&
-      delete lyricLanguageData[key as keyof LyricLanguage],
-  );
-  return LyricLanguageSchema.parse(lyricLanguageData);
-};
