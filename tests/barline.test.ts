@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { mapBarlineElement } from '../src/parser/mappers';
-import type { Barline, Repeat, Ending } from '../src/types';
+import type { Barline, Repeat, Ending, Fermata } from '../src/types';
 import { JSDOM } from 'jsdom';
 
 // Helper to create an Element from an XML string snippet
@@ -77,6 +77,34 @@ describe('Barline Schema Tests', () => {
       expect(barline.barStyle).toBe('dotted');
     });
     
-    // TODO: Add tests for coda, segno, fermata within barline if applicable via mapBarlineElement
+    it('should parse coda and segno child elements', () => {
+      const xml = `<barline><coda/><segno/></barline>`;
+      const element = createElement(xml);
+      const barline = mapBarlineElement(element);
+      expect(barline.coda).toBeDefined();
+      expect(barline.segno).toBeDefined();
+    });
+
+    it('should parse fermata elements', () => {
+      const xml = `<barline><fermata type="upright">angled</fermata><fermata type="inverted"/></barline>`;
+      const element = createElement(xml);
+      const barline = mapBarlineElement(element);
+      expect(barline.fermata).toBeDefined();
+      const fermatas = barline.fermata as Fermata[];
+      expect(fermatas.length).toBe(2);
+      expect(fermatas[0].value).toBe('angled');
+      expect(fermatas[0].type).toBe('upright');
+      expect(fermatas[1].type).toBe('inverted');
+    });
+
+    it('should parse barline attributes segno, coda and divisions', () => {
+      const xml = `<barline segno="S1" coda="C1" divisions="480" id="b1"/>`;
+      const element = createElement(xml);
+      const barline = mapBarlineElement(element);
+      expect(barline.segnoAttr).toBe('S1');
+      expect(barline.codaAttr).toBe('C1');
+      expect(barline.divisions).toBe(480);
+      expect(barline.id).toBe('b1');
+    });
   });
 }); 

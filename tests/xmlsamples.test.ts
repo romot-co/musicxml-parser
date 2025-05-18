@@ -71,4 +71,13 @@ describe('Specific feature checks from samples', () => {
     const noteWithStaccato = score.parts[0].measures.flatMap(m => getNotesFromContent(m.content)).find(n => n.notations?.articulations?.some(a => a.staccato));
     expect(noteWithStaccato).toBeDefined();
   });
+
+  it('ActorPreludeSample.musicxml captures staff-layout defaults', () => {
+    const xmlString = fs.readFileSync(path.join(samplesDir, 'ActorPreludeSample.musicxml'), 'utf-8');
+    const xmlDoc = parseMusicXmlString(xmlString);
+    if (!xmlDoc) throw new Error('ActorPreludeSample.musicxml failed to parse');
+    const score = mapDocumentToScorePartwise(xmlDoc);
+    expect(score.defaults?.staffLayout).toBeDefined();
+    expect(score.defaults?.staffLayout?.[0]?.staffDistance).toBe(93);
+  });
 });

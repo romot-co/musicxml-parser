@@ -38,10 +38,19 @@ import type {
   Articulations,
   Staccato,
   Accent,
+  Tenuto,
+  Spiccato,
+  Staccatissimo,
+  StrongAccent,
+  Tuplet,
+  Ornaments,
+  Technical,
+  Tie,
   Barline,
   BarStyle,
   Repeat,
   Ending,
+  Fermata,
   Work,
   Identification,
   Creator,
@@ -73,12 +82,17 @@ import type {
   MeasureContent,
   PageLayout,
   SystemLayout,
+  StaffLayout,
   Margins,
   LineWidth,
   Appearance,
   TimewisePart,
   TimewiseMeasure,
   ScoreTimewise,
+  Supports,
+  Relation,
+  Miscellaneous,
+  MiscellaneousField,
 } from '../types';
 import {
   PitchSchema,
@@ -120,9 +134,18 @@ import {
   ArticulationsSchema,
   StaccatoSchema,
   AccentSchema,
+  TenutoSchema,
+  SpiccatoSchema,
+  StaccatissimoSchema,
+  StrongAccentSchema,
+  TupletSchema,
+  OrnamentsSchema,
+  TechnicalSchema,
+  TieSchema,
   BarlineSchema,
   RepeatSchema,
   EndingSchema,
+  FermataSchema,
   WorkSchema,
   IdentificationSchema,
   CreatorSchema,
@@ -160,10 +183,15 @@ import {
   LineWidthSchema,
   AppearanceSchema,
   SystemLayoutSchema,
+  StaffLayoutSchema,
   BackupSchema,
   ForwardSchema,
   PrintSchema,
   SoundSchema,
+  SupportsSchema,
+  RelationSchema,
+  MiscellaneousSchema,
+  MiscellaneousFieldSchema,
 } from '../schemas';
 
 // Helper function to get text content of a child element
@@ -278,8 +306,25 @@ export const mapLyricElement = (element: Element): Lyric => {
   const lyricData: Partial<Lyric> = {
     text: getTextContent(element, 'text') ?? '',
     syllabic: getTextContent(element, 'syllabic') as 'single' | 'begin' | 'end' | 'middle' | undefined,
-    // TODO: Map other lyric attributes and child elements like number, name, extend, elision etc.
   };
+  const numberAttr = getAttribute(element, 'number');
+  const nameAttr = getAttribute(element, 'name');
+  if (numberAttr) lyricData.number = numberAttr;
+  if (nameAttr) lyricData.name = nameAttr;
+
+  const extendElement = element.querySelector('extend');
+  if (extendElement) {
+    lyricData.extend = {
+      type: getAttribute(extendElement, 'type') as 'start' | 'stop' | 'continue' | undefined,
+    };
+  }
+
+  const elisionElement = element.querySelector('elision');
+  if (elisionElement) {
+    lyricData.elision = {
+      text: elisionElement.textContent?.trim() || undefined,
+    };
+  }
   return LyricSchema.parse(lyricData);
 };
 
@@ -438,11 +483,23 @@ const mapSlurElement = (element: Element): Slur => {
   return SlurSchema.parse(slurData);
 };
 
+const mapFermataElement = (element: Element) => {
+  const fermataData: Partial<Fermata> = {};
+  const text = element.textContent?.trim();
+  if (text) fermataData.value = text as any;
+  const typeAttr = getAttribute(element, 'type');
+  if (typeAttr) fermataData.type = typeAttr as 'upright' | 'inverted';
+  return FermataSchema.parse(fermataData);
+};
+
 // Helper function to map an <articulations> element
 const mapArticulationsElement = (element: Element): Articulations => {
   const staccatoElement = element.querySelector('staccato');
   const accentElement = element.querySelector('accent');
-  // TODO: Query for other articulation types
+  const tenutoElement = element.querySelector('tenuto');
+  const spiccatoElement = element.querySelector('spiccato');
+  const staccatissimoElement = element.querySelector('staccatissimo');
+  const strongAccentElement = element.querySelector('strong-accent');
 
   const articulationsData: Partial<Articulations> = {
     placement: getAttribute(element, 'placement') as 'above' | 'below' | undefined,
@@ -454,9 +511,52 @@ const mapArticulationsElement = (element: Element): Articulations => {
   if (accentElement) {
     articulationsData.accent = {}; // AccentSchema is an empty object
   }
-  // TODO: Map other articulations
+  if (tenutoElement) {
+    articulationsData.tenuto = {};
+  }
+  if (spiccatoElement) {
+    articulationsData.spiccato = {};
+  }
+  if (staccatissimoElement) {
+    articulationsData.staccatissimo = {};
+  }
+  if (strongAccentElement) {
+    articulationsData.strongAccent = {};
+  }
 
   return ArticulationsSchema.parse(articulationsData);
+};
+
+// Helper to map a <tied> element
+const mapTiedElement = (element: Element): Tie => {
+  const type = getAttribute(element, 'type') as 'start' | 'stop' | undefined;
+  if (!type) {
+    throw new Error('<tied> element requires a "type" attribute.');
+  }
+  return TieSchema.parse({ type });
+};
+
+// Helper to map a <tuplet> element
+const mapTupletElement = (element: Element): Tuplet => {
+  const type = getAttribute(element, 'type') as 'start' | 'stop' | undefined;
+  if (!type) {
+    throw new Error('<tuplet> element requires a "type" attribute.');
+  }
+  const tupletData: Partial<Tuplet> = {
+    type,
+    number: parseOptionalNumberAttribute(element, 'number'),
+  };
+  return TupletSchema.parse(tupletData);
+};
+
+// Helper to map an <ornaments> element
+const mapOrnamentsElement = (_element: Element): Ornaments => {
+  return OrnamentsSchema.parse({});
+};
+
+// Helper to map a <technical> element
+const mapTechnicalElement = (_element: Element): Technical => {
+  return TechnicalSchema.parse({});
 };
 
 // Helper function to map a <words> element (within <direction-type>)
@@ -573,7 +673,10 @@ export const mapDirectionElement = (element: Element): Direction => {
 const mapNotationsElement = (element: Element): Notations => {
   const slurElements = Array.from(element.querySelectorAll('slur'));
   const articulationsElements = Array.from(element.querySelectorAll('articulations'));
-  // TODO: Query for other notation types like <tied>, <tuplet>, <ornaments>, <technical>
+  const tiedElements = Array.from(element.querySelectorAll('tied'));
+  const tupletElements = Array.from(element.querySelectorAll('tuplet'));
+  const ornamentsElements = Array.from(element.querySelectorAll('ornaments'));
+  const technicalElements = Array.from(element.querySelectorAll('technical'));
 
   const notationsData: Partial<Notations> = {};
 
@@ -582,6 +685,18 @@ const mapNotationsElement = (element: Element): Notations => {
   }
   if (articulationsElements.length > 0) {
     notationsData.articulations = articulationsElements.map(mapArticulationsElement);
+  }
+  if (tiedElements.length > 0) {
+    notationsData.tied = tiedElements.map(mapTiedElement);
+  }
+  if (tupletElements.length > 0) {
+    notationsData.tuplets = tupletElements.map(mapTupletElement);
+  }
+  if (ornamentsElements.length > 0) {
+    notationsData.ornaments = ornamentsElements.map(mapOrnamentsElement);
+  }
+  if (technicalElements.length > 0) {
+    notationsData.technical = technicalElements.map(mapTechnicalElement);
   }
 
   return NotationsSchema.parse(notationsData);
@@ -624,6 +739,7 @@ export const mapBarlineElement = (element: Element): Barline => {
   const endingElement = element.querySelector('ending');
   const codaElement = element.querySelector('coda');
   const segnoElement = element.querySelector('segno');
+  const fermataElements = Array.from(element.querySelectorAll('fermata'));
 
   const barlineData: Partial<Barline> = {
     _type: 'barline',
@@ -645,6 +761,18 @@ export const mapBarlineElement = (element: Element): Barline => {
   if (segnoElement) {
     barlineData.segno = {};
   }
+  if (fermataElements.length > 0) {
+    barlineData.fermata = fermataElements.map(mapFermataElement);
+  }
+  barlineData.segnoAttr = getAttribute(element, 'segno');
+  barlineData.codaAttr = getAttribute(element, 'coda');
+  const divisionsAttr = getAttribute(element, 'divisions');
+  if (divisionsAttr) {
+    const val = parseInt(divisionsAttr, 10);
+    if (!isNaN(val)) barlineData.divisions = val;
+  }
+  const idAttr = getAttribute(element, 'id');
+  if (idAttr) barlineData.id = idAttr;
   // TODO: Parse other barline children and attributes
 
   return BarlineSchema.parse(barlineData);
@@ -677,11 +805,73 @@ const mapRightsElement = (element: Element): Rights => {
   return RightsSchema.parse(rightsData);
 };
 
+const mapSupportsElement = (element: Element): Supports | undefined => {
+  const typeAttr = getAttribute(element, 'type') as 'yes' | 'no' | undefined;
+  const el = getAttribute(element, 'element');
+  if (!typeAttr || !el) return undefined;
+  const data: Partial<Supports> = {
+    type: typeAttr,
+    element: el,
+    attribute: getAttribute(element, 'attribute') || undefined,
+    value: getAttribute(element, 'value') || undefined,
+  };
+  try {
+    return SupportsSchema.parse(data);
+  } catch {
+    return undefined;
+  }
+};
+
+const mapRelationElement = (element: Element): Relation | undefined => {
+  const text = element.textContent?.trim();
+  if (!text) return undefined;
+  const data = {
+    text,
+    type: getAttribute(element, 'type') || undefined,
+  };
+  try {
+    return RelationSchema.parse(data);
+  } catch {
+    return undefined;
+  }
+};
+
+const mapMiscellaneousFieldElement = (
+  element: Element,
+): MiscellaneousField | undefined => {
+  const name = getAttribute(element, 'name');
+  const text = element.textContent?.trim();
+  if (!name || text === undefined) return undefined;
+  try {
+    return MiscellaneousFieldSchema.parse({ name, text });
+  } catch {
+    return undefined;
+  }
+};
+
+const mapMiscellaneousElement = (
+  element: Element,
+): Miscellaneous | undefined => {
+  const fieldElements = Array.from(
+    element.querySelectorAll('miscellaneous-field'),
+  );
+  const fields = fieldElements
+    .map(mapMiscellaneousFieldElement)
+    .filter(Boolean) as MiscellaneousField[];
+  if (fields.length === 0) return undefined;
+  try {
+    return MiscellaneousSchema.parse({ fields });
+  } catch {
+    return undefined;
+  }
+};
+
 // Helper function to map an <encoding> element (within <identification>)
 const mapEncodingElement = (element: Element): Encoding => {
   const softwareElements = Array.from(element.querySelectorAll('software'));
   const encodingDateElements = Array.from(element.querySelectorAll('encoding-date'));
   const encoderElements = Array.from(element.querySelectorAll('encoder'));
+  const supportsElements = Array.from(element.querySelectorAll('supports'));
 
   const encodingData: Partial<Encoding> = {};
   if (softwareElements.length > 0) {
@@ -693,6 +883,10 @@ const mapEncodingElement = (element: Element): Encoding => {
   if (encoderElements.length > 0) {
     encodingData.encoder = encoderElements.map(el => el.textContent?.trim() ?? '');
   }
+  if (supportsElements.length > 0) {
+    const mappedSupports = supportsElements.map(mapSupportsElement).filter(Boolean) as Supports[];
+    if (mappedSupports.length > 0) encodingData.supports = mappedSupports;
+  }
   return EncodingSchema.parse(encodingData);
 };
 
@@ -701,6 +895,8 @@ const mapIdentificationElement = (element: Element): Identification => {
   const creatorElements = Array.from(element.querySelectorAll('creator'));
   const rightsElements = Array.from(element.querySelectorAll('rights'));
   const encodingElement = element.querySelector('encoding');
+  const relationElements = Array.from(element.querySelectorAll('relation'));
+  const miscellaneousElement = element.querySelector('miscellaneous');
   const source = getTextContent(element, 'source');
 
   const identificationData: Partial<Identification> = {
@@ -715,6 +911,14 @@ const mapIdentificationElement = (element: Element): Identification => {
   }
   if (encodingElement) {
     identificationData.encoding = mapEncodingElement(encodingElement);
+  }
+  if (relationElements.length > 0) {
+    const mappedRelations = relationElements.map(mapRelationElement).filter(Boolean) as Relation[];
+    if (mappedRelations.length > 0) identificationData.relations = mappedRelations;
+  }
+  if (miscellaneousElement) {
+    const mappedMisc = mapMiscellaneousElement(miscellaneousElement);
+    if (mappedMisc) identificationData.miscellaneous = mappedMisc;
   }
   return IdentificationSchema.parse(identificationData);
 };
@@ -834,6 +1038,69 @@ export const mapTransposeElement = (element: Element): Transpose | undefined => 
   }
 };
 
+// Helper to map a <line-detail> element
+const mapLineDetailElement = (element: Element): LineDetail | undefined => {
+  const lineAttr = getAttribute(element, 'line');
+  if (!lineAttr) return undefined;
+  const line = parseInt(lineAttr, 10);
+  if (isNaN(line)) return undefined;
+
+  const data: Partial<LineDetail> = {
+    line,
+  };
+
+  const widthAttr = getAttribute(element, 'width');
+  if (widthAttr !== undefined) {
+    const w = parseFloat(widthAttr);
+    if (!isNaN(w)) data.width = w;
+  }
+
+  const colorAttr = getAttribute(element, 'color');
+  if (colorAttr) data.color = colorAttr;
+
+  const lineTypeAttr = getAttribute(element, 'line-type');
+  if (lineTypeAttr) data.lineType = lineTypeAttr;
+
+  const printObjAttr = getAttribute(element, 'print-object');
+  if (printObjAttr === 'yes' || printObjAttr === 'no') data.printObject = printObjAttr;
+
+  const cleaned = Object.fromEntries(
+    Object.entries(data).filter(([, v]) => v !== undefined)
+  );
+
+  try {
+    return LineDetailSchema.parse(cleaned);
+  } catch {
+    return undefined;
+  }
+};
+
+// Helper to map a <staff-tuning> element
+const mapStaffTuningElement = (element: Element): StaffTuning | undefined => {
+  const lineAttr = getAttribute(element, 'line');
+  const step = getTextContent(element, 'tuning-step');
+  const octave = parseNumberContent(element, 'tuning-octave');
+  if (!lineAttr || !step || octave === undefined) return undefined;
+
+  const line = parseInt(lineAttr, 10);
+  if (isNaN(line)) return undefined;
+
+  const data: Partial<StaffTuning> = {
+    line,
+    tuningStep: step as any,
+    tuningOctave: octave,
+  };
+
+  const alter = parseFloatContent(element, 'tuning-alter');
+  if (alter !== undefined) data.tuningAlter = alter;
+
+  try {
+    return StaffTuningSchema.parse(data);
+  } catch {
+    return undefined;
+  }
+};
+
 // Function to map a <staff-details> element
 export const mapStaffDetailsElement = (element: Element): StaffDetails | undefined => {
   if (!element) return undefined;
@@ -841,14 +1108,26 @@ export const mapStaffDetailsElement = (element: Element): StaffDetails | undefin
   const staffDetailsData: Partial<StaffDetails> = {
     staffType: getTextContent(element, 'staff-type'),
     staffLines: parseNumberContent(element, 'staff-lines'),
-    // lineDetail: // TODO: map line-detail elements
-    // staffTuning: // TODO: map staff-tuning elements
     capo: parseNumberContent(element, 'capo'),
     number: parseOptionalNumberAttribute(element, 'number'),
     showFrets: getAttribute(element, 'show-frets') as 'numbers' | 'letters' | undefined,
     printObject: getAttribute(element, 'print-object') as 'yes' | 'no' | undefined,
     printSpacing: getAttribute(element, 'print-spacing') as 'yes' | 'no' | undefined,
   };
+
+  const lineDetailEls = Array.from(element.querySelectorAll('line-detail'));
+  if (lineDetailEls.length > 0) {
+    staffDetailsData.lineDetail = lineDetailEls
+      .map(mapLineDetailElement)
+      .filter(Boolean) as LineDetail[];
+  }
+
+  const tuningEls = Array.from(element.querySelectorAll('staff-tuning'));
+  if (tuningEls.length > 0) {
+    staffDetailsData.staffTuning = tuningEls
+      .map(mapStaffTuningElement)
+      .filter(Boolean) as StaffTuning[];
+  }
 
   const staffSizeElement = element.querySelector('staff-size');
   if (staffSizeElement) {
@@ -1398,6 +1677,25 @@ const mapSystemLayoutElement = (element: Element): SystemLayout | undefined => {
   }
 };
 
+// Helper to parse <staff-layout> element
+const mapStaffLayoutElement = (element: Element): StaffLayout | undefined => {
+  if (!element) return undefined;
+  const staffLayoutData: Partial<StaffLayout> = {
+    number: parseOptionalNumberAttribute(element, 'number'),
+    staffDistance: parseFloatContent(element, 'staff-distance'),
+  };
+  Object.keys(staffLayoutData).forEach(
+    key => staffLayoutData[key as keyof StaffLayout] === undefined && delete staffLayoutData[key as keyof StaffLayout],
+  );
+  if (Object.keys(staffLayoutData).length === 0) return undefined;
+  try {
+    return StaffLayoutSchema.parse(staffLayoutData);
+  } catch (e) {
+    // console.warn('Failed to parse staff-layout element:', JSON.stringify(staffLayoutData, null, 2), (e as z.ZodError).errors);
+    return undefined;
+  }
+};
+
 // Helper to parse <line-width> element
 const mapLineWidthElement = (element: Element): LineWidth | undefined => {
   if (!element) return undefined;
@@ -1491,7 +1789,7 @@ export const mapDefaultsElement = (element: Element): Defaults | undefined => {
   const wordFontElement = element.querySelector('word-font');
   const lyricFontElements = Array.from(element.querySelectorAll('lyric-font'));
   const lyricLanguageElements = Array.from(element.querySelectorAll('lyric-language'));
-  // TODO: Add staff-layout mapping if needed
+  const staffLayoutElements = Array.from(element.querySelectorAll('staff-layout'));
 
   const defaultsData: Partial<Defaults> = {};
 
@@ -1509,6 +1807,12 @@ export const mapDefaultsElement = (element: Element): Defaults | undefined => {
   if (systemLayoutElement) { // Added
     const mappedSystemLayout = mapSystemLayoutElement(systemLayoutElement);
     if (mappedSystemLayout) defaultsData.systemLayout = mappedSystemLayout;
+  }
+  if (staffLayoutElements.length > 0) {
+    const mappedStaffLayouts = staffLayoutElements
+      .map(mapStaffLayoutElement)
+      .filter(Boolean) as StaffLayout[];
+    if (mappedStaffLayouts.length > 0) defaultsData.staffLayout = mappedStaffLayouts;
   }
   if (appearanceElement) { // Added
     const mappedAppearance = mapAppearanceElement(appearanceElement);

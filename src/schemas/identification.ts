@@ -27,11 +27,36 @@ export const EncodingSoftwareSchema = z.string(); // Software name
 export const EncodingDateSchema = z.string(); // Date in YYYY-MM-DD format or similar
 export const EncoderSchema = z.string(); // Person or organization doing the encoding
 
+export const SupportsSchema = z.object({
+  type: z.enum(['yes', 'no']),
+  element: z.string(),
+  attribute: z.string().optional(),
+  value: z.string().optional(),
+});
+export type Supports = z.infer<typeof SupportsSchema>;
+
+export const RelationSchema = z.object({
+  type: z.string().optional(),
+  text: z.string(),
+});
+export type Relation = z.infer<typeof RelationSchema>;
+
+export const MiscellaneousFieldSchema = z.object({
+  name: z.string(),
+  text: z.string(),
+});
+export type MiscellaneousField = z.infer<typeof MiscellaneousFieldSchema>;
+
+export const MiscellaneousSchema = z.object({
+  fields: z.array(MiscellaneousFieldSchema),
+});
+export type Miscellaneous = z.infer<typeof MiscellaneousSchema>;
+
 export const EncodingSchema = z.object({
   software: z.array(EncodingSoftwareSchema).optional(), // Can have multiple <software> tags
   'encoding-date': z.array(EncodingDateSchema).optional(), // Can have multiple <encoding-date> tags
   encoder: z.array(EncoderSchema).optional(), // Can have multiple <encoder> tags
-  // TODO: Add other encoding children like <supports>
+  supports: z.array(SupportsSchema).optional(),
 });
 export type Encoding = z.infer<typeof EncodingSchema>;
 
@@ -47,6 +72,8 @@ export const IdentificationSchema = z.object({
    * The source element is used to give a bibliographic reference for the source of the music.
    */
   source: z.string().optional(),
-  // TODO: Add other identification children like <relation>, <miscellaneous>
+  relations: z.array(RelationSchema).optional(),
+  miscellaneous: MiscellaneousSchema.optional(),
 });
-export type Identification = z.infer<typeof IdentificationSchema>; 
+export type Identification = z.infer<typeof IdentificationSchema>;
+

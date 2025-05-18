@@ -13,8 +13,9 @@ export type { Key } from '../schemas/key';
 export type { Time } from '../schemas/time';
 export type { Clef } from '../schemas/clef';
 export type { Attributes } from '../schemas/attributes';
-export type { Lyric } from '../schemas/lyric';
+export type { Lyric, Extend, Elision } from '../schemas/lyric';
 export type { Tie } from '../schemas/tie';
+export type { Tie as Tied } from '../schemas/tie';
 export type {
   Direction,
   DirectionType,
@@ -33,14 +34,26 @@ export type {
   Articulations,
   Staccato,
   Accent,
+  Tenuto,
+  Spiccato,
+  Staccatissimo,
+  StrongAccent,
+  Tuplet,
+  Ornaments,
+  Technical,
 } from '../schemas/notations';
 export type { Barline, BarStyle, Repeat, Ending } from '../schemas/barline';
+export type { Fermata, FermataShape } from '../schemas/fermata';
 export type { Work } from '../schemas/work';
 export type {
   Identification,
   Creator,
   Rights,
   Encoding,
+  Supports,
+  Relation,
+  Miscellaneous,
+  MiscellaneousField,
   EncodingSoftwareSchema as EncodingSoftware,
   EncodingDateSchema as EncodingDate,
   EncoderSchema as Encoder

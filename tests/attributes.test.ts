@@ -92,7 +92,39 @@ describe('Attributes Schema Tests', () => {
       expect(attributes.staves).toBe(2);
     });
 
-    // TODO: Add tests for part-symbol, instruments, staff-details, transpose, measure-style
+    // TODO: Add tests for part-symbol and instruments
+
+    it('should parse <staff-details> with <line-detail>', () => {
+      const xml = `<attributes><staff-details><staff-lines>5</staff-lines><line-detail line="1" width="0.5" color="#ff0" line-type="dashed" print-object="no"/></staff-details></attributes>`;
+      const element = createElement(xml);
+      const attributes = mapAttributesElement(element);
+      expect(attributes.staffDetails).toBeDefined();
+      expect(attributes.staffDetails).toHaveLength(1);
+      const sd = attributes.staffDetails?.[0]!;
+      expect(sd.lineDetail).toBeDefined();
+      expect(sd.lineDetail).toHaveLength(1);
+      const ld = sd.lineDetail?.[0]!;
+      expect(ld.line).toBe(1);
+      expect(ld.width).toBeCloseTo(0.5);
+      expect(ld.color).toBe('#ff0');
+      expect(ld.lineType).toBe('dashed');
+      expect(ld.printObject).toBe('no');
+    });
+
+    it('should parse <staff-details> with <staff-tuning>', () => {
+      const xml = `<attributes><staff-details><staff-tuning line="1"><tuning-step>E</tuning-step><tuning-octave>4</tuning-octave></staff-tuning></staff-details></attributes>`;
+      const element = createElement(xml);
+      const attributes = mapAttributesElement(element);
+      expect(attributes.staffDetails).toBeDefined();
+      expect(attributes.staffDetails).toHaveLength(1);
+      const sd = attributes.staffDetails?.[0]!;
+      expect(sd.staffTuning).toBeDefined();
+      expect(sd.staffTuning).toHaveLength(1);
+      const tuning = sd.staffTuning?.[0]!;
+      expect(tuning.line).toBe(1);
+      expect(tuning.tuningStep).toBe('E');
+      expect(tuning.tuningOctave).toBe(4);
+    });
 
     it('should parse <measure-style> with <multiple-rest>', () => {
       const xml = `<attributes><measure-style><multiple-rest use-symbols="yes">4</multiple-rest></measure-style></attributes>`;
