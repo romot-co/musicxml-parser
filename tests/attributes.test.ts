@@ -1,6 +1,16 @@
 import { describe, it, expect } from 'vitest';
 import { mapAttributesElement } from '../src/parser/mappers';
-import type { Attributes, Key, Time, Clef } from '../src/types';
+import type {
+  Attributes,
+  Key,
+  Time,
+  Clef,
+  MeasureStyle,
+  MultipleRest,
+  MeasureRepeat,
+  BeatRepeat,
+  Slash,
+} from '../src/types';
 import { JSDOM } from 'jsdom';
 
 // Helper to create an Element from an XML string snippet
@@ -83,5 +93,70 @@ describe('Attributes Schema Tests', () => {
     });
 
     // TODO: Add tests for part-symbol, instruments, staff-details, transpose, measure-style
+
+    it('should parse <measure-style> with <multiple-rest>', () => {
+      const xml = `<attributes><measure-style><multiple-rest use-symbols="yes">4</multiple-rest></measure-style></attributes>`;
+      const element = createElement(xml);
+      const attributes = mapAttributesElement(element);
+      expect(attributes.measureStyle).toBeDefined();
+      expect(attributes.measureStyle).toHaveLength(1);
+      const style = attributes.measureStyle?.[0] as MeasureStyle;
+      expect(style.multipleRest).toBeDefined();
+      const mr = style.multipleRest as MultipleRest;
+      expect(mr.value).toBe(4);
+      expect(mr.useSymbols).toBe('yes');
+    });
+
+    it('should parse <measure-style> with <measure-repeat>', () => {
+      const xml = `<attributes><measure-style><measure-repeat type="start" slashes="2">3</measure-repeat></measure-style></attributes>`;
+      const element = createElement(xml);
+      const attributes = mapAttributesElement(element);
+      expect(attributes.measureStyle).toBeDefined();
+      expect(attributes.measureStyle).toHaveLength(1);
+      const style = attributes.measureStyle?.[0] as MeasureStyle;
+      expect(style.measureRepeat).toBeDefined();
+      const rep = style.measureRepeat as MeasureRepeat;
+      expect(rep.value).toBe(3);
+      expect(rep.type).toBe('start');
+      expect(rep.slashes).toBe(2);
+    });
+
+    it('should parse <measure-style> with <beat-repeat>', () => {
+      const xml = `<attributes><measure-style><beat-repeat type="stop" slashes="1" use-dots="no"><slash-type>quarter</slash-type></beat-repeat></measure-style></attributes>`;
+      const element = createElement(xml);
+      const attributes = mapAttributesElement(element);
+      expect(attributes.measureStyle).toBeDefined();
+      expect(attributes.measureStyle).toHaveLength(1);
+      const style = attributes.measureStyle?.[0] as MeasureStyle;
+      expect(style.beatRepeat).toBeDefined();
+      const br = style.beatRepeat as BeatRepeat;
+      expect(br.type).toBe('stop');
+      expect(br.slashes).toBe(1);
+      expect(br.useDots).toBe('no');
+      expect(br.slashType).toBe('quarter');
+    });
+
+    it('should parse <measure-style> with <slash>', () => {
+      const xml = `<attributes><measure-style><slash type="start" use-dots="yes" use-stems="no"><slash-type>eighth</slash-type></slash></measure-style></attributes>`;
+      const element = createElement(xml);
+      const attributes = mapAttributesElement(element);
+      expect(attributes.measureStyle).toBeDefined();
+      expect(attributes.measureStyle).toHaveLength(1);
+      const style = attributes.measureStyle?.[0] as MeasureStyle;
+      expect(style.slash).toBeDefined();
+      const sl = style.slash as Slash;
+      expect(sl.type).toBe('start');
+      expect(sl.useDots).toBe('yes');
+      expect(sl.useStems).toBe('no');
+      expect(sl.slashType).toBe('eighth');
+    });
+
+    it('should ignore invalid <measure-style> with no style child', () => {
+      const xml = `<attributes><measure-style number="1"></measure-style></attributes>`;
+      const element = createElement(xml);
+      const attributes = mapAttributesElement(element);
+      expect(attributes.measureStyle).toBeDefined();
+      expect(attributes.measureStyle).toHaveLength(0);
+    });
   });
 }); 
