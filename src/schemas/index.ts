@@ -24,6 +24,7 @@ export * from "./accidental";
 export * from "./notations";
 export * from "./barline";
 export * from "./work";
+export * from "./opus";
 export * from "./identification";
 export * from "./stem";
 export * from "./beam";

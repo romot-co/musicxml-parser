@@ -63,6 +63,7 @@ import type {
   Footnote,
   Level,
   Work,
+  Opus,
   Identification,
   Creator,
   Rights,
@@ -169,6 +170,7 @@ import {
   EndingSchema,
   FermataSchema,
   WorkSchema,
+  OpusSchema,
   IdentificationSchema,
   CreatorSchema,
   RightsSchema,
@@ -1207,10 +1209,30 @@ export const mapBarlineElement = (element: Element): Barline => {
 
 // Helper function to map a <work> element
 const mapWorkElement = (element: Element): Work => {
-  const workData = {
+  const workData: Partial<Work> = {
     "work-number": getTextContent(element, "work-number"),
     "work-title": getTextContent(element, "work-title"),
   };
+
+  const opusElement = element.querySelector("opus");
+  if (opusElement) {
+    const opusData: Partial<Opus> = {
+      href: getAttribute(opusElement, "xlink:href") ?? "",
+    };
+    const typeAttr = getAttribute(opusElement, "xlink:type");
+    if (typeAttr) opusData.type = typeAttr;
+    const roleAttr = getAttribute(opusElement, "xlink:role");
+    if (roleAttr) opusData.role = roleAttr;
+    const titleAttr = getAttribute(opusElement, "xlink:title");
+    if (titleAttr) opusData.title = titleAttr;
+    const showAttr = getAttribute(opusElement, "xlink:show");
+    if (showAttr) opusData.show = showAttr;
+    const actuateAttr = getAttribute(opusElement, "xlink:actuate");
+    if (actuateAttr) opusData.actuate = actuateAttr;
+
+    workData.opus = OpusSchema.parse(opusData);
+  }
+
   return WorkSchema.parse(workData);
 };
 
