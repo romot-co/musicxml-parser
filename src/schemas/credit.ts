@@ -8,22 +8,46 @@ export const TextFormattingSchema = z
   .object({
     justify: z.enum(["left", "center", "right"]).optional(),
     halign: z.enum(["left", "center", "right"]).optional(),
+    valign: z.enum(["top", "middle", "bottom", "baseline"]).optional(),
     defaultX: z.number().optional(),
     defaultY: z.number().optional(),
-    valign: z.enum(["top", "middle", "bottom", "baseline"]).optional(),
-    // ... other attributes like Smufl, text-decoration etc.
+    relativeX: z.number().optional(),
+    relativeY: z.number().optional(),
+    underline: z.number().optional(),
+    overline: z.number().optional(),
+    lineThrough: z.number().optional(),
+    rotation: z.number().optional(),
+    letterSpacing: z.string().optional(),
+    lineHeight: z.string().optional(),
+    dir: z.enum(["ltr", "rtl", "lro", "rlo"]).optional(),
+    enclosure: z.string().optional(),
+    xmlLang: z.string().optional(),
+    xmlSpace: z.enum(["default", "preserve"]).optional(),
     color: z.string().optional(),
   })
   .merge(FontSchema); // Include font attributes
 
 // Placeholder for symbol formatting attributes (simplified)
-export const SymbolFormattingSchema = z.object({
-  defaultX: z.number().optional(),
-  defaultY: z.number().optional(),
-  halign: z.enum(["left", "center", "right"]).optional(),
-  valign: z.enum(["top", "middle", "bottom"]).optional(),
-  // ... color, etc.
-});
+export const SymbolFormattingSchema = z
+  .object({
+    justify: z.enum(["left", "center", "right"]).optional(),
+    halign: z.enum(["left", "center", "right"]).optional(),
+    valign: z.enum(["top", "middle", "bottom"]).optional(),
+    defaultX: z.number().optional(),
+    defaultY: z.number().optional(),
+    relativeX: z.number().optional(),
+    relativeY: z.number().optional(),
+    underline: z.number().optional(),
+    overline: z.number().optional(),
+    lineThrough: z.number().optional(),
+    rotation: z.number().optional(),
+    letterSpacing: z.string().optional(),
+    lineHeight: z.string().optional(),
+    dir: z.enum(["ltr", "rtl", "lro", "rlo"]).optional(),
+    enclosure: z.string().optional(),
+    color: z.string().optional(),
+  })
+  .merge(FontSchema);
 
 export const CreditTypeSchema = z.string();
 
@@ -53,11 +77,8 @@ export const CreditSchema = z.object({
   creditTypes: z.array(CreditTypeSchema).optional(),
   links: z.array(LinkSchema).optional(),
   bookmarks: z.array(BookmarkSchema).optional(),
-  creditWords: z.array(CreditWordsSchema).optional(), // Simplified: only allowing multiple words
-  creditSymbols: z.array(CreditSymbolSchema).optional(), // Simplified
-  creditImage: CreditImageSchema.optional(), // Simplified: only one image
-  // The DTD allows a sequence of (credit-words | credit-symbol), which is hard to model directly with Zod objects for now.
-  // This simplified schema allows arrays of words, symbols, or a single image.
+  items: z.array(z.union([CreditWordsSchema, CreditSymbolSchema])).optional(),
+  creditImages: z.array(CreditImageSchema).optional(),
 });
 
 export type TextFormatting = z.infer<typeof TextFormattingSchema>;
