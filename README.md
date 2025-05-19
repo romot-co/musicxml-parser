@@ -6,23 +6,22 @@ The primary goal is to provide a robust foundation for applications that need to
 
 ## Current Status
 
-This project is currently in **Phase 1: Core Parsing Functionality**.
+This project currently supports a significant subset of the **MusicXML 3.1** specification and is under active development.
 
 **Implemented Features:**
 *   Parses MusicXML strings into a DOM Document. In Node.js, the parser dynamically loads `jsdom` if `DOMParser` is missing.
-*   Defines Zod schemas for core MusicXML elements:
-    *   `<pitch>`
-    *   `<rest>`
-    *   `<note>` (handles both pitched notes and rests)
-    *   `<measure>` (including a placeholder for `<attributes>`)
-    *   `<part>`
-    *   `<score-part>` (from `<part-list>`)
-    *   `<part-list>`
+*   Provides asynchronous `parseMusicXml` and synchronous `parseMusicXmlSync` APIs.
+*   Defines Zod schemas for a broad set of MusicXML elements, including:
+    *   `<pitch>`, `<rest>`, and `<note>`
+    *   `<measure>` with fully modeled `<attributes>`
+    *   `<direction>`, `<barline>`, `<harmony>` and other common measure children
+    *   `<part>`, `<score-part>` and `<part-list>`
     *   `<score-partwise>` (root element)
 *   Maps the parsed DOM structure to a typed JavaScript object (`ScorePartwise`) according to the defined Zod schemas.
 *   Validates the mapped object against the Zod schemas at each step of the mapping process.
 *   Basic unit tests for the core parsing and mapping logic.
 *   Reads `.mxl` archives directly using Node.js—no external `unzip` command is required.
+*   Conversion utilities for JSON, YAML, Tone.js sequences, MIDI-like data, and MusicXML serialization.
 
 **Design Choices:**
 *   **DOM-based Parsing:** Utilizes `DOMParser` in browsers and loads `jsdom` on demand in Node.js to build a Document Object Model from the MusicXML string. This approach was chosen for its suitability for both transformation and potential future editing capabilities, offering easier random access and manipulation of the XML structure compared to SAX-based parsing.
@@ -144,20 +143,12 @@ const midi = toMidi(score);
 
 ## Future
 
-*   **Phase 2: Detailed Schema Implementation & Advanced Mapping:**
-    *   Implement detailed Zod schemas for `<attributes>` (key signature, time signature, clef, divisions, etc.).
-    *   Map more MusicXML elements within `<note>` (e.g., `<stem>`, `<notations>`, `<lyric>`).
-    *   Map more MusicXML elements within `<measure>` (e.g., `<barline>`, `<direction>`, `<harmony>`).
-    *   Implement mappers for other top-level metadata elements (`<work>`, `<identification>`, `<defaults>`, `<credit>`).
-    *   Support for `<score-timewise>` if necessary.
-*   **Phase 3: Conversion Utilities:**
-    *   Add `toMusicXML()` for serializing a parsed score back into MusicXML.
-*   **Phase 4: Enhancements & Optimizations:**
-    *   Performance profiling and optimization for large MusicXML files.
-    *   Error handling improvements and configurable logging.
-    *   Support for MusicXML 4.0 features (e.g., SMuFL).
-    *   More comprehensive test suite with a wider range of MusicXML files.
-    *   Documentation generation (e.g., TypeDoc).
+*   **Planned Improvements**
+    *   Continue expanding schema and mapper coverage toward full MusicXML 3.1 compliance.
+    *   Improve conversion utilities and add round-trip tests.
+    *   Optimize performance and extend error reporting.
+    *   Explore MusicXML 4.0 features such as SMuFL support.
+    *   Grow the automated test suite and generate API documentation.
 
 ## Contributing
 
