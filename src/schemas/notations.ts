@@ -82,6 +82,19 @@ export const GlissandoSchema = z.object({
   value: z.string().optional(),
   type: z.enum(["start", "stop"]),
   number: z.number().int().optional(),
+  orientation: z.enum(["over", "under"]).optional(),
+  lineType: z.string().optional(),
+  dashLength: z.number().optional(),
+  spaceLength: z.number().optional(),
+  defaultX: z.number().optional(),
+  defaultY: z.number().optional(),
+  relativeX: z.number().optional(),
+  relativeY: z.number().optional(),
+  color: z.string().optional(),
+  accelerate: YesNoEnum.optional(),
+  beats: z.number().optional(),
+  firstBeat: z.number().optional(),
+  lastBeat: z.number().optional(),
 });
 export type Glissando = z.infer<typeof GlissandoSchema>;
 
@@ -92,6 +105,19 @@ export const SlideSchema = z.object({
   value: z.string().optional(),
   type: z.enum(["start", "stop"]),
   number: z.number().int().optional(),
+  orientation: z.enum(["over", "under"]).optional(),
+  lineType: z.string().optional(),
+  dashLength: z.number().optional(),
+  spaceLength: z.number().optional(),
+  defaultX: z.number().optional(),
+  defaultY: z.number().optional(),
+  relativeX: z.number().optional(),
+  relativeY: z.number().optional(),
+  color: z.string().optional(),
+  accelerate: YesNoEnum.optional(),
+  beats: z.number().optional(),
+  firstBeat: z.number().optional(),
+  lastBeat: z.number().optional(),
 });
 export type Slide = z.infer<typeof SlideSchema>;
 

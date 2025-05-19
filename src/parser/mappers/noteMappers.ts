@@ -1077,6 +1077,39 @@ export const mapGlissandoElement = (element: Element): Glissando => {
     type: getAttribute(element, "type") as "start" | "stop" | undefined,
     number: parseOptionalNumberAttribute(element, "number"),
   };
+  const orientation = getAttribute(element, "orientation");
+  if (orientation === "over" || orientation === "under")
+    glissandoData.orientation = orientation;
+  const lineTypeAttr = getAttribute(element, "line-type");
+  if (lineTypeAttr) glissandoData.lineType = lineTypeAttr;
+  const dashLenAttr = getAttribute(element, "dash-length");
+  if (dashLenAttr)
+    glissandoData.dashLength = parseOptionalFloat(dashLenAttr);
+  const spaceLenAttr = getAttribute(element, "space-length");
+  if (spaceLenAttr)
+    glissandoData.spaceLength = parseOptionalFloat(spaceLenAttr);
+  const dxAttr = getAttribute(element, "default-x");
+  if (dxAttr) glissandoData.defaultX = parseOptionalFloat(dxAttr);
+  const dyAttr = getAttribute(element, "default-y");
+  if (dyAttr) glissandoData.defaultY = parseOptionalFloat(dyAttr);
+  const rxAttr = getAttribute(element, "relative-x");
+  if (rxAttr) glissandoData.relativeX = parseOptionalFloat(rxAttr);
+  const ryAttr = getAttribute(element, "relative-y");
+  if (ryAttr) glissandoData.relativeY = parseOptionalFloat(ryAttr);
+  const colorAttr = getAttribute(element, "color");
+  if (colorAttr) glissandoData.color = colorAttr;
+  const accelAttr = getAttribute(element, "accelerate");
+  if (accelAttr === "yes" || accelAttr === "no")
+    glissandoData.accelerate = accelAttr;
+  const beatsAttr = getAttribute(element, "beats");
+  if (beatsAttr)
+    glissandoData.beats = parseOptionalFloat(beatsAttr);
+  const firstBeatAttr = getAttribute(element, "first-beat");
+  if (firstBeatAttr)
+    glissandoData.firstBeat = parseOptionalFloat(firstBeatAttr);
+  const lastBeatAttr = getAttribute(element, "last-beat");
+  if (lastBeatAttr)
+    glissandoData.lastBeat = parseOptionalFloat(lastBeatAttr);
   if (!glissandoData.type) {
     throw new Error('<glissando> element requires a "type" attribute.');
   }
@@ -1089,6 +1122,33 @@ export const mapSlideElement = (element: Element): Slide => {
     type: getAttribute(element, "type") as "start" | "stop" | undefined,
     number: parseOptionalNumberAttribute(element, "number"),
   };
+  const orientation = getAttribute(element, "orientation");
+  if (orientation === "over" || orientation === "under")
+    slideData.orientation = orientation;
+  const lineTypeAttr = getAttribute(element, "line-type");
+  if (lineTypeAttr) slideData.lineType = lineTypeAttr;
+  const dashLenAttr = getAttribute(element, "dash-length");
+  if (dashLenAttr) slideData.dashLength = parseOptionalFloat(dashLenAttr);
+  const spaceLenAttr = getAttribute(element, "space-length");
+  if (spaceLenAttr) slideData.spaceLength = parseOptionalFloat(spaceLenAttr);
+  const dxAttr = getAttribute(element, "default-x");
+  if (dxAttr) slideData.defaultX = parseOptionalFloat(dxAttr);
+  const dyAttr = getAttribute(element, "default-y");
+  if (dyAttr) slideData.defaultY = parseOptionalFloat(dyAttr);
+  const rxAttr = getAttribute(element, "relative-x");
+  if (rxAttr) slideData.relativeX = parseOptionalFloat(rxAttr);
+  const ryAttr = getAttribute(element, "relative-y");
+  if (ryAttr) slideData.relativeY = parseOptionalFloat(ryAttr);
+  const colorAttr = getAttribute(element, "color");
+  if (colorAttr) slideData.color = colorAttr;
+  const accelAttr = getAttribute(element, "accelerate");
+  if (accelAttr === "yes" || accelAttr === "no") slideData.accelerate = accelAttr;
+  const beatsAttr = getAttribute(element, "beats");
+  if (beatsAttr) slideData.beats = parseOptionalFloat(beatsAttr);
+  const firstBeatAttr = getAttribute(element, "first-beat");
+  if (firstBeatAttr) slideData.firstBeat = parseOptionalFloat(firstBeatAttr);
+  const lastBeatAttr = getAttribute(element, "last-beat");
+  if (lastBeatAttr) slideData.lastBeat = parseOptionalFloat(lastBeatAttr);
   if (!slideData.type) {
     throw new Error('<slide> element requires a "type" attribute.');
   }
