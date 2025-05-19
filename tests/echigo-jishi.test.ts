@@ -5,7 +5,6 @@ import { parseMusicXmlString } from "../src/parser/xmlParser";
 import { mapDocumentToScorePartwise } from "../src/parser/mappers";
 import type {
   ScorePartwise,
-  CreditWords,
   Measure,
   Note,
   Attributes,
@@ -183,19 +182,20 @@ describe("Echigo-Jishi.musicxml Parser Test", () => {
     const titleCredit = scorePartwise.credit?.find(
       (c: Credit) =>
         c.creditTypes?.includes("title") &&
-        c.creditWords?.[0]?.text === "越後獅子",
+        c.items?.[0] && (c.items[0] as any).text === "越後獅子",
     );
     expect(titleCredit).toBeDefined();
     expect(titleCredit?.page).toBe("1");
-    expect(titleCredit?.creditWords?.[0].formatting?.defaultX).toBe(607);
-    expect(titleCredit?.creditWords?.[0].formatting?.defaultY).toBe(1443);
-    expect(titleCredit?.creditWords?.[0].formatting?.fontFamily).toBe(
+    const firstItem = titleCredit?.items?.[0] as any;
+    expect(firstItem.formatting?.defaultX).toBe(607);
+    expect(firstItem.formatting?.defaultY).toBe(1443);
+    expect(firstItem.formatting?.fontFamily).toBe(
       "ＭＳ ゴシック",
     );
-    expect(titleCredit?.creditWords?.[0].formatting?.fontSize).toBe("24");
-    expect(titleCredit?.creditWords?.[0].formatting?.fontWeight).toBe("bold");
-    expect(titleCredit?.creditWords?.[0].formatting?.justify).toBe("center");
-    expect(titleCredit?.creditWords?.[0].formatting?.valign).toBe("top");
+    expect(firstItem.formatting?.fontSize).toBe("24");
+    expect(firstItem.formatting?.fontWeight).toBe("bold");
+    expect(firstItem.formatting?.justify).toBe("center");
+    expect(firstItem.formatting?.valign).toBe("top");
     // xml:lang is not directly in CreditWordsSchema.textFormatting, but on credit-words element itself.
     // Our current schema/mapper for credit-words doesn't capture xml:lang on credit-words directly.
 
@@ -203,20 +203,22 @@ describe("Echigo-Jishi.musicxml Parser Test", () => {
       c.creditTypes?.includes("arranger"),
     );
     expect(arrangerCredit).toBeDefined();
-    expect(arrangerCredit?.creditWords?.[0].text).toBe(
+    const arrangerItem = arrangerCredit?.items?.[0] as any;
+    expect(arrangerItem.text).toBe(
       "Arr. Y. Nagai , K. Kobatake",
     );
-    expect(arrangerCredit?.creditWords?.[0].formatting?.defaultX).toBe(1124);
-    expect(arrangerCredit?.creditWords?.[0].formatting?.justify).toBe("right");
+    expect(arrangerItem.formatting?.defaultX).toBe(1124);
+    expect(arrangerItem.formatting?.justify).toBe("right");
 
     const rightsCredit = scorePartwise.credit?.find((c: Credit) =>
       c.creditTypes?.includes("rights"),
     );
     expect(rightsCredit).toBeDefined();
-    expect(rightsCredit?.creditWords?.[0].text).toBe(
+    const rightsItem = rightsCredit?.items?.[0] as any;
+    expect(rightsItem.text).toBe(
       "Transcription donated to the public domain, 2005 by Tom Potter",
     );
-    expect(rightsCredit?.creditWords?.[0].formatting?.justify).toBe("center");
+    expect(rightsItem.formatting?.justify).toBe("center");
   });
 
   it("should parse part-list and score-part (basic check)", () => {

@@ -303,13 +303,27 @@ export const mapCreditWordsElement = (
   const justifyAttr = getAttribute(element, "justify");
   const defaultX = parseOptionalNumberAttribute(element, "default-x");
   const defaultY = parseOptionalNumberAttribute(element, "default-y");
+  const relativeX = parseOptionalNumberAttribute(element, "relative-x");
+  const relativeY = parseOptionalNumberAttribute(element, "relative-y");
   const valignAttr = getAttribute(element, "valign");
   const halignAttr = getAttribute(element, "halign"); // Read halign
-
+  const underlineAttr = getAttribute(element, "underline");
+  const overlineAttr = getAttribute(element, "overline");
+  const lineThroughAttr = getAttribute(element, "line-through");
+  const rotationAttr = getAttribute(element, "rotation");
+  const letterSpacing = getAttribute(element, "letter-spacing");
+  const lineHeight = getAttribute(element, "line-height");
+  const dirAttr = getAttribute(element, "dir");
+  const enclosure = getAttribute(element, "enclosure");
+  const xmlLang = getAttribute(element, "xml:lang");
+  const xmlSpaceAttr = getAttribute(element, "xml:space");
+  
   if (fontFamily) formatting.fontFamily = fontFamily;
   if (fontSize) formatting.fontSize = fontSize;
   if (defaultX !== undefined) formatting.defaultX = defaultX;
   if (defaultY !== undefined) formatting.defaultY = defaultY;
+  if (relativeX !== undefined) formatting.relativeX = relativeX;
+  if (relativeY !== undefined) formatting.relativeY = relativeY;
 
   if (fontStyleAttr === "normal" || fontStyleAttr === "italic") {
     formatting.fontStyle = fontStyleAttr;
@@ -346,6 +360,28 @@ export const mapCreditWordsElement = (
     formatting.justify = finalJustify;
   }
 
+  const parseLines = (v: string | undefined): number | undefined => {
+    if (!v) return undefined;
+    const n = parseInt(v, 10);
+    return isNaN(n) ? undefined : n;
+  };
+  const underline = parseLines(underlineAttr);
+  if (underline !== undefined) formatting.underline = underline;
+  const overline = parseLines(overlineAttr);
+  if (overline !== undefined) formatting.overline = overline;
+  const lineThrough = parseLines(lineThroughAttr);
+  if (lineThrough !== undefined) formatting.lineThrough = lineThrough;
+  const rotation = rotationAttr ? parseFloat(rotationAttr) : undefined;
+  if (rotation !== undefined && !isNaN(rotation)) formatting.rotation = rotation;
+  if (letterSpacing) formatting.letterSpacing = letterSpacing;
+  if (lineHeight) formatting.lineHeight = lineHeight;
+  if (dirAttr && ["ltr", "rtl", "lro", "rlo"].includes(dirAttr))
+    formatting.dir = dirAttr as "ltr" | "rtl" | "lro" | "rlo";
+  if (enclosure) formatting.enclosure = enclosure;
+  if (xmlLang) formatting.xmlLang = xmlLang;
+  if (xmlSpaceAttr && ["default", "preserve"].includes(xmlSpaceAttr))
+    formatting.xmlSpace = xmlSpaceAttr as "default" | "preserve";
+
   const data: Partial<CreditWords> = { text: text || "" }; // Ensure text is always a string
   if (Object.keys(formatting).length > 0) {
     data.formatting = formatting as TextFormatting;
@@ -380,6 +416,10 @@ export const mapCreditSymbolElement = (
   if (dx !== undefined) formatting.defaultX = dx;
   const dy = parseOptionalNumberAttribute(element, "default-y");
   if (dy !== undefined) formatting.defaultY = dy;
+  const rx = parseOptionalNumberAttribute(element, "relative-x");
+  if (rx !== undefined) formatting.relativeX = rx;
+  const ry = parseOptionalNumberAttribute(element, "relative-y");
+  if (ry !== undefined) formatting.relativeY = ry;
   const haAttr = getAttribute(element, "halign");
   if (haAttr && ["left", "center", "right"].includes(haAttr)) {
     formatting.halign = haAttr as "left" | "center" | "right";
@@ -388,6 +428,35 @@ export const mapCreditSymbolElement = (
   if (vaAttr && ["top", "middle", "bottom"].includes(vaAttr)) {
     formatting.valign = vaAttr as "top" | "middle" | "bottom";
   }
+  const underlineAttr = getAttribute(element, "underline");
+  const overlineAttr = getAttribute(element, "overline");
+  const lineThroughAttr = getAttribute(element, "line-through");
+  const rotationAttr = getAttribute(element, "rotation");
+  const letterSpacing = getAttribute(element, "letter-spacing");
+  const lineHeight = getAttribute(element, "line-height");
+  const dirAttr = getAttribute(element, "dir");
+  const enclosure = getAttribute(element, "enclosure");
+  const colorAttr = getAttribute(element, "color");
+
+  const parseLines = (v: string | undefined): number | undefined => {
+    if (!v) return undefined;
+    const n = parseInt(v, 10);
+    return isNaN(n) ? undefined : n;
+  };
+  const underline = parseLines(underlineAttr);
+  if (underline !== undefined) formatting.underline = underline;
+  const overline = parseLines(overlineAttr);
+  if (overline !== undefined) formatting.overline = overline;
+  const lineThrough = parseLines(lineThroughAttr);
+  if (lineThrough !== undefined) formatting.lineThrough = lineThrough;
+  const rotation = rotationAttr ? parseFloat(rotationAttr) : undefined;
+  if (rotation !== undefined && !isNaN(rotation)) formatting.rotation = rotation;
+  if (letterSpacing) formatting.letterSpacing = letterSpacing;
+  if (lineHeight) formatting.lineHeight = lineHeight;
+  if (dirAttr && ["ltr", "rtl", "lro", "rlo"].includes(dirAttr))
+    formatting.dir = dirAttr as "ltr" | "rtl" | "lro" | "rlo";
+  if (enclosure) formatting.enclosure = enclosure;
+  if (colorAttr) formatting.color = colorAttr;
 
   const data: Partial<CreditSymbol> = { smuflGlyphName };
   if (Object.keys(formatting).length > 0) {
@@ -456,41 +525,54 @@ export const mapCreditImageElement = (
 
 export const mapCreditElement = (element: Element): Credit | undefined => {
   const page = getAttribute(element, "page");
-  const creditTypes = Array.from(element.querySelectorAll("credit-type"))
-    .map((el) => el.textContent?.trim())
-    .filter(Boolean) as string[];
-  const linkElements = Array.from(element.querySelectorAll("link"));
-  const bookmarkElements = Array.from(element.querySelectorAll("bookmark"));
-  const creditWordsElements = Array.from(
-    element.querySelectorAll("credit-words"),
-  );
-  const creditSymbolElements = Array.from(
-    element.querySelectorAll("credit-symbol"),
-  );
-  const creditImageEl = element.querySelector("credit-image");
+  const creditTypes: string[] = [];
+  const links: Link[] = [];
+  const bookmarks: Bookmark[] = [];
+  const items: (CreditWords | CreditSymbol)[] = [];
+  const images: CreditImage[] = [];
 
-  const creditWords = creditWordsElements
-    .map(mapCreditWordsElement)
-    .filter(Boolean) as CreditWords[];
-  const creditSymbols = creditSymbolElements
-    .map(mapCreditSymbolElement)
-    .filter(Boolean) as CreditSymbol[];
-  const creditImage = creditImageEl
-    ? mapCreditImageElement(creditImageEl)
-    : undefined;
-  const links = linkElements.map(mapLinkElement).filter(Boolean) as Link[];
-  const bookmarks = bookmarkElements
-    .map(mapBookmarkElement)
-    .filter(Boolean) as Bookmark[];
+  for (const child of Array.from(element.children)) {
+    switch (child.tagName) {
+      case "credit-type": {
+        const t = child.textContent?.trim();
+        if (t) creditTypes.push(t);
+        break;
+      }
+      case "link": {
+        const l = mapLinkElement(child);
+        if (l) links.push(l);
+        break;
+      }
+      case "bookmark": {
+        const b = mapBookmarkElement(child);
+        if (b) bookmarks.push(b);
+        break;
+      }
+      case "credit-words": {
+        const w = mapCreditWordsElement(child);
+        if (w) items.push(w);
+        break;
+      }
+      case "credit-symbol": {
+        const s = mapCreditSymbolElement(child);
+        if (s) items.push(s);
+        break;
+      }
+      case "credit-image": {
+        const img = mapCreditImageElement(child);
+        if (img) images.push(img);
+        break;
+      }
+    }
+  }
 
   const data: Partial<Credit> = {};
   if (page) data.page = page;
   if (creditTypes.length > 0) data.creditTypes = creditTypes;
   if (links.length > 0) data.links = links;
   if (bookmarks.length > 0) data.bookmarks = bookmarks;
-  if (creditWords.length > 0) data.creditWords = creditWords;
-  if (creditSymbols.length > 0) data.creditSymbols = creditSymbols;
-  if (creditImage) data.creditImage = creditImage;
+  if (items.length > 0) data.items = items;
+  if (images.length > 0) data.creditImages = images;
 
   // If, after attempting to populate 'data' from all parts of the <credit> element,
   // the 'data' object is still empty, it means the <credit> element

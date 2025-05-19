@@ -154,4 +154,48 @@ describe("Direction parsing", () => {
     const direction = mapDirectionElement(el);
     expect(direction.offset).toBe(2.5);
   });
+
+  it("parses eyeglasses and damping elements", () => {
+    const xml = `<direction><direction-type><eyeglasses/><damp/><damp-all/></direction-type></direction>`;
+    const el = createElement(xml);
+    const direction = mapDirectionElement(el);
+    const dt = direction.direction_type[0];
+    expect(dt.eyeglasses).toBeDefined();
+    expect(dt.damp).toBeDefined();
+    expect(dt.dampAll).toBeDefined();
+  });
+
+  it("parses string-mute element", () => {
+    const xml = `<direction><direction-type><string-mute type="on"/></direction-type></direction>`;
+    const el = createElement(xml);
+    const direction = mapDirectionElement(el);
+    expect(direction.direction_type[0].stringMute?.type).toBe("on");
+  });
+
+  it("parses harp-pedals element", () => {
+    const xml = `<direction><direction-type><harp-pedals><pedal-tuning><pedal-step>D</pedal-step><pedal-alter>-1</pedal-alter></pedal-tuning><pedal-tuning><pedal-step>E</pedal-step></pedal-tuning></harp-pedals></direction-type></direction>`;
+    const el = createElement(xml);
+    const direction = mapDirectionElement(el);
+    const hp = direction.direction_type[0].harpPedals!;
+    expect(hp["pedal-tuning"].length).toBe(2);
+    expect(hp["pedal-tuning"][0]["pedal-step"]).toBe("D");
+    expect(hp["pedal-tuning"][0]["pedal-alter"]).toBe(-1);
+  });
+
+  it("parses scordatura element", () => {
+    const xml = `<direction><direction-type><scordatura><accord string="1"><tuning-step>A</tuning-step><tuning-octave>4</tuning-octave></accord></scordatura></direction-type></direction>`;
+    const el = createElement(xml);
+    const direction = mapDirectionElement(el);
+    const sc = direction.direction_type[0].scordatura!;
+    expect(sc.accord.length).toBe(1);
+    expect(sc.accord[0]["tuning-step"]).toBe("A");
+    expect(sc.accord[0].string).toBe("1");
+  });
+
+  it("parses other-direction element", () => {
+    const xml = `<direction><direction-type><other-direction>custom</other-direction></direction-type></direction>`;
+    const el = createElement(xml);
+    const direction = mapDirectionElement(el);
+    expect(direction.direction_type[0].otherDirection?.text).toBe("custom");
+  });
 });

@@ -132,6 +132,18 @@ import type {
   Dashes,
   Bracket,
   Image,
+  Eyeglasses,
+  Damp,
+  DampAll,
+  StringMute,
+  HarpPedals,
+  PedalTuning,
+  Accord,
+  Scordatura,
+  PrincipalVoice,
+  AccordionRegistration,
+  StaffDivide,
+  OtherDirection,
 } from "../../types";
 import {
   PitchSchema,
@@ -243,6 +255,18 @@ import {
   DashesSchema,
   BracketSchema,
   ImageSchema,
+  EyeglassesSchema,
+  DampSchema,
+  DampAllSchema,
+  StringMuteSchema,
+  HarpPedalsSchema,
+  PedalTuningSchema,
+  AccordSchema,
+  ScordaturaSchema,
+  PrincipalVoiceSchema,
+  AccordionRegistrationSchema,
+  StaffDivideSchema,
+  OtherDirectionSchema,
   GroupSymbolValueEnum,
   RootSchema,
   KindSchema,
@@ -1042,6 +1066,10 @@ export const mapTechnicalElement = (element: Element): Technical => {
           | "above"
           | "below"
           | undefined,
+        accelerate: getAttribute(el, "accelerate") as "yes" | "no" | undefined,
+        beats: parseOptionalNumberAttribute(el, "beats"),
+        firstBeat: parseOptionalFloat(getAttribute(el, "first-beat")),
+        lastBeat: parseOptionalFloat(getAttribute(el, "last-beat")),
       }),
     );
   const taps = Array.from(element.querySelectorAll("tap"));
@@ -1077,9 +1105,36 @@ export const mapGlissandoElement = (element: Element): Glissando => {
     type: getAttribute(element, "type") as "start" | "stop" | undefined,
     number: parseOptionalNumberAttribute(element, "number"),
   };
-  const orientAttr = getAttribute(element, "orientation");
-  if (orientAttr === "up" || orientAttr === "down")
-    glissandoData.orientation = orientAttr;
+  const lineTypeAttr = getAttribute(element, "line-type");
+  if (lineTypeAttr) glissandoData.lineType = lineTypeAttr;
+  const dashLenAttr = getAttribute(element, "dash-length");
+  if (dashLenAttr)
+    glissandoData.dashLength = parseOptionalFloat(dashLenAttr);
+  const spaceLenAttr = getAttribute(element, "space-length");
+  if (spaceLenAttr)
+    glissandoData.spaceLength = parseOptionalFloat(spaceLenAttr);
+  const dxAttr = getAttribute(element, "default-x");
+  if (dxAttr) glissandoData.defaultX = parseOptionalFloat(dxAttr);
+  const dyAttr = getAttribute(element, "default-y");
+  if (dyAttr) glissandoData.defaultY = parseOptionalFloat(dyAttr);
+  const rxAttr = getAttribute(element, "relative-x");
+  if (rxAttr) glissandoData.relativeX = parseOptionalFloat(rxAttr);
+  const ryAttr = getAttribute(element, "relative-y");
+  if (ryAttr) glissandoData.relativeY = parseOptionalFloat(ryAttr);
+  const colorAttr = getAttribute(element, "color");
+  if (colorAttr) glissandoData.color = colorAttr;
+  const accelAttr = getAttribute(element, "accelerate");
+  if (accelAttr === "yes" || accelAttr === "no")
+    glissandoData.accelerate = accelAttr;
+  const beatsAttr = getAttribute(element, "beats");
+  if (beatsAttr)
+    glissandoData.beats = parseOptionalFloat(beatsAttr);
+  const firstBeatAttr = getAttribute(element, "first-beat");
+  if (firstBeatAttr)
+    glissandoData.firstBeat = parseOptionalFloat(firstBeatAttr);
+  const lastBeatAttr = getAttribute(element, "last-beat");
+  if (lastBeatAttr)
+    glissandoData.lastBeat = parseOptionalFloat(lastBeatAttr);
   if (!glissandoData.type) {
     throw new Error('<glissando> element requires a "type" attribute.');
   }
@@ -1092,6 +1147,33 @@ export const mapSlideElement = (element: Element): Slide => {
     type: getAttribute(element, "type") as "start" | "stop" | undefined,
     number: parseOptionalNumberAttribute(element, "number"),
   };
+  const orientation = getAttribute(element, "orientation");
+  if (orientation === "over" || orientation === "under")
+    slideData.orientation = orientation;
+  const lineTypeAttr = getAttribute(element, "line-type");
+  if (lineTypeAttr) slideData.lineType = lineTypeAttr;
+  const dashLenAttr = getAttribute(element, "dash-length");
+  if (dashLenAttr) slideData.dashLength = parseOptionalFloat(dashLenAttr);
+  const spaceLenAttr = getAttribute(element, "space-length");
+  if (spaceLenAttr) slideData.spaceLength = parseOptionalFloat(spaceLenAttr);
+  const dxAttr = getAttribute(element, "default-x");
+  if (dxAttr) slideData.defaultX = parseOptionalFloat(dxAttr);
+  const dyAttr = getAttribute(element, "default-y");
+  if (dyAttr) slideData.defaultY = parseOptionalFloat(dyAttr);
+  const rxAttr = getAttribute(element, "relative-x");
+  if (rxAttr) slideData.relativeX = parseOptionalFloat(rxAttr);
+  const ryAttr = getAttribute(element, "relative-y");
+  if (ryAttr) slideData.relativeY = parseOptionalFloat(ryAttr);
+  const colorAttr = getAttribute(element, "color");
+  if (colorAttr) slideData.color = colorAttr;
+  const accelAttr = getAttribute(element, "accelerate");
+  if (accelAttr === "yes" || accelAttr === "no") slideData.accelerate = accelAttr;
+  const beatsAttr = getAttribute(element, "beats");
+  if (beatsAttr) slideData.beats = parseOptionalFloat(beatsAttr);
+  const firstBeatAttr = getAttribute(element, "first-beat");
+  if (firstBeatAttr) slideData.firstBeat = parseOptionalFloat(firstBeatAttr);
+  const lastBeatAttr = getAttribute(element, "last-beat");
+  if (lastBeatAttr) slideData.lastBeat = parseOptionalFloat(lastBeatAttr);
   if (!slideData.type) {
     throw new Error('<slide> element requires a "type" attribute.');
   }
@@ -1111,6 +1193,13 @@ export const mapTremoloElement = (element: Element): Tremolo => {
     | "unmeasured"
     | undefined;
   if (typeAttr) tremoloData.type = typeAttr;
+  const placementAttr = getAttribute(element, "placement") as
+    | "above"
+    | "below"
+    | undefined;
+  if (placementAttr) tremoloData.placement = placementAttr;
+  const smuflAttr = getAttribute(element, "smufl");
+  if (smuflAttr) tremoloData.smufl = smuflAttr;
   return TremoloSchema.parse(tremoloData);
 };
 
@@ -1449,6 +1538,102 @@ export const mapImageElement = (element: Element): Image | undefined => {
   return ImageSchema.parse(data);
 };
 
+export const mapEyeglassesElement = (_element: Element): Eyeglasses => {
+  return EyeglassesSchema.parse({});
+};
+
+export const mapDampElement = (_element: Element): Damp => {
+  return DampSchema.parse({});
+};
+
+export const mapDampAllElement = (_element: Element): DampAll => {
+  return DampAllSchema.parse({});
+};
+
+export const mapStringMuteElement = (element: Element): StringMute => {
+  const typeAttr = getAttribute(element, "type") as "on" | "off" | undefined;
+  return StringMuteSchema.parse({ type: typeAttr });
+};
+
+export const mapPedalTuningElement = (element: Element): PedalTuning => {
+  const data: Partial<PedalTuning> = {
+    "pedal-step": getTextContent(element, "pedal-step") ?? "",
+  };
+  const alt = parseFloatContent(element, "pedal-alter");
+  if (alt !== undefined) data["pedal-alter"] = alt;
+  return PedalTuningSchema.parse(data);
+};
+
+export const mapHarpPedalsElement = (element: Element): HarpPedals => {
+  const tunings = Array.from(element.querySelectorAll("pedal-tuning")).map(
+    mapPedalTuningElement,
+  );
+  return HarpPedalsSchema.parse({ "pedal-tuning": tunings });
+};
+
+export const mapAccordElement = (element: Element): Accord => {
+  const data: Partial<Accord> = {
+    "tuning-step": getTextContent(element, "tuning-step") ?? "",
+    "tuning-octave": parseNumberContent(element, "tuning-octave") ?? 0,
+  };
+  const alt = parseFloatContent(element, "tuning-alter");
+  if (alt !== undefined) data["tuning-alter"] = alt;
+  const stringAttr = getAttribute(element, "string");
+  if (stringAttr) data.string = stringAttr;
+  return AccordSchema.parse(data);
+};
+
+export const mapScordaturaElement = (element: Element): Scordatura => {
+  const accords = Array.from(element.querySelectorAll("accord")).map(
+    mapAccordElement,
+  );
+  return ScordaturaSchema.parse({ accord: accords });
+};
+
+export const mapPrincipalVoiceElement = (element: Element): PrincipalVoice => {
+  const data: Partial<PrincipalVoice> = {
+    text: element.textContent?.trim() ?? "",
+  };
+  const typeAttr = getAttribute(element, "type") as
+    | "start"
+    | "stop"
+    | undefined;
+  if (typeAttr) data.type = typeAttr;
+  const symbolAttr = getAttribute(element, "symbol") as
+    | "Hauptstimme"
+    | "Nebenstimme"
+    | "plain"
+    | "none"
+    | undefined;
+  if (symbolAttr) data.symbol = symbolAttr;
+  return PrincipalVoiceSchema.parse(data);
+};
+
+export const mapAccordionRegistrationElement = (
+  element: Element,
+): AccordionRegistration => {
+  const data: Partial<AccordionRegistration> = {};
+  if (element.querySelector("accordion-high")) data["accordion-high"] = true;
+  const midEl = element.querySelector("accordion-middle");
+  if (midEl) data["accordion-middle"] = midEl.textContent?.trim() ?? "";
+  if (element.querySelector("accordion-low")) data["accordion-low"] = true;
+  return AccordionRegistrationSchema.parse(data);
+};
+
+export const mapStaffDivideElement = (element: Element): StaffDivide => {
+  const typeAttr = getAttribute(element, "type") as
+    | "down"
+    | "up"
+    | "up-down"
+    | undefined;
+  return StaffDivideSchema.parse({ type: typeAttr });
+};
+
+export const mapOtherDirectionElement = (element: Element): OtherDirection => {
+  const text = element.textContent?.trim() ?? "";
+  return OtherDirectionSchema.parse({ text });
+};
+
 // Helper function to map a <beat-unit> element (within <metronome>)
 export const mapMetronomeBeatUnitElement = (
   element: Element,
@@ -1550,6 +1735,16 @@ export const mapDirectionTypeElement = (element: Element): DirectionType => {
   const dashesElement = element.querySelector("dashes");
   const bracketElement = element.querySelector("bracket");
   const imageElement = element.querySelector("image");
+  const eyeglassesElement = element.querySelector("eyeglasses");
+  const dampElement = element.querySelector("damp");
+  const dampAllElement = element.querySelector("damp-all");
+  const stringMuteElement = element.querySelector("string-mute");
+  const harpPedalsElement = element.querySelector("harp-pedals");
+  const scordaturaElement = element.querySelector("scordatura");
+  const principalVoiceElement = element.querySelector("principal-voice");
+  const accordionRegElement = element.querySelector("accordion-registration");
+  const staffDivideElement = element.querySelector("staff-divide");
+  const otherDirectionElement = element.querySelector("other-direction");
   const directionTypeData: Partial<DirectionType> = {};
   if (wordsElement) {
     directionTypeData.words = mapWordsElement(wordsElement);
@@ -1654,6 +1849,41 @@ export const mapDirectionTypeElement = (element: Element): DirectionType => {
   }
   if (bracketElement) {
     directionTypeData.bracket = mapBracketElement(bracketElement);
+  }
+  if (eyeglassesElement) {
+    directionTypeData.eyeglasses = mapEyeglassesElement(eyeglassesElement);
+  }
+  if (dampElement) {
+    directionTypeData.damp = mapDampElement(dampElement);
+  }
+  if (dampAllElement) {
+    directionTypeData.dampAll = mapDampAllElement(dampAllElement);
+  }
+  if (stringMuteElement) {
+    directionTypeData.stringMute = mapStringMuteElement(stringMuteElement);
+  }
+  if (harpPedalsElement) {
+    directionTypeData.harpPedals = mapHarpPedalsElement(harpPedalsElement);
+  }
+  if (scordaturaElement) {
+    directionTypeData.scordatura = mapScordaturaElement(scordaturaElement);
+  }
+  if (principalVoiceElement) {
+    directionTypeData.principalVoice = mapPrincipalVoiceElement(
+      principalVoiceElement,
+    );
+  }
+  if (accordionRegElement) {
+    directionTypeData.accordionRegistration =
+      mapAccordionRegistrationElement(accordionRegElement);
+  }
+  if (staffDivideElement) {
+    directionTypeData.staffDivide = mapStaffDivideElement(staffDivideElement);
+  }
+  if (otherDirectionElement) {
+    directionTypeData.otherDirection = mapOtherDirectionElement(
+      otherDirectionElement,
+    );
   }
   if (imageElement) {
     const img = mapImageElement(imageElement);

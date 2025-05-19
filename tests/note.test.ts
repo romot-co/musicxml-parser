@@ -255,6 +255,49 @@ describe("Note Schema Tests (note.mod)", () => {
       expect(note.notations?.otherNotations?.[0].type).toBe("single");
     });
 
+    it("parses glissando with attributes", () => {
+      const xml =
+        '<note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration><notations><glissando type="start" orientation="over" line-type="dashed" dash-length="1" space-length="2" default-x="3" default-y="4" relative-x="0.5" relative-y="-0.5" color="blue" accelerate="yes" beats="6" first-beat="20" last-beat="80">gliss</glissando></notations></note>';
+      const el = createElement(xml);
+      const note = mapNoteElement(el);
+      const gl = note.notations?.glissandos?.[0]!;
+      expect(gl.orientation).toBe("over");
+      expect(gl.lineType).toBe("dashed");
+      expect(gl.dashLength).toBe(1);
+      expect(gl.spaceLength).toBe(2);
+      expect(gl.defaultX).toBe(3);
+      expect(gl.defaultY).toBe(4);
+      expect(gl.relativeX).toBe(0.5);
+      expect(gl.relativeY).toBe(-0.5);
+      expect(gl.color).toBe("blue");
+      expect(gl.accelerate).toBe("yes");
+      expect(gl.beats).toBe(6);
+      expect(gl.firstBeat).toBe(20);
+      expect(gl.lastBeat).toBe(80);
+    });
+
+    it("parses slide with bend-sound attributes", () => {
+      const xml =
+        '<note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration><notations><slide type="stop" line-type="wavy" dash-length="1.2" space-length="0.8" accelerate="no" beats="5" first-beat="10" last-beat="90" default-x="1" default-y="-1" relative-x="0" relative-y="0.2" color="red" orientation="under"/></notations></note>';
+      const el = createElement(xml);
+      const note = mapNoteElement(el);
+      const slide = note.notations?.slides?.[0]!;
+      expect(slide.type).toBe("stop");
+      expect(slide.lineType).toBe("wavy");
+      expect(slide.dashLength).toBe(1.2);
+      expect(slide.spaceLength).toBe(0.8);
+      expect(slide.accelerate).toBe("no");
+      expect(slide.beats).toBe(5);
+      expect(slide.firstBeat).toBe(10);
+      expect(slide.lastBeat).toBe(90);
+      expect(slide.defaultX).toBe(1);
+      expect(slide.defaultY).toBe(-1);
+      expect(slide.relativeX).toBe(0);
+      expect(slide.relativeY).toBe(0.2);
+      expect(slide.color).toBe("red");
+      expect(slide.orientation).toBe("under");
+    });
+
     it("parses tuplets via <time-modification>", () => {
       const xml =
         "<note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration><time-modification><actual-notes>3</actual-notes><normal-notes>2</normal-notes><normal-type>eighth</normal-type><normal-dot/></time-modification></note>";
@@ -349,6 +392,28 @@ describe("Note Schema Tests (note.mod)", () => {
       expect(tech?.strings?.[0].value).toBe(2);
       expect(tech?.hammerOns?.[0].type).toBe("start");
       expect(tech?.bends?.[0].release).toBe(true);
+    });
+
+    it("parses tremolo placement and smufl", () => {
+      const xml =
+        '<note><pitch><step>E</step><octave>5</octave></pitch><duration>1</duration><notations><tremolo type="single" placement="above" smufl="tremoloUnmeasured">3</tremolo></notations></note>';
+      const element = createElement(xml);
+      const note = mapNoteElement(element);
+      const trem = note.notations?.tremolos?.[0];
+      expect(trem?.placement).toBe("above");
+      expect(trem?.smufl).toBe("tremoloUnmeasured");
+    });
+
+    it("parses bend sound attributes", () => {
+      const xml =
+        '<note><pitch><step>A</step><octave>4</octave></pitch><duration>1</duration><notations><technical><bend accelerate="yes" beats="6" first-beat="30" last-beat="70"><bend-alter>1</bend-alter></bend></technical></notations></note>';
+      const element = createElement(xml);
+      const note = mapNoteElement(element);
+      const bend = note.notations?.technical?.[0]?.bends?.[0];
+      expect(bend?.accelerate).toBe("yes");
+      expect(bend?.beats).toBe(6);
+      expect(bend?.firstBeat).toBe(30);
+      expect(bend?.lastBeat).toBe(70);
     });
   });
 });
