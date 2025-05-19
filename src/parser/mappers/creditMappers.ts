@@ -317,7 +317,7 @@ export const mapCreditWordsElement = (
   const enclosure = getAttribute(element, "enclosure");
   const xmlLang = getAttribute(element, "xml:lang");
   const xmlSpaceAttr = getAttribute(element, "xml:space");
-  
+
   if (fontFamily) formatting.fontFamily = fontFamily;
   if (fontSize) formatting.fontSize = fontSize;
   if (defaultX !== undefined) formatting.defaultX = defaultX;
@@ -372,7 +372,8 @@ export const mapCreditWordsElement = (
   const lineThrough = parseLines(lineThroughAttr);
   if (lineThrough !== undefined) formatting.lineThrough = lineThrough;
   const rotation = rotationAttr ? parseFloat(rotationAttr) : undefined;
-  if (rotation !== undefined && !isNaN(rotation)) formatting.rotation = rotation;
+  if (rotation !== undefined && !isNaN(rotation))
+    formatting.rotation = rotation;
   if (letterSpacing) formatting.letterSpacing = letterSpacing;
   if (lineHeight) formatting.lineHeight = lineHeight;
   if (dirAttr && ["ltr", "rtl", "lro", "rlo"].includes(dirAttr))
@@ -450,7 +451,8 @@ export const mapCreditSymbolElement = (
   const lineThrough = parseLines(lineThroughAttr);
   if (lineThrough !== undefined) formatting.lineThrough = lineThrough;
   const rotation = rotationAttr ? parseFloat(rotationAttr) : undefined;
-  if (rotation !== undefined && !isNaN(rotation)) formatting.rotation = rotation;
+  if (rotation !== undefined && !isNaN(rotation))
+    formatting.rotation = rotation;
   if (letterSpacing) formatting.letterSpacing = letterSpacing;
   if (lineHeight) formatting.lineHeight = lineHeight;
   if (dirAttr && ["ltr", "rtl", "lro", "rlo"].includes(dirAttr))

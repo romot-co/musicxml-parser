@@ -182,16 +182,15 @@ describe("Echigo-Jishi.musicxml Parser Test", () => {
     const titleCredit = scorePartwise.credit?.find(
       (c: Credit) =>
         c.creditTypes?.includes("title") &&
-        c.items?.[0] && (c.items[0] as any).text === "越後獅子",
+        c.items?.[0] &&
+        (c.items[0] as any).text === "越後獅子",
     );
     expect(titleCredit).toBeDefined();
     expect(titleCredit?.page).toBe("1");
     const firstItem = titleCredit?.items?.[0] as any;
     expect(firstItem.formatting?.defaultX).toBe(607);
     expect(firstItem.formatting?.defaultY).toBe(1443);
-    expect(firstItem.formatting?.fontFamily).toBe(
-      "ＭＳ ゴシック",
-    );
+    expect(firstItem.formatting?.fontFamily).toBe("ＭＳ ゴシック");
     expect(firstItem.formatting?.fontSize).toBe("24");
     expect(firstItem.formatting?.fontWeight).toBe("bold");
     expect(firstItem.formatting?.justify).toBe("center");
@@ -204,9 +203,7 @@ describe("Echigo-Jishi.musicxml Parser Test", () => {
     );
     expect(arrangerCredit).toBeDefined();
     const arrangerItem = arrangerCredit?.items?.[0] as any;
-    expect(arrangerItem.text).toBe(
-      "Arr. Y. Nagai , K. Kobatake",
-    );
+    expect(arrangerItem.text).toBe("Arr. Y. Nagai , K. Kobatake");
     expect(arrangerItem.formatting?.defaultX).toBe(1124);
     expect(arrangerItem.formatting?.justify).toBe("right");
 

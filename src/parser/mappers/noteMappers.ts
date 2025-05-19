@@ -1111,8 +1111,7 @@ export const mapGlissandoElement = (element: Element): Glissando => {
   const lineTypeAttr = getAttribute(element, "line-type");
   if (lineTypeAttr) glissandoData.lineType = lineTypeAttr;
   const dashLenAttr = getAttribute(element, "dash-length");
-  if (dashLenAttr)
-    glissandoData.dashLength = parseOptionalFloat(dashLenAttr);
+  if (dashLenAttr) glissandoData.dashLength = parseOptionalFloat(dashLenAttr);
   const spaceLenAttr = getAttribute(element, "space-length");
   if (spaceLenAttr)
     glissandoData.spaceLength = parseOptionalFloat(spaceLenAttr);
@@ -1130,14 +1129,12 @@ export const mapGlissandoElement = (element: Element): Glissando => {
   if (accelAttr === "yes" || accelAttr === "no")
     glissandoData.accelerate = accelAttr;
   const beatsAttr = getAttribute(element, "beats");
-  if (beatsAttr)
-    glissandoData.beats = parseOptionalFloat(beatsAttr);
+  if (beatsAttr) glissandoData.beats = parseOptionalFloat(beatsAttr);
   const firstBeatAttr = getAttribute(element, "first-beat");
   if (firstBeatAttr)
     glissandoData.firstBeat = parseOptionalFloat(firstBeatAttr);
   const lastBeatAttr = getAttribute(element, "last-beat");
-  if (lastBeatAttr)
-    glissandoData.lastBeat = parseOptionalFloat(lastBeatAttr);
+  if (lastBeatAttr) glissandoData.lastBeat = parseOptionalFloat(lastBeatAttr);
   if (!glissandoData.type) {
     throw new Error('<glissando> element requires a "type" attribute.');
   }
@@ -1170,7 +1167,8 @@ export const mapSlideElement = (element: Element): Slide => {
   const colorAttr = getAttribute(element, "color");
   if (colorAttr) slideData.color = colorAttr;
   const accelAttr = getAttribute(element, "accelerate");
-  if (accelAttr === "yes" || accelAttr === "no") slideData.accelerate = accelAttr;
+  if (accelAttr === "yes" || accelAttr === "no")
+    slideData.accelerate = accelAttr;
   const beatsAttr = getAttribute(element, "beats");
   if (beatsAttr) slideData.beats = parseOptionalFloat(beatsAttr);
   const firstBeatAttr = getAttribute(element, "first-beat");
