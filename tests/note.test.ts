@@ -255,6 +255,49 @@ describe("Note Schema Tests (note.mod)", () => {
       expect(note.notations?.otherNotations?.[0].type).toBe("single");
     });
 
+    it("parses glissando with attributes", () => {
+      const xml =
+        '<note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration><notations><glissando type="start" orientation="over" line-type="dashed" dash-length="1" space-length="2" default-x="3" default-y="4" relative-x="0.5" relative-y="-0.5" color="blue" accelerate="yes" beats="6" first-beat="20" last-beat="80">gliss</glissando></notations></note>';
+      const el = createElement(xml);
+      const note = mapNoteElement(el);
+      const gl = note.notations?.glissandos?.[0]!;
+      expect(gl.orientation).toBe("over");
+      expect(gl.lineType).toBe("dashed");
+      expect(gl.dashLength).toBe(1);
+      expect(gl.spaceLength).toBe(2);
+      expect(gl.defaultX).toBe(3);
+      expect(gl.defaultY).toBe(4);
+      expect(gl.relativeX).toBe(0.5);
+      expect(gl.relativeY).toBe(-0.5);
+      expect(gl.color).toBe("blue");
+      expect(gl.accelerate).toBe("yes");
+      expect(gl.beats).toBe(6);
+      expect(gl.firstBeat).toBe(20);
+      expect(gl.lastBeat).toBe(80);
+    });
+
+    it("parses slide with bend-sound attributes", () => {
+      const xml =
+        '<note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration><notations><slide type="stop" line-type="wavy" dash-length="1.2" space-length="0.8" accelerate="no" beats="5" first-beat="10" last-beat="90" default-x="1" default-y="-1" relative-x="0" relative-y="0.2" color="red" orientation="under"/></notations></note>';
+      const el = createElement(xml);
+      const note = mapNoteElement(el);
+      const slide = note.notations?.slides?.[0]!;
+      expect(slide.type).toBe("stop");
+      expect(slide.lineType).toBe("wavy");
+      expect(slide.dashLength).toBe(1.2);
+      expect(slide.spaceLength).toBe(0.8);
+      expect(slide.accelerate).toBe("no");
+      expect(slide.beats).toBe(5);
+      expect(slide.firstBeat).toBe(10);
+      expect(slide.lastBeat).toBe(90);
+      expect(slide.defaultX).toBe(1);
+      expect(slide.defaultY).toBe(-1);
+      expect(slide.relativeX).toBe(0);
+      expect(slide.relativeY).toBe(0.2);
+      expect(slide.color).toBe("red");
+      expect(slide.orientation).toBe("under");
+    });
+
     it("parses tuplets via <time-modification>", () => {
       const xml =
         "<note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration><time-modification><actual-notes>3</actual-notes><normal-notes>2</normal-notes><normal-type>eighth</normal-type><normal-dot/></time-modification></note>";
