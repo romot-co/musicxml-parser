@@ -35,6 +35,18 @@ export type {
   Dashes,
   Bracket,
   Image,
+  Eyeglasses,
+  Damp,
+  DampAll,
+  StringMute,
+  HarpPedals,
+  PedalTuning,
+  Scordatura,
+  Accord,
+  PrincipalVoice,
+  AccordionRegistration,
+  StaffDivide,
+  OtherDirection,
 } from "../schemas/direction";
 
 export type {

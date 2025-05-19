@@ -132,6 +132,18 @@ import type {
   Dashes,
   Bracket,
   Image,
+  Eyeglasses,
+  Damp,
+  DampAll,
+  StringMute,
+  HarpPedals,
+  PedalTuning,
+  Accord,
+  Scordatura,
+  PrincipalVoice,
+  AccordionRegistration,
+  StaffDivide,
+  OtherDirection,
 } from "../../types";
 import {
   PitchSchema,
@@ -243,6 +255,18 @@ import {
   DashesSchema,
   BracketSchema,
   ImageSchema,
+  EyeglassesSchema,
+  DampSchema,
+  DampAllSchema,
+  StringMuteSchema,
+  HarpPedalsSchema,
+  PedalTuningSchema,
+  AccordSchema,
+  ScordaturaSchema,
+  PrincipalVoiceSchema,
+  AccordionRegistrationSchema,
+  StaffDivideSchema,
+  OtherDirectionSchema,
   GroupSymbolValueEnum,
   RootSchema,
   KindSchema,
@@ -1517,6 +1541,102 @@ export const mapImageElement = (element: Element): Image | undefined => {
   return ImageSchema.parse(data);
 };
 
+export const mapEyeglassesElement = (_element: Element): Eyeglasses => {
+  return EyeglassesSchema.parse({});
+};
+
+export const mapDampElement = (_element: Element): Damp => {
+  return DampSchema.parse({});
+};
+
+export const mapDampAllElement = (_element: Element): DampAll => {
+  return DampAllSchema.parse({});
+};
+
+export const mapStringMuteElement = (element: Element): StringMute => {
+  const typeAttr = getAttribute(element, "type") as "on" | "off" | undefined;
+  return StringMuteSchema.parse({ type: typeAttr });
+};
+
+export const mapPedalTuningElement = (element: Element): PedalTuning => {
+  const data: Partial<PedalTuning> = {
+    "pedal-step": getTextContent(element, "pedal-step") ?? "",
+  };
+  const alt = parseFloatContent(element, "pedal-alter");
+  if (alt !== undefined) data["pedal-alter"] = alt;
+  return PedalTuningSchema.parse(data);
+};
+
+export const mapHarpPedalsElement = (element: Element): HarpPedals => {
+  const tunings = Array.from(element.querySelectorAll("pedal-tuning")).map(
+    mapPedalTuningElement,
+  );
+  return HarpPedalsSchema.parse({ "pedal-tuning": tunings });
+};
+
+export const mapAccordElement = (element: Element): Accord => {
+  const data: Partial<Accord> = {
+    "tuning-step": getTextContent(element, "tuning-step") ?? "",
+    "tuning-octave": parseNumberContent(element, "tuning-octave") ?? 0,
+  };
+  const alt = parseFloatContent(element, "tuning-alter");
+  if (alt !== undefined) data["tuning-alter"] = alt;
+  const stringAttr = getAttribute(element, "string");
+  if (stringAttr) data.string = stringAttr;
+  return AccordSchema.parse(data);
+};
+
+export const mapScordaturaElement = (element: Element): Scordatura => {
+  const accords = Array.from(element.querySelectorAll("accord")).map(
+    mapAccordElement,
+  );
+  return ScordaturaSchema.parse({ accord: accords });
+};
+
+export const mapPrincipalVoiceElement = (element: Element): PrincipalVoice => {
+  const data: Partial<PrincipalVoice> = {
+    text: element.textContent?.trim() ?? "",
+  };
+  const typeAttr = getAttribute(element, "type") as
+    | "start"
+    | "stop"
+    | undefined;
+  if (typeAttr) data.type = typeAttr;
+  const symbolAttr = getAttribute(element, "symbol") as
+    | "Hauptstimme"
+    | "Nebenstimme"
+    | "plain"
+    | "none"
+    | undefined;
+  if (symbolAttr) data.symbol = symbolAttr;
+  return PrincipalVoiceSchema.parse(data);
+};
+
+export const mapAccordionRegistrationElement = (
+  element: Element,
+): AccordionRegistration => {
+  const data: Partial<AccordionRegistration> = {};
+  if (element.querySelector("accordion-high")) data["accordion-high"] = true;
+  const midEl = element.querySelector("accordion-middle");
+  if (midEl) data["accordion-middle"] = midEl.textContent?.trim() ?? "";
+  if (element.querySelector("accordion-low")) data["accordion-low"] = true;
+  return AccordionRegistrationSchema.parse(data);
+};
+
+export const mapStaffDivideElement = (element: Element): StaffDivide => {
+  const typeAttr = getAttribute(element, "type") as
+    | "down"
+    | "up"
+    | "up-down"
+    | undefined;
+  return StaffDivideSchema.parse({ type: typeAttr });
+};
+
+export const mapOtherDirectionElement = (element: Element): OtherDirection => {
+  const text = element.textContent?.trim() ?? "";
+  return OtherDirectionSchema.parse({ text });
+};
+
 // Helper function to map a <beat-unit> element (within <metronome>)
 export const mapMetronomeBeatUnitElement = (
   element: Element,
@@ -1618,6 +1738,16 @@ export const mapDirectionTypeElement = (element: Element): DirectionType => {
   const dashesElement = element.querySelector("dashes");
   const bracketElement = element.querySelector("bracket");
   const imageElement = element.querySelector("image");
+  const eyeglassesElement = element.querySelector("eyeglasses");
+  const dampElement = element.querySelector("damp");
+  const dampAllElement = element.querySelector("damp-all");
+  const stringMuteElement = element.querySelector("string-mute");
+  const harpPedalsElement = element.querySelector("harp-pedals");
+  const scordaturaElement = element.querySelector("scordatura");
+  const principalVoiceElement = element.querySelector("principal-voice");
+  const accordionRegElement = element.querySelector("accordion-registration");
+  const staffDivideElement = element.querySelector("staff-divide");
+  const otherDirectionElement = element.querySelector("other-direction");
   const directionTypeData: Partial<DirectionType> = {};
   if (wordsElement) {
     directionTypeData.words = mapWordsElement(wordsElement);
@@ -1722,6 +1852,41 @@ export const mapDirectionTypeElement = (element: Element): DirectionType => {
   }
   if (bracketElement) {
     directionTypeData.bracket = mapBracketElement(bracketElement);
+  }
+  if (eyeglassesElement) {
+    directionTypeData.eyeglasses = mapEyeglassesElement(eyeglassesElement);
+  }
+  if (dampElement) {
+    directionTypeData.damp = mapDampElement(dampElement);
+  }
+  if (dampAllElement) {
+    directionTypeData.dampAll = mapDampAllElement(dampAllElement);
+  }
+  if (stringMuteElement) {
+    directionTypeData.stringMute = mapStringMuteElement(stringMuteElement);
+  }
+  if (harpPedalsElement) {
+    directionTypeData.harpPedals = mapHarpPedalsElement(harpPedalsElement);
+  }
+  if (scordaturaElement) {
+    directionTypeData.scordatura = mapScordaturaElement(scordaturaElement);
+  }
+  if (principalVoiceElement) {
+    directionTypeData.principalVoice = mapPrincipalVoiceElement(
+      principalVoiceElement,
+    );
+  }
+  if (accordionRegElement) {
+    directionTypeData.accordionRegistration =
+      mapAccordionRegistrationElement(accordionRegElement);
+  }
+  if (staffDivideElement) {
+    directionTypeData.staffDivide = mapStaffDivideElement(staffDivideElement);
+  }
+  if (otherDirectionElement) {
+    directionTypeData.otherDirection = mapOtherDirectionElement(
+      otherDirectionElement,
+    );
   }
   if (imageElement) {
     const img = mapImageElement(imageElement);
