@@ -6,6 +6,7 @@ import {
   toYaml,
   toToneJsSequence,
   toMidi,
+  toMusicXML,
 } from "../src/converters";
 import { load } from "js-yaml";
 
@@ -49,5 +50,20 @@ describe("Conversion utilities", () => {
     const midi = toMidi(score);
     expect(midi.tracks.length).toBe(1);
     expect(midi.tracks[0].midi).toBe(60);
+  });
+
+  it("serializes back to MusicXML", async () => {
+    const doc = await parseMusicXmlString(xml);
+    if (!doc) throw new Error("parse failed");
+    const score = mapDocumentToScorePartwise(doc);
+    const xmlString = toMusicXML(score);
+    const parsed = await parseMusicXmlString(xmlString);
+    expect(parsed).not.toBeNull();
+    if (!parsed) return;
+    const part = parsed.querySelector("part-list score-part");
+    expect(part?.getAttribute("id")).toBe("P1");
+    const step = parsed
+      .querySelector("part measure note pitch step")?.textContent;
+    expect(step).toBe("C");
   });
 });

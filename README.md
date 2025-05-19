@@ -106,10 +106,17 @@ run().catch((e) => console.error(e));
 Once you have a `ScorePartwise` object you can convert it into other formats:
 
 ```typescript
-import { toMusicJson, toYaml, toToneJsSequence, toMidi } from 'your-musicxml-parser-package-name';
+import {
+  toMusicJson,
+  toYaml,
+  toToneJsSequence,
+  toMidi,
+  toMusicXML,
+} from 'your-musicxml-parser-package-name';
 
 const json = toMusicJson(score);
 const yamlString = toYaml(score);
+const xmlString = toMusicXML(score);
 const toneSeq = toToneJsSequence(score);
 const midi = toMidi(score);
 ```
@@ -152,10 +159,7 @@ const midi = toMidi(score);
     *   Implement mappers for other top-level metadata elements (`<work>`, `<identification>`, `<defaults>`, `<credit>`).
     *   Support for `<score-timewise>` if necessary.
 *   **Phase 3: Conversion Utilities:**
-    *   Implement `toMusicJson()`: Convert the `ScorePartwise` object to a JSON string.
-    *   Implement `toYaml()`: Convert to YAML string (using `js-yaml` or similar).
-    *   Investigate and implement `toToneJsSequence()`: Convert to a format suitable for Tone.js.
-    *   Investigate and implement `toMidi()`: Convert to MIDI format (potentially using libraries like `tonejs/Midi` or `midiconvert`).
+    *   Add `toMusicXML()` for serializing a parsed score back into MusicXML.
 *   **Phase 4: Enhancements & Optimizations:**
     *   Performance profiling and optimization for large MusicXML files.
     *   Error handling improvements and configurable logging.
