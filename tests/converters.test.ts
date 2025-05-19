@@ -62,8 +62,9 @@ describe("Conversion utilities", () => {
     if (!parsed) return;
     const part = parsed.querySelector("part-list score-part");
     expect(part?.getAttribute("id")).toBe("P1");
-    const step = parsed
-      .querySelector("part measure note pitch step")?.textContent;
+    const step = parsed.querySelector(
+      "part measure note pitch step",
+    )?.textContent;
     expect(step).toBe("C");
   });
 });
