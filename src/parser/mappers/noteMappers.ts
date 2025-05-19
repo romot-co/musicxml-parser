@@ -1077,6 +1077,9 @@ export const mapGlissandoElement = (element: Element): Glissando => {
     type: getAttribute(element, "type") as "start" | "stop" | undefined,
     number: parseOptionalNumberAttribute(element, "number"),
   };
+  const orientAttr = getAttribute(element, "orientation");
+  if (orientAttr === "up" || orientAttr === "down")
+    glissandoData.orientation = orientAttr;
   if (!glissandoData.type) {
     throw new Error('<glissando> element requires a "type" attribute.');
   }

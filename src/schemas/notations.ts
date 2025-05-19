@@ -82,6 +82,7 @@ export const GlissandoSchema = z.object({
   value: z.string().optional(),
   type: z.enum(["start", "stop"]),
   number: z.number().int().optional(),
+  orientation: UpDownEnum.optional(),
 });
 export type Glissando = z.infer<typeof GlissandoSchema>;
 
