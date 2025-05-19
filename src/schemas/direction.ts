@@ -140,6 +140,68 @@ export type Bracket = z.infer<typeof BracketSchema>;
 export const ImageSchema = CreditImageSchema;
 export type Image = z.infer<typeof ImageSchema>;
 
+export const EyeglassesSchema = z.object({});
+export type Eyeglasses = z.infer<typeof EyeglassesSchema>;
+
+export const DampSchema = z.object({});
+export type Damp = z.infer<typeof DampSchema>;
+
+export const DampAllSchema = z.object({});
+export type DampAll = z.infer<typeof DampAllSchema>;
+
+export const StringMuteSchema = z.object({
+  type: z.enum(["on", "off"]).optional(),
+});
+export type StringMute = z.infer<typeof StringMuteSchema>;
+
+export const PedalTuningSchema = z.object({
+  "pedal-step": z.string(),
+  "pedal-alter": z.number().optional(),
+});
+export type PedalTuning = z.infer<typeof PedalTuningSchema>;
+
+export const HarpPedalsSchema = z.object({
+  "pedal-tuning": z.array(PedalTuningSchema),
+});
+export type HarpPedals = z.infer<typeof HarpPedalsSchema>;
+
+export const AccordSchema = z.object({
+  string: z.string().optional(),
+  "tuning-step": z.string(),
+  "tuning-alter": z.number().optional(),
+  "tuning-octave": z.number(),
+});
+export type Accord = z.infer<typeof AccordSchema>;
+
+export const ScordaturaSchema = z.object({
+  accord: z.array(AccordSchema),
+});
+export type Scordatura = z.infer<typeof ScordaturaSchema>;
+
+export const PrincipalVoiceSchema = z.object({
+  type: z.enum(["start", "stop"]).optional(),
+  symbol: z.enum(["Hauptstimme", "Nebenstimme", "plain", "none"]).optional(),
+  text: z.string().optional(),
+});
+export type PrincipalVoice = z.infer<typeof PrincipalVoiceSchema>;
+
+export const AccordionRegistrationSchema = z.object({
+  "accordion-high": z.boolean().optional(),
+  "accordion-middle": z.string().optional(),
+  "accordion-low": z.boolean().optional(),
+});
+export type AccordionRegistration = z.infer<typeof AccordionRegistrationSchema>;
+
+export const StaffDivideSchema = z.object({
+  type: z.enum(["down", "up", "up-down"]).optional(),
+});
+export type StaffDivide = z.infer<typeof StaffDivideSchema>;
+
+export const OtherDirectionSchema = z.object({
+  text: z.string(),
+});
+export type OtherDirection = z.infer<typeof OtherDirectionSchema>;
+
 /**
  * Represents the <direction-type> element, which contains the actual content of a direction.
  */
@@ -156,6 +218,16 @@ export const DirectionTypeSchema = z.object({
   dashes: DashesSchema.optional(),
   bracket: BracketSchema.optional(),
   image: ImageSchema.optional(),
+  eyeglasses: EyeglassesSchema.optional(),
+  damp: DampSchema.optional(),
+  dampAll: DampAllSchema.optional(),
+  stringMute: StringMuteSchema.optional(),
+  harpPedals: HarpPedalsSchema.optional(),
+  scordatura: ScordaturaSchema.optional(),
+  principalVoice: PrincipalVoiceSchema.optional(),
+  accordionRegistration: AccordionRegistrationSchema.optional(),
+  staffDivide: StaffDivideSchema.optional(),
+  otherDirection: OtherDirectionSchema.optional(),
 });
 export type DirectionType = z.infer<typeof DirectionTypeSchema>;
 
