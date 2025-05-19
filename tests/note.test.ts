@@ -350,5 +350,27 @@ describe("Note Schema Tests (note.mod)", () => {
       expect(tech?.hammerOns?.[0].type).toBe("start");
       expect(tech?.bends?.[0].release).toBe(true);
     });
+
+    it("parses tremolo placement and smufl", () => {
+      const xml =
+        '<note><pitch><step>E</step><octave>5</octave></pitch><duration>1</duration><notations><tremolo type="single" placement="above" smufl="tremoloUnmeasured">3</tremolo></notations></note>';
+      const element = createElement(xml);
+      const note = mapNoteElement(element);
+      const trem = note.notations?.tremolos?.[0];
+      expect(trem?.placement).toBe("above");
+      expect(trem?.smufl).toBe("tremoloUnmeasured");
+    });
+
+    it("parses bend sound attributes", () => {
+      const xml =
+        '<note><pitch><step>A</step><octave>4</octave></pitch><duration>1</duration><notations><technical><bend accelerate="yes" beats="6" first-beat="30" last-beat="70"><bend-alter>1</bend-alter></bend></technical></notations></note>';
+      const element = createElement(xml);
+      const note = mapNoteElement(element);
+      const bend = note.notations?.technical?.[0]?.bends?.[0];
+      expect(bend?.accelerate).toBe("yes");
+      expect(bend?.beats).toBe(6);
+      expect(bend?.firstBeat).toBe(30);
+      expect(bend?.lastBeat).toBe(70);
+    });
   });
 });

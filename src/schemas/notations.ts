@@ -101,6 +101,8 @@ export type Slide = z.infer<typeof SlideSchema>;
 export const TremoloSchema = z.object({
   value: z.number().int(),
   type: z.enum(["single", "start", "stop", "unmeasured"]).optional(),
+  placement: z.enum(["above", "below"]).optional(),
+  smufl: z.string().optional(),
 });
 export type Tremolo = z.infer<typeof TremoloSchema>;
 
@@ -203,6 +205,10 @@ export const BendSchema = z.object({
   release: z.boolean().optional(),
   withBar: z.string().optional(),
   placement: z.enum(["above", "below"]).optional(),
+  accelerate: YesNoEnum.optional(),
+  beats: z.number().optional(),
+  firstBeat: z.number().optional(),
+  lastBeat: z.number().optional(),
 });
 export type Bend = z.infer<typeof BendSchema>;
 

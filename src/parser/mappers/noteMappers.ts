@@ -1042,6 +1042,10 @@ export const mapTechnicalElement = (element: Element): Technical => {
           | "above"
           | "below"
           | undefined,
+        accelerate: getAttribute(el, "accelerate") as "yes" | "no" | undefined,
+        beats: parseOptionalNumberAttribute(el, "beats"),
+        firstBeat: parseOptionalFloat(getAttribute(el, "first-beat")),
+        lastBeat: parseOptionalFloat(getAttribute(el, "last-beat")),
       }),
     );
   const taps = Array.from(element.querySelectorAll("tap"));
@@ -1108,6 +1112,13 @@ export const mapTremoloElement = (element: Element): Tremolo => {
     | "unmeasured"
     | undefined;
   if (typeAttr) tremoloData.type = typeAttr;
+  const placementAttr = getAttribute(element, "placement") as
+    | "above"
+    | "below"
+    | undefined;
+  if (placementAttr) tremoloData.placement = placementAttr;
+  const smuflAttr = getAttribute(element, "smufl");
+  if (smuflAttr) tremoloData.smufl = smuflAttr;
   return TremoloSchema.parse(tremoloData);
 };
 
