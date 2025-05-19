@@ -2,10 +2,7 @@ export * from "./xmlParser";
 export * from "./mappers";
 
 import type { ScorePartwise } from "../types";
-import {
-  parseMusicXmlString,
-  parseMusicXmlStringSync,
-} from "./xmlParser";
+import { parseMusicXmlString, parseMusicXmlStringSync } from "./xmlParser";
 import { mapDocumentToScorePartwise } from "./mappers";
 
 /**

@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { parseMusicXml } from "../src/parser";
 
-const xml = `<score-partwise version="3.1"><part-list><score-part id="P1"></score-part></part-list><part id="P1"></part></score-partwise>`;
+const xml = `<score-partwise version="3.1"><part-list><score-part id="P1"></score-part></part-list><part id="P1"><measure number="1"></measure></part></score-partwise>`;
 
 describe("parseMusicXml", () => {
   it("returns ScorePartwise", async () => {

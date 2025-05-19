@@ -38,6 +38,12 @@ export default [
     },
   },
   {
+    files: ["src/parser/xmlParser.ts"],
+    rules: {
+      "@typescript-eslint/no-var-requires": "off",
+    },
+  },
+  {
     // Prettierとの連携設定
     // Prettier関連の設定は一番最後に配置することが推奨されます
     // (他のルール設定を上書きできるようにするため)

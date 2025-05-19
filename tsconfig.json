@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "ES2020",                       /* ECMAScript のターゲットバージョンを指定します */
     "module": "commonjs",                     /* 使用するモジュールシステムを指定します */
+    "moduleResolution": "node",            /* モジュール解決方法を指定します */
     // "rootDir": "./src", // Temporarily commenting out or removing to avoid issues with files outside src
     "outDir": "./dist",                       /* 出力ディレクトリの場所を指定します */
     "esModuleInterop": true,                  /* CommonJSとESモジュールの相互運用を可能にします */

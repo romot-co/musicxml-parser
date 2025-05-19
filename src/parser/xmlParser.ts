@@ -1,5 +1,3 @@
-import { createRequire } from "module";
-
 /**
  * Parses an XML string into a DOM Document.
  * This function is primarily intended for browser environments.
@@ -20,8 +18,7 @@ export async function parseMusicXmlString(
       try {
         const { JSDOM } = await import("jsdom");
         DOMParserImpl = new JSDOM().window.DOMParser;
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      } catch (_e) {
+      } catch {
         throw new Error(
           "DOMParser is not available and jsdom could not be loaded.",
         );
@@ -33,7 +30,7 @@ export async function parseMusicXmlString(
     }
   }
 
-  const parser = new DOMParserImpl();
+  const parser = new DOMParserImpl!();
   const doc = parser.parseFromString(xmlString, "application/xml");
 
   // Check for parsing errors (browser-specific)
@@ -63,10 +60,10 @@ export function parseMusicXmlStringSync(xmlString: string): Document | null {
   if (!DOMParserImpl) {
     if (typeof process !== "undefined" && process.versions?.node) {
       try {
-        const require = createRequire(import.meta.url);
+        // eslint-disable-next-line
         const { JSDOM } = require("jsdom");
         DOMParserImpl = new JSDOM().window.DOMParser;
-      } catch (_e) {
+      } catch {
         throw new Error(
           "DOMParser is not available and jsdom could not be loaded.",
         );
@@ -78,12 +75,11 @@ export function parseMusicXmlStringSync(xmlString: string): Document | null {
     }
   }
 
-  const parser = new DOMParserImpl();
+  const parser = new DOMParserImpl!();
   const doc = parser.parseFromString(xmlString, "application/xml");
 
   const parserError = doc.getElementsByTagName("parsererror");
   if (parserError.length > 0) {
-    // eslint-disable-next-line no-console
     console.error("Error parsing XML:", parserError[0].textContent);
     return null;
   }
