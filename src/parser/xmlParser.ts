@@ -1,3 +1,5 @@
+import { createRequire } from "module";
+
 /**
  * Parses an XML string into a DOM Document.
  * This function is primarily intended for browser environments.
@@ -41,6 +43,47 @@ export async function parseMusicXmlString(
   // A common way to check is to look for a <parsererror> element.
   const parserError = doc.getElementsByTagName("parsererror");
   if (parserError.length > 0) {
+    console.error("Error parsing XML:", parserError[0].textContent);
+    return null;
+  }
+
+  return doc;
+}
+
+/**
+ * Synchronous variant of {@link parseMusicXmlString}.
+ * Falls back to `jsdom` in Node.js environments when a global DOMParser is not
+ * available.
+ */
+export function parseMusicXmlStringSync(xmlString: string): Document | null {
+  let DOMParserImpl: typeof DOMParser | undefined =
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (globalThis as any).DOMParser;
+
+  if (!DOMParserImpl) {
+    if (typeof process !== "undefined" && process.versions?.node) {
+      try {
+        const require = createRequire(import.meta.url);
+        const { JSDOM } = require("jsdom");
+        DOMParserImpl = new JSDOM().window.DOMParser;
+      } catch (_e) {
+        throw new Error(
+          "DOMParser is not available and jsdom could not be loaded.",
+        );
+      }
+    } else {
+      throw new Error(
+        "DOMParser is not available in this environment. For Node.js, consider using a library like jsdom.",
+      );
+    }
+  }
+
+  const parser = new DOMParserImpl();
+  const doc = parser.parseFromString(xmlString, "application/xml");
+
+  const parserError = doc.getElementsByTagName("parsererror");
+  if (parserError.length > 0) {
+    // eslint-disable-next-line no-console
     console.error("Error parsing XML:", parserError[0].textContent);
     return null;
   }

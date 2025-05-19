@@ -35,14 +35,14 @@ This project is currently in **Phase 1: Core Parsing Functionality**.
 npm install your-musicxml-parser-package-name # Replace with actual package name once published
 ```
 
-For Node.js environments, install `jsdom` (or another DOM implementation) so that `parseMusicXmlString` can create a `DOMParser` when one is not provided by the runtime.
+For Node.js environments, install `jsdom` (or another DOM implementation) so that `parseMusicXmlString` can create a `DOMParser` when one is not provided by the runtime. A synchronous variant `parseMusicXmlStringSync` is also available when `DOMParser` can be loaded synchronously.
 
 ## Usage
 
-The main parsing functionality is exposed through the `parseMusicXmlString` and `mapDocumentToScorePartwise` functions. Because `parseMusicXmlString` may dynamically load `jsdom` in Node.js, it is asynchronous and returns a `Promise<Document | null>`, so be sure to call it with `await` inside an async context.
+The main parsing functionality is exposed through the `parseMusicXmlString` and `mapDocumentToScorePartwise` functions. A convenience wrapper `parseMusicXml` combines these steps. Because `parseMusicXmlString` may dynamically load `jsdom` in Node.js, it is asynchronous and returns a `Promise<Document | null>`.
 
 ```typescript
-import { parseMusicXmlString, mapDocumentToScorePartwise, ScorePartwise, Note } from 'your-musicxml-parser-package-name'; // Adjust import path
+import { parseMusicXml, ScorePartwise, Note } from 'your-musicxml-parser-package-name'; // Adjust import path
 
 const musicXmlString = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
@@ -67,16 +67,8 @@ const musicXmlString = `<?xml version="1.0" encoding="UTF-8"?>
 </score-partwise>`;
 
 async function run() {
-  // 1. Parse the XML string into a DOM Document
-  const doc = await parseMusicXmlString(musicXmlString);
-
-  if (!doc) {
-    console.error("Failed to parse MusicXML string.");
-    return;
-  }
-
-  // 2. Map the DOM Document to the ScorePartwise JavaScript object
-  const score: ScorePartwise | null = mapDocumentToScorePartwise(doc);
+  // Parse and map in one step
+  const score: ScorePartwise | null = await parseMusicXml(musicXmlString);
 
   if (!score) {
     console.error("Failed to map Document to ScorePartwise object.");
