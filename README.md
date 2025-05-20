@@ -102,6 +102,7 @@ import {
   toYaml,
   toToneJsSequence,
   toMidi,
+  fromMidi,
   toMusicXML,
 } from 'your-musicxml-parser-package-name';
 
