@@ -19,7 +19,7 @@ describe("readMusicXmlFile", () => {
   it("uses container manifest to locate the score", async () => {
     const xml = await readMusicXmlFile(path.join(dataDir, "container.mxl"));
     const expected =
-      '<score-partwise version="3.1"><part-list></part-list><part id="P1"><measure number="1"></measure></part></score-partwise>\n';
+      '<score-partwise version="3.1"><part-list></part-list><part id="P1"><measure number="1"></measure></part></score-partwise>';
     expect(xml).toBe(expected);
   });
 });

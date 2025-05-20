@@ -132,5 +132,6 @@ export async function readMusicXmlFile(filePath: string): Promise<string> {
   if (xml.charCodeAt(0) === 0xfeff) {
     xml = xml.slice(1);
   }
-  return xml;
+  // 末尾の空白を削除する
+  return xml.trim();
 }
