@@ -1,8 +1,10 @@
 import { promises as fs } from "fs";
 import * as zlib from "zlib";
 
-async function extractMusicXmlEntry(filePath: string): Promise<Buffer> {
-  const buf = await fs.readFile(filePath);
+function extractZipEntry(
+  buf: Buffer,
+  matcher: (name: string) => boolean,
+): Buffer | null {
   const eocd = buf.lastIndexOf(Buffer.from("PK\x05\x06"));
   if (eocd === -1) throw new Error("Invalid zip archive");
   const cdOffset = buf.readUInt32LE(eocd + 16);
@@ -17,7 +19,7 @@ async function extractMusicXmlEntry(filePath: string): Promise<Buffer> {
     const localOffset = buf.readUInt32LE(ptr + 42);
     const name = buf.slice(ptr + 46, ptr + 46 + fileNameLen).toString("utf8");
     ptr += 46 + fileNameLen + extraLen + commentLen;
-    if (name.toLowerCase().endsWith(".musicxml")) {
+    if (matcher(name)) {
       if (buf.readUInt32LE(localOffset) !== 0x04034b50) {
         throw new Error("Invalid local header");
       }
@@ -30,7 +32,42 @@ async function extractMusicXmlEntry(filePath: string): Promise<Buffer> {
       throw new Error("Unsupported compression method");
     }
   }
-  throw new Error(`No .musicxml entry found in ${filePath}`);
+  return null;
+}
+
+async function extractMusicXmlEntry(filePath: string): Promise<Buffer> {
+  const buf = await fs.readFile(filePath);
+
+  const container = extractZipEntry(
+    buf,
+    (n) => n.toLowerCase() === "meta-inf/container.xml",
+  );
+
+  let targetPath: string | undefined;
+  if (container) {
+    const containerXml = container.toString("utf8");
+    const primary = containerXml.match(
+      /<rootfile[^>]*media-type=["']application\/vnd\.recordare\.musicxml\+xml["'][^>]*full-path=["']([^"']+)["']/i,
+    );
+    if (primary) {
+      targetPath = primary[1];
+    } else {
+      const first = containerXml.match(
+        /<rootfile[^>]*full-path=["']([^"']+)["']/i,
+      );
+      targetPath = first ? first[1] : undefined;
+    }
+  }
+
+  const entry = targetPath
+    ? extractZipEntry(buf, (n) => n === targetPath)
+    : extractZipEntry(buf, (n) => n.toLowerCase().endsWith(".musicxml"));
+
+  if (!entry) {
+    throw new Error(`No .musicxml entry found in ${filePath}`);
+  }
+
+  return entry;
 }
 
 /**
@@ -38,9 +75,9 @@ async function extractMusicXmlEntry(filePath: string): Promise<Buffer> {
  * The function checks the XML prolog for an encoding declaration and converts
  * UTF-16 files to UTF-8.
  *
- * For `.mxl` archives this implementation extracts the first `*.musicxml`
- * entry directly using Node.js and does not require the external `unzip`
- * command.
+ * For `.mxl` archives this implementation reads `META-INF/container.xml`
+ * to locate the primary score file and extracts it directly using Node.js,
+ * without requiring external tools.
  */
 export async function readMusicXmlFile(filePath: string): Promise<string> {
   let data: Buffer;
