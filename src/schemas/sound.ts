@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { YesNoEnum, YesNoNumberSchema, RotationDegreesSchema } from "./common";
+import { InstrumentChangeSchema } from "./instrumentChange";
 
 export const SoundSchema = z.object({
   _type: z.literal("sound"),
@@ -21,6 +22,7 @@ export const SoundSchema = z.object({
   softPedal: YesNoNumberSchema.optional(),
   sostenutoPedal: YesNoNumberSchema.optional(),
   id: z.string().optional(),
+  instrumentChanges: z.array(InstrumentChangeSchema).optional(),
 });
 
 export type Sound = z.infer<typeof SoundSchema>;

@@ -110,6 +110,7 @@ import type {
   MidiDevice,
   FiguredBass,
   Figure,
+  InstrumentChange,
   Grouping,
   Feature,
   Link,
@@ -259,6 +260,7 @@ import {
   FirstFretSchema,
   MidiDeviceSchema,
   MidiInstrumentSchema,
+  InstrumentChangeSchema,
   DisplayTextSchema,
   AccidentalTextSchema,
   PartNameDisplaySchema,
@@ -1011,6 +1013,15 @@ export function mapSoundElement(element: Element): Sound {
   }
   if (idAttr) soundData.id = idAttr;
 
+  const instChangeElements = Array.from(
+    element.querySelectorAll("instrument-change"),
+  );
+  if (instChangeElements.length > 0) {
+    soundData.instrumentChanges = instChangeElements.map(
+      mapInstrumentChangeElement,
+    );
+  }
+
   return SoundSchema.parse(soundData);
 }
 
@@ -1393,6 +1404,31 @@ export const mapMidiInstrumentElement = (element: Element): MidiInstrument => {
     elevation: parseFloatContent(element, "elevation"),
   };
   return MidiInstrumentSchema.parse(data);
+};
+
+export const mapInstrumentChangeElement = (
+  element: Element,
+): InstrumentChange => {
+  const data: Partial<InstrumentChange> = {
+    _type: "instrument-change",
+    id: getAttribute(element, "id") ?? "",
+  };
+  const sound = getTextContent(element, "instrument-sound");
+  if (sound) data.instrumentSound = sound;
+  if (element.querySelector("solo")) data.solo = true;
+  const ensembleEl = element.querySelector("ensemble");
+  if (ensembleEl) {
+    const size = parseInt(ensembleEl.textContent ?? "", 10);
+    if (!isNaN(size)) data.ensemble = size;
+  }
+  const virt = element.querySelector("virtual-instrument");
+  if (virt) {
+    const lib = getTextContent(virt, "virtual-library");
+    if (lib) data.virtualLibrary = lib;
+    const name = getTextContent(virt, "virtual-name");
+    if (name) data.virtualName = name;
+  }
+  return InstrumentChangeSchema.parse(data);
 };
 
 export const mapDisplayTextElement = (element: Element): DisplayText => {
