@@ -56,20 +56,14 @@ describe("Note Schema Tests (note.mod)", () => {
       expect(note.type).toBe("quarter");
     });
 
-    it("parses rest display information", () => {
+    it("parses rest display attributes and measure", () => {
       const xml =
-        "<note><rest><display-step>B</display-step><display-octave>4</display-octave></rest><duration>4</duration></note>";
-      const element = createElement(xml);
-      const note = mapNoteElement(element);
-      expect(note.rest?.displayStep).toBe("B");
-      expect(note.rest?.displayOctave).toBe(4);
-    });
-
-    it("parses whole-measure rest", () => {
-      const xml = '<note><rest measure="yes"/><duration>4</duration></note>';
-      const element = createElement(xml);
-      const note = mapNoteElement(element);
+        '<note><rest measure="yes"><display-step>D</display-step><display-octave>5</display-octave></rest><duration>4</duration></note>';
+      const el = createElement(xml);
+      const note = mapNoteElement(el);
       expect(note.rest?.measure).toBe(true);
+      expect(note.rest?.displayStep).toBe("D");
+      expect(note.rest?.displayOctave).toBe(5);
     });
 
     it("should parse a <note> with <chord>", () => {

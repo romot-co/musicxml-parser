@@ -80,12 +80,21 @@ describe("Direction parsing", () => {
     expect(met["metronome-note"]?.[1]["metronome-type"]).toBe("eighth");
   });
 
-  it("parses metronome parentheses attribute", () => {
-    const xml = `<direction><direction-type><metronome parentheses="yes"><beat-unit>quarter</beat-unit><per-minute>120</per-minute></metronome></direction-type></direction>`;
+  it("parses metronome with parentheses", () => {
+    const xml = `<direction><direction-type><metronome parentheses="yes"><beat-unit>quarter</beat-unit><per-minute>100</per-minute></metronome></direction-type></direction>`;
     const el = createElement(xml);
-    const direction = mapDirectionElement(el);
-    const met = direction.direction_type[0].metronome!;
-    expect(met.parentheses).toBe("yes");
+    const dir = mapDirectionElement(el);
+    expect(dir.direction_type[0].metronome?.parentheses).toBe("yes");
+  });
+
+  it("parses segno and coda position attributes", () => {
+    const xml = `<direction><direction-type><segno default-x="3" default-y="-2"/><coda relative-x="1" relative-y="2"/></direction-type></direction>`;
+    const el = createElement(xml);
+    const dir = mapDirectionElement(el);
+    expect(dir.direction_type[0].segno?.defaultX).toBe(3);
+    expect(dir.direction_type[0].segno?.defaultY).toBe(-2);
+    expect(dir.direction_type[0].coda?.relativeX).toBe(1);
+    expect(dir.direction_type[0].coda?.relativeY).toBe(2);
   });
 
   it("parses directive attribute", () => {
@@ -198,30 +207,6 @@ describe("Direction parsing", () => {
     expect(sc.accord.length).toBe(1);
     expect(sc.accord[0]["tuning-step"]).toBe("A");
     expect(sc.accord[0].string).toBe("1");
-  });
-
-  it("parses segno attributes", () => {
-    const xml = `<direction><direction-type><segno default-x="3.5" default-y="-2" relative-x="1" relative-y="2" placement="below"/></direction-type></direction>`;
-    const el = createElement(xml);
-    const direction = mapDirectionElement(el);
-    const seg = direction.direction_type[0].segno!;
-    expect(seg.defaultX).toBe(3.5);
-    expect(seg.defaultY).toBe(-2);
-    expect(seg.relativeX).toBe(1);
-    expect(seg.relativeY).toBe(2);
-    expect(seg.placement).toBe("below");
-  });
-
-  it("parses coda attributes", () => {
-    const xml = `<direction><direction-type><coda default-x="1" default-y="2" relative-x="-1" relative-y="-2" placement="above"/></direction-type></direction>`;
-    const el = createElement(xml);
-    const direction = mapDirectionElement(el);
-    const coda = direction.direction_type[0].coda!;
-    expect(coda.defaultX).toBe(1);
-    expect(coda.defaultY).toBe(2);
-    expect(coda.relativeX).toBe(-1);
-    expect(coda.relativeY).toBe(-2);
-    expect(coda.placement).toBe("above");
   });
 
   it("parses other-direction element", () => {

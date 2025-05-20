@@ -2,42 +2,135 @@ import { z } from "zod";
 import type {
   Pitch,
   Note,
+  Measure,
+  Part,
+  ScorePart,
+  PartList,
+  PartGroup,
+  ScorePartwise,
+  Key,
+  Time,
+  Clef,
+  Attributes,
+  Direction,
+  DirectionType,
+  Words,
+  Metronome,
+  MetronomeBeatUnit,
+  MetronomePerMinute,
+  MetronomeNote,
+  MetronomeRelation,
+  // Dynamics,
+  Wedge,
+  Segno,
+  Coda,
+  Transpose,
+  // Diatonic,
+  // Chromatic,
+  // OctaveChange,
+  // Double,
+  StaffDetails,
+  StaffTuning,
+  LineDetail,
+  MeasureStyle,
+  MultipleRest,
+  Rest,
+  MeasureRepeat,
+  BeatRepeat,
+  Slash,
   Accidental,
   AccidentalValue,
   NoteheadText,
-  Lyric,
-  Grace,
-  Cue,
-  Unpitched,
-  Rest,
-  TimeModification,
+  Notations,
   Slur,
   Articulations,
+  // Staccato,
+  //Accent,
+  //Tenuto,
+  //Spiccato,
+  //Staccatissimo,
+  //StrongAccent,
   Tuplet,
-  Tie,
-  Fermata,
-  WavyLine,
-  Footnote,
-  Level,
+  Ornaments,
+  TrillMark, // Add
+  Turn, // Add
+  Mordent, // Add
+  Schleifer, // Add
+  OtherOrnament, // Add
+  SoftAccent,
+  OtherArticulation,
+  Technical,
   Glissando,
   Slide,
   Tremolo,
   Arpeggiate,
   NonArpeggiate,
   OtherNotation,
-  Key,
-  Time,
-  Clef,
-  Words,
-  Metronome,
-  MetronomeBeatUnit,
-  MetronomePerMinute,
-  MetronomeNote,
+  Tie,
+  Barline,
+  BarStyle,
+  Repeat,
+  Ending,
+  Fermata,
+  WavyLine,
+  Footnote,
+  Level,
+  Work,
+  Opus,
+  Identification,
+  Creator,
+  Rights,
+  Encoding,
+  Beam,
+  BeamValue,
+  PartSymbol,
+  GroupSymbolValue,
+  Lyric,
+  Grace,
+  Cue,
+  Unpitched,
+  TimeModification,
+  Font,
+  Scaling,
+  LyricFont,
+  LyricLanguage,
+  Defaults,
+  CreditWords,
+  CreditSymbol,
+  CreditImage,
+  Credit,
   TextFormatting,
-  DirectionType,
-  Wedge,
-  Segno,
-  Coda,
+  LyricFormatting,
+  SymbolFormatting, // Added
+  Harmony,
+  Backup,
+  Forward,
+  Print,
+  Sound,
+  MeasureContent,
+  PageLayout,
+  SystemLayout,
+  StaffLayout,
+  Margins,
+  LineWidth,
+  Appearance,
+  TimewisePart,
+  TimewiseMeasure,
+  ScoreTimewise,
+  Supports,
+  Relation,
+  Miscellaneous,
+  MiscellaneousField,
+  FermataShape,
+  ScoreInstrument,
+  MidiInstrument,
+  MidiDevice, // Added MidiDevice to imports
+  FiguredBass,
+  Figure,
+  Grouping,
+  Feature,
+  Link,
+  Bookmark,
   Rehearsal,
   OctaveShift,
   Dashes,
@@ -55,54 +148,115 @@ import type {
   AccordionRegistration,
   StaffDivide,
   OtherDirection,
-  Technical,
-  Ornaments,
-  TrillMark,
-  Turn,
-  Mordent,
-  Schleifer,
-  OtherOrnament,
-  SoftAccent,
-  OtherArticulation,
-  Beam,
-  FermataShape,
 } from "../../types";
 import {
   PitchSchema,
   NoteSchema,
+  MeasureSchema,
+  PartSchema,
+  ScorePartSchema,
+  PartListSchema,
+  PartGroupSchema,
+  ScorePartwiseSchema,
+  ScoreTimewiseSchema,
+  TimewisePartSchema,
+  TimewiseMeasureSchema,
+  KeySchema,
+  TimeSchema,
+  ClefSchema,
+  AttributesSchema,
+  DirectionSchema,
+  DirectionTypeSchema,
+  WordsSchema,
+  MetronomeSchema,
+  MetronomeBeatUnitSchema,
+  MetronomePerMinuteSchema,
+  MetronomeNoteSchema,
+  TransposeSchema,
+  // DiatonicSchema,
+  // ChromaticSchema,
+  // OctaveChangeSchema,
+  // DoubleSchema,
+  StaffDetailsSchema,
+  StaffTuningSchema,
+  LineDetailSchema,
+  MeasureStyleSchema,
+  MultipleRestSchema,
+  RestSchema,
+  MeasureRepeatSchema,
+  BeatRepeatSchema,
+  SlashSchema,
   AccidentalSchema,
   NoteheadTextSchema,
   DisplayTextSchema,
   AccidentalTextSchema,
-  LyricSchema,
-  GraceSchema,
-  CueSchema,
-  UnpitchedSchema,
-  RestSchema,
-  TimeModificationSchema,
+  NotationsSchema,
   SlurSchema,
   ArticulationsSchema,
+  // StaccatoSchema,
+  // AccentSchema,
+  // TenutoSchema,
+  // SpiccatoSchema,
+  // StaccatissimoSchema,
+  // StrongAccentSchema,
   TupletSchema,
-  TieSchema,
-  FermataSchema,
-  WavyLineSchema,
-  FootnoteSchema,
-  LevelSchema,
+  TrillMarkSchema,
+  TurnSchema,
+  MordentSchema,
+  SchleiferSchema,
+  OtherOrnamentSchema,
+  SoftAccentSchema,
+  OtherArticulationSchema,
+  FingeringSchema,
+  StringSchema,
+  FretSchema,
+  HammerOnPullOffSchema,
+  BendSchema,
+  TapSchema,
+  OtherTechnicalSchema,
+  ValuePlacementSchema,
+  OrnamentsSchema,
+  TechnicalSchema,
   GlissandoSchema,
   SlideSchema,
   TremoloSchema,
   ArpeggiateSchema,
   NonArpeggiateSchema,
   OtherNotationSchema,
-  KeySchema,
-  TimeSchema,
-  ClefSchema,
-  WordsSchema,
-  MetronomeSchema,
-  MetronomeBeatUnitSchema,
-  MetronomePerMinuteSchema,
-  MetronomeNoteSchema,
-  DirectionTypeSchema,
+  TieSchema,
+  BarlineSchema,
+  WavyLineSchema,
+  FootnoteSchema,
+  LevelSchema,
+  RepeatSchema,
+  EndingSchema,
+  FermataSchema,
+  WorkSchema,
+  OpusSchema,
+  IdentificationSchema,
+  CreatorSchema,
+  RightsSchema,
+  EncodingSchema,
+  BeamSchema,
+  PartSymbolSchema,
+  LyricSchema,
+  GraceSchema,
+  CueSchema,
+  UnpitchedSchema,
+  TimeModificationSchema,
+  FontSchema,
+  ScalingSchema,
+  LyricFontSchema,
+  LyricLanguageSchema,
+  DefaultsSchema,
+  CreditWordsSchema,
+  CreditSymbolSchema, // Added
+  CreditImageSchema,
+  CreditSchema,
+  // TextFormattingSchema,
+  // SymbolFormattingSchema,
+  HarmonySchema,
+  DynamicsSchema,
   WedgeSchema,
   SegnoSchema,
   CodaSchema,
@@ -123,29 +277,57 @@ import {
   AccordionRegistrationSchema,
   StaffDivideSchema,
   OtherDirectionSchema,
-  TechnicalSchema,
-  OrnamentsSchema,
-  TrillMarkSchema,
-  TurnSchema,
-  MordentSchema,
-  SchleiferSchema,
-  OtherOrnamentSchema,
-  SoftAccentSchema,
-  OtherArticulationSchema,
-  FingeringSchema,
-  StringSchema,
-  FretSchema,
-  HammerOnPullOffSchema,
-  BendSchema,
-  TapSchema,
-  OtherTechnicalSchema,
-  ValuePlacementSchema,
-  DynamicsSchema,
-  PedalSchema,
+  GroupSymbolValueEnum,
+  RootSchema,
+  KindSchema,
+  BassSchema,
+  DegreeSchema,
+  RootStepSchema,
+  KindValueEnum,
+  BassStepSchema,
+  DegreeTypeEnum,
+  PageLayoutSchema,
+  MarginsSchema,
+  LineWidthSchema,
+  AppearanceSchema,
+  SystemLayoutSchema,
+  StaffLayoutSchema,
+  BackupSchema,
+  ForwardSchema,
+  PrintSchema,
+  SoundSchema,
+  SupportsSchema,
+  RelationSchema,
+  MiscellaneousSchema,
+  MiscellaneousFieldSchema,
   FermataShapeEnum,
+  PedalSchema,
+  ScoreInstrumentSchema,
+  FiguredBassSchema,
+  FigureSchema,
+  GroupingSchema,
+  FeatureSchema,
+  LinkSchema,
+  BookmarkSchema,
+  FrameSchema,
+  FrameNoteSchema,
+  FirstFretSchema,
+  MidiDeviceSchema,
+  MidiInstrumentSchema,
 } from "../../schemas";
 
 // Re-exported mappers from other modules
+import {
+  mapDefaultsElement,
+  mapPageLayoutElement,
+  mapSystemLayoutElement,
+  mapStaffLayoutElement,
+} from "./defaultsMappers";
+import {
+  mapCreditElement,
+  mapBookmarkElement,
+  mapLinkElement,
+} from "./creditMappers";
 import {
   getTextContent,
   parseNumberContent,
@@ -156,6 +338,8 @@ import {
   parseOptionalFloat,
 } from "./utils";
 import { mapNotationsElement, mapBeamElement } from "./measureMappers";
+
+// Helper function to get text content of a child element
 
 // Mapper for <pitch> element
 export const mapPitchElement = (element: Element): Pitch => {
@@ -431,13 +615,13 @@ export const mapNoteElement = (element: Element): Note => {
   } else if (unpitchedElement) {
     noteData.unpitched = mapUnpitchedElement(unpitchedElement);
   } else if (restElement) {
+    const restData: Partial<Rest> = {};
     const measureAttr = getAttribute(restElement, "measure");
-    const restData: Partial<Rest> = {
-      measure:
-        measureAttr === "yes" ? true : measureAttr === "no" ? false : undefined,
-      displayStep: getTextContent(restElement, "display-step"),
-      displayOctave: parseNumberContent(restElement, "display-octave"),
-    };
+    if (measureAttr === "yes") restData.measure = true;
+    const ds = getTextContent(restElement, "display-step");
+    if (ds) restData.displayStep = ds;
+    const doOct = parseNumberContent(restElement, "display-octave");
+    if (doOct !== undefined) restData.displayOctave = doOct;
     noteData.rest = RestSchema.parse(restData);
   }
 
@@ -1535,62 +1719,6 @@ export const mapOtherDirectionElement = (element: Element): OtherDirection => {
   return OtherDirectionSchema.parse({ text });
 };
 
-export const mapSegnoElement = (element: Element): Segno => {
-  const data: Partial<Segno> = {};
-  const dxAttr = getAttribute(element, "default-x");
-  if (dxAttr) {
-    const val = parseOptionalFloat(dxAttr);
-    if (val !== undefined) data.defaultX = val;
-  }
-  const dyAttr = getAttribute(element, "default-y");
-  if (dyAttr) {
-    const val = parseOptionalFloat(dyAttr);
-    if (val !== undefined) data.defaultY = val;
-  }
-  const rxAttr = getAttribute(element, "relative-x");
-  if (rxAttr) {
-    const val = parseOptionalFloat(rxAttr);
-    if (val !== undefined) data.relativeX = val;
-  }
-  const ryAttr = getAttribute(element, "relative-y");
-  if (ryAttr) {
-    const val = parseOptionalFloat(ryAttr);
-    if (val !== undefined) data.relativeY = val;
-  }
-  const placementAttr = getAttribute(element, "placement");
-  if (placementAttr === "above" || placementAttr === "below")
-    data.placement = placementAttr as "above" | "below";
-  return SegnoSchema.parse(data);
-};
-
-export const mapCodaElement = (element: Element): Coda => {
-  const data: Partial<Coda> = {};
-  const dxAttr = getAttribute(element, "default-x");
-  if (dxAttr) {
-    const val = parseOptionalFloat(dxAttr);
-    if (val !== undefined) data.defaultX = val;
-  }
-  const dyAttr = getAttribute(element, "default-y");
-  if (dyAttr) {
-    const val = parseOptionalFloat(dyAttr);
-    if (val !== undefined) data.defaultY = val;
-  }
-  const rxAttr = getAttribute(element, "relative-x");
-  if (rxAttr) {
-    const val = parseOptionalFloat(rxAttr);
-    if (val !== undefined) data.relativeX = val;
-  }
-  const ryAttr = getAttribute(element, "relative-y");
-  if (ryAttr) {
-    const val = parseOptionalFloat(ryAttr);
-    if (val !== undefined) data.relativeY = val;
-  }
-  const placementAttr = getAttribute(element, "placement");
-  if (placementAttr === "above" || placementAttr === "below")
-    data.placement = placementAttr as "above" | "below";
-  return CodaSchema.parse(data);
-};
-
 // Helper function to map a <beat-unit> element (within <metronome>)
 export const mapMetronomeBeatUnitElement = (
   element: Element,
@@ -1658,10 +1786,6 @@ export const mapMetronomeElement = (element: Element): Metronome => {
     element.querySelectorAll("metronome-note"),
   );
   const relationElement = element.querySelector("metronome-relation");
-  const parenthesesAttr = getAttribute(element, "parentheses") as
-    | "yes"
-    | "no"
-    | undefined;
   const metronomeData: Partial<Metronome> = {};
   if (beatUnitElement) {
     metronomeData["beat-unit"] = mapMetronomeBeatUnitElement(beatUnitElement);
@@ -1679,9 +1803,9 @@ export const mapMetronomeElement = (element: Element): Metronome => {
     metronomeData["metronome-relation"] =
       relationElement.textContent?.trim() ?? "";
   }
-  if (parenthesesAttr) {
-    metronomeData.parentheses = parenthesesAttr;
-  }
+  const parAttr = getAttribute(element, "parentheses");
+  if (parAttr === "yes" || parAttr === "no")
+    metronomeData.parentheses = parAttr;
   return MetronomeSchema.parse(metronomeData);
 };
 
@@ -1854,10 +1978,28 @@ export const mapDirectionTypeElement = (element: Element): DirectionType => {
     if (img) directionTypeData.image = img;
   }
   if (segnoElement) {
-    directionTypeData.segno = mapSegnoElement(segnoElement);
+    const data: Partial<Segno> = {};
+    const dx = getAttribute(segnoElement, "default-x");
+    if (dx) data.defaultX = parseOptionalFloat(dx);
+    const dy = getAttribute(segnoElement, "default-y");
+    if (dy) data.defaultY = parseOptionalFloat(dy);
+    const rx = getAttribute(segnoElement, "relative-x");
+    if (rx) data.relativeX = parseOptionalFloat(rx);
+    const ry = getAttribute(segnoElement, "relative-y");
+    if (ry) data.relativeY = parseOptionalFloat(ry);
+    directionTypeData.segno = SegnoSchema.parse(data);
   }
   if (codaElement) {
-    directionTypeData.coda = mapCodaElement(codaElement);
+    const data: Partial<Coda> = {};
+    const dx = getAttribute(codaElement, "default-x");
+    if (dx) data.defaultX = parseOptionalFloat(dx);
+    const dy = getAttribute(codaElement, "default-y");
+    if (dy) data.defaultY = parseOptionalFloat(dy);
+    const rx = getAttribute(codaElement, "relative-x");
+    if (rx) data.relativeX = parseOptionalFloat(rx);
+    const ry = getAttribute(codaElement, "relative-y");
+    if (ry) data.relativeY = parseOptionalFloat(ry);
+    directionTypeData.coda = CodaSchema.parse(data);
   }
   return DirectionTypeSchema.parse(directionTypeData);
 };
