@@ -1,53 +1,57 @@
 import { z } from "zod";
-import { FontSchema } from "./common"; // Assuming ColorSchema might be added here later
+import { FontStyleEnum, FontWeightEnum } from "./common"; // Assuming ColorSchema might be added here later
 import { LinkSchema } from "./link";
 import { BookmarkSchema } from "./bookmark";
 
 // Placeholder for text formatting attributes (simplified)
-export const TextFormattingSchema = z
-  .object({
-    justify: z.enum(["left", "center", "right"]).optional(),
-    halign: z.enum(["left", "center", "right"]).optional(),
-    valign: z.enum(["top", "middle", "bottom", "baseline"]).optional(),
-    defaultX: z.number().optional(),
-    defaultY: z.number().optional(),
-    relativeX: z.number().optional(),
-    relativeY: z.number().optional(),
-    underline: z.number().optional(),
-    overline: z.number().optional(),
-    lineThrough: z.number().optional(),
-    rotation: z.number().optional(),
-    letterSpacing: z.string().optional(),
-    lineHeight: z.string().optional(),
-    dir: z.enum(["ltr", "rtl", "lro", "rlo"]).optional(),
-    enclosure: z.string().optional(),
-    xmlLang: z.string().optional(),
-    xmlSpace: z.enum(["default", "preserve"]).optional(),
-    color: z.string().optional(),
-  })
-  .merge(FontSchema); // Include font attributes
+export const TextFormattingSchema = z.object({
+  fontFamily: z.string().optional(),
+  fontStyle: FontStyleEnum.optional(),
+  fontSize: z.string().optional(),
+  fontWeight: FontWeightEnum.optional(),
+  justify: z.enum(["left", "center", "right"]).optional(),
+  halign: z.enum(["left", "center", "right"]).optional(),
+  valign: z.enum(["top", "middle", "bottom", "baseline"]).optional(),
+  defaultX: z.number().optional(),
+  defaultY: z.number().optional(),
+  relativeX: z.number().optional(),
+  relativeY: z.number().optional(),
+  underline: z.number().optional(),
+  overline: z.number().optional(),
+  lineThrough: z.number().optional(),
+  rotation: z.number().optional(),
+  letterSpacing: z.string().optional(),
+  lineHeight: z.string().optional(),
+  dir: z.enum(["ltr", "rtl", "lro", "rlo"]).optional(),
+  enclosure: z.string().optional(),
+  xmlLang: z.string().optional(),
+  xmlSpace: z.enum(["default", "preserve"]).optional(),
+  color: z.string().optional(),
+});
 
 // Placeholder for symbol formatting attributes (simplified)
-export const SymbolFormattingSchema = z
-  .object({
-    justify: z.enum(["left", "center", "right"]).optional(),
-    halign: z.enum(["left", "center", "right"]).optional(),
-    valign: z.enum(["top", "middle", "bottom"]).optional(),
-    defaultX: z.number().optional(),
-    defaultY: z.number().optional(),
-    relativeX: z.number().optional(),
-    relativeY: z.number().optional(),
-    underline: z.number().optional(),
-    overline: z.number().optional(),
-    lineThrough: z.number().optional(),
-    rotation: z.number().optional(),
-    letterSpacing: z.string().optional(),
-    lineHeight: z.string().optional(),
-    dir: z.enum(["ltr", "rtl", "lro", "rlo"]).optional(),
-    enclosure: z.string().optional(),
-    color: z.string().optional(),
-  })
-  .merge(FontSchema);
+export const SymbolFormattingSchema = z.object({
+  fontFamily: z.string().optional(),
+  fontStyle: FontStyleEnum.optional(),
+  fontSize: z.string().optional(),
+  fontWeight: FontWeightEnum.optional(),
+  justify: z.enum(["left", "center", "right"]).optional(),
+  halign: z.enum(["left", "center", "right"]).optional(),
+  valign: z.enum(["top", "middle", "bottom"]).optional(),
+  defaultX: z.number().optional(),
+  defaultY: z.number().optional(),
+  relativeX: z.number().optional(),
+  relativeY: z.number().optional(),
+  underline: z.number().optional(),
+  overline: z.number().optional(),
+  lineThrough: z.number().optional(),
+  rotation: z.number().optional(),
+  letterSpacing: z.string().optional(),
+  lineHeight: z.string().optional(),
+  dir: z.enum(["ltr", "rtl", "lro", "rlo"]).optional(),
+  enclosure: z.string().optional(),
+  color: z.string().optional(),
+});
 
 export const CreditTypeSchema = z.string();
 

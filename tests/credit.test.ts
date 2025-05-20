@@ -93,4 +93,13 @@ describe("Credit parsing", () => {
     expect(w2.text).toBe("World");
     expect(w2.formatting?.overline).toBe(1);
   });
+
+  it("parses letter-spacing and line-height", () => {
+    const xml = `<credit><credit-words letter-spacing="0.5em" line-height="1.5">Hi</credit-words></credit>`;
+    const element = createElement(xml);
+    const credit = mapCreditElement(element)!;
+    const word = credit.items?.[0] as any;
+    expect(word.formatting?.letterSpacing).toBe("0.5em");
+    expect(word.formatting?.lineHeight).toBe("1.5");
+  });
 });
