@@ -1,14 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { parseMusicXmlString } from "../src/parser/xmlParser";
 import { mapDocumentToScorePartwise } from "../src/parser/mappers";
-import type {
-  ScorePartwise,
-  Measure,
-  Note,
-  Attributes,
-  Direction,
-} from "../src/types";
-import { NoteSchema, AttributesSchema, DirectionSchema } from "../src/schemas";
+import type { Measure, Note, Attributes } from "../src/types";
+import { NoteSchema, AttributesSchema } from "../src/schemas";
 
 // Helper functions to extract elements from Measure content
 function getNotesFromContent(content: Measure["content"]): Note[] {

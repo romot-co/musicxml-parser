@@ -9,7 +9,6 @@ import type {
   Note,
   Attributes,
   Direction,
-  Lyric,
 } from "../src/types";
 import {
   NoteSchema,

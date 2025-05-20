@@ -1,9 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { mapNoteElement } from "../src/parser/mappers";
 import type {
-  Note,
   Pitch,
-  Rest,
   Lyric,
   Beam,
   Slur,

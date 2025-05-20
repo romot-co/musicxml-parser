@@ -3,12 +3,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { parseMusicXmlString } from "../src/parser/xmlParser";
 import { mapDocumentToScorePartwise } from "../src/parser/mappers";
-import type {
-  Supports,
-  Relation,
-  Miscellaneous,
-  MiscellaneousField,
-} from "../src/types";
+import type { Supports, Relation, Miscellaneous } from "../src/types";
 
 const filePath = path.resolve(
   __dirname,

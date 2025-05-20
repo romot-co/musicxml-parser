@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { mapBarlineElement } from "../src/parser/mappers";
-import type { Barline, Repeat, Ending, Fermata } from "../src/types";
+import type { Repeat, Ending, Fermata } from "../src/types";
 import type { WavyLine, Footnote, Level } from "../src/types";
 import { JSDOM } from "jsdom";
 

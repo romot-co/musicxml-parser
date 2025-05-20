@@ -1,7 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { mapAttributesElement } from "../src/parser/mappers";
 import type {
-  Attributes,
   Key,
   Time,
   Clef,

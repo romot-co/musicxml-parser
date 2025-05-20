@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { mapMeasureElement } from "../src/parser/mappers";
-import type { Measure, Print, Sound } from "../src/types";
+import type { Print, Sound } from "../src/types";
 import { JSDOM } from "jsdom";
 
 function createElement(xmlString: string): Element {

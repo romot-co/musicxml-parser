@@ -37,7 +37,6 @@ import {
 } from "../../schemas";
 
 import {
-  getTextContent,
   parseNumberContent,
   parseFloatContent,
   getAttribute,
