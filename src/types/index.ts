@@ -1,3 +1,6 @@
+import type { ScorePartwise } from "../schemas/scorePartwise";
+import type { ScoreTimewise } from "../schemas/scoreTimewise";
+
 export type { Pitch } from "../schemas/pitch";
 export type { Rest } from "../schemas/rest";
 export type { Note } from "../schemas/note";
@@ -190,3 +193,9 @@ export type {
 export type ParsedMusicXml = Record<string, unknown>;
 export type { PartNameDisplay } from "../schemas/partNameDisplay";
 export type { PartAbbreviationDisplay } from "../schemas/partAbbreviationDisplay";
+
+export interface OpusDocument {
+  version?: string;
+  title?: string;
+  movements: Array<ScorePartwise | ScoreTimewise | OpusDocument>;
+}
