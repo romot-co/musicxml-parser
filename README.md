@@ -41,7 +41,7 @@ For Node.js environments, install `jsdom` (or another DOM implementation) so tha
 The main parsing functionality is exposed through the `parseMusicXmlString` and `mapDocumentToScorePartwise` functions. A convenience wrapper `parseMusicXml` combines these steps. Because `parseMusicXmlString` may dynamically load `jsdom` in Node.js, it is asynchronous and returns a `Promise<Document | null>`.
 
 ```typescript
-import { parseMusicXml, ScorePartwise, Note } from 'your-musicxml-parser-package-name'; // Adjust import path
+import { parseMusicXml, ScorePartwise, getAllNotes } from 'your-musicxml-parser-package-name'; // Adjust import path
 
 const musicXmlString = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
@@ -78,14 +78,8 @@ async function run() {
   console.log("Version:", score.version);
   console.log("First part ID:", score.parts[0]?.id);
 
-  const measure = score.parts[0]?.measures[0];
-  const notes = measure?.content?.filter(
-    (item): item is Note => (item as any)._type === "note",
-  );
-  console.log(
-    "First note in first measure of first part:",
-    notes?.[0],
-  );
+  const notes = getAllNotes(score);
+  console.log("First note in score:", notes[0]);
   // You can now work with the typed 'score' object
 }
 
@@ -110,6 +104,17 @@ const yamlString = toYaml(score);
 const xmlString = toMusicXML(score);
 const toneSeq = toToneJsSequence(score);
 const midi = toMidi(score);
+```
+
+### Helper Utilities
+
+Utility functions are provided to easily access measures and notes:
+
+```typescript
+import { getAllNotes, getAllMeasures } from 'your-musicxml-parser-package-name';
+
+const notes = getAllNotes(score); // all notes in the entire score
+const measuresOfFirstPart = getAllMeasures(score.parts[0]);
 ```
 
 ## Project Structure
