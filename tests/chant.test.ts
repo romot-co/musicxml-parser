@@ -149,6 +149,7 @@ describe("Chant.musicxml Parser Test", () => {
     const attributesArray = getAttributesFromContent(measure1.content);
     expect(attributesArray).toHaveLength(1);
     const attrs = attributesArray[0];
+    expect(measure1.attributesElements?.length).toBe(attributesArray.length);
     expect(attrs?.divisions).toBe(8);
     expect(attrs?.key?.[0].fifths).toBe(0);
     // Check for <senza-misura/>
@@ -160,6 +161,7 @@ describe("Chant.musicxml Parser Test", () => {
 
     // Check direction
     const directionsArray = getDirectionsFromContent(measure1.content);
+    expect(measure1.directions?.length).toBe(directionsArray.length);
     expect(directionsArray.length).toBeGreaterThanOrEqual(1); // At least "Angelus dicit:"
     const angelusDirection = directionsArray.find(
       (d) => d.direction_type?.[0]?.words?.text === "Angelus dicit:",
@@ -170,6 +172,7 @@ describe("Chant.musicxml Parser Test", () => {
 
     // Check notes and lyrics
     const notesArray = getNotesFromContent(measure1.content);
+    expect(measure1.notes?.length).toBe(notesArray.length);
     expect(notesArray.length).toBeGreaterThanOrEqual(26); // Based on the provided XML for measure 1
 
     const firstNote = notesArray[0];
@@ -199,13 +202,9 @@ describe("Chant.musicxml Parser Test", () => {
     // If the barline is a direct property of the measure (e.g., measure.barlines), test that instead.
     // Based on Chant.xml, the barline is a direct child, not in a 'content' array per se in the typical sense.
     // It will be mapped as a MeasureContent item with _type: 'barline'.
-    const barlineElement = measure1.content?.find(
-      (item: any) => (item as any)._type === "barline",
-    );
+    const barlineElement = measure1.barlines?.[0];
     expect(barlineElement).toBeDefined();
-    // @ts-ignore
     expect(barlineElement?.location).toBe("right");
-    // @ts-ignore
     expect(barlineElement?.barStyle).toBe("light-light");
   });
 

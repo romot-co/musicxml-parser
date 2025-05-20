@@ -258,6 +258,7 @@ describe("Echigo-Jishi.musicxml Parser Test", () => {
     expect(attributesArray).toBeDefined();
     expect(attributesArray).toHaveLength(1);
     const attrs = attributesArray[0];
+    expect(measure1.attributesElements?.length).toBe(attributesArray.length);
     expect(attrs?.divisions).toBe(8);
     expect(attrs?.key?.[0].fifths).toBe(0);
     expect(attrs?.time?.[0].beats).toBe("2");
@@ -267,6 +268,7 @@ describe("Echigo-Jishi.musicxml Parser Test", () => {
     // Check <direction> elements - Partially implemented
     const directionsArray = getDirectionsFromContent(measure1.content);
     expect(directionsArray).toBeDefined();
+    expect(measure1.directions?.length).toBe(directionsArray.length);
     expect(directionsArray.length).toBeGreaterThanOrEqual(2);
 
     const allegroDirection = directionsArray.find(
@@ -284,6 +286,7 @@ describe("Echigo-Jishi.musicxml Parser Test", () => {
 
     const notesArray = getNotesFromContent(measure1.content);
     expect(notesArray).toBeDefined();
+    expect(measure1.notes?.length).toBe(notesArray.length);
     expect(notesArray).toHaveLength(4);
     const note1 = notesArray[0];
     expect(note1?.pitch?.step).toBe("A");
@@ -304,6 +307,7 @@ describe("Echigo-Jishi.musicxml Parser Test", () => {
     expect(measure11).toBeDefined();
     if (!measure11) return;
     const notesInMeasure11 = getNotesFromContent(measure11.content);
+    expect(measure11.notes?.length).toBe(notesInMeasure11.length);
     const noteWithLyric = notesInMeasure11.find(
       (n) => n.lyrics && n.lyrics.length > 0,
     );

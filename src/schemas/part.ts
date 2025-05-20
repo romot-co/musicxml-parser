@@ -5,7 +5,8 @@ import { MeasureSchema } from "./measure";
  * Represents a single part in a score (e.g., a single instrument or voice).
  * Each part contains a sequence of measures.
  */
-export const PartSchema = z
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const PartSchema: z.ZodType<any> = z
   .object({
     /**
      * A unique identifier for this part. This ID should correspond to an ID

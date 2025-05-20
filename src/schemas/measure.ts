@@ -39,6 +39,20 @@ export const MeasureSchema = z.object({
   nonControlling: z.boolean().optional(),
   width: z.number().optional(),
   content: z.array(MeasureContentSchema).optional().default([]),
+  /** Convenience lists extracted from `content`. */
+  notes: z.array(NoteSchema).optional().readonly(),
+  directions: z.array(DirectionSchema).optional().readonly(),
+  attributesElements: z.array(AttributesSchema).optional().readonly(),
+  barlines: z.array(BarlineSchema).optional().readonly(),
+  harmonies: z.array(HarmonySchema).optional().readonly(),
+  prints: z.array(PrintSchema).optional().readonly(),
+  sounds: z.array(SoundSchema).optional().readonly(),
+  figuredBasses: z.array(FiguredBassSchema).optional().readonly(),
+  groupings: z.array(GroupingSchema).optional().readonly(),
+  links: z.array(LinkSchema).optional().readonly(),
+  bookmarks: z.array(BookmarkSchema).optional().readonly(),
+  backups: z.array(BackupSchema).optional().readonly(),
+  forwards: z.array(ForwardSchema).optional().readonly(),
   // The 'passthrough()' below was removed as explicit content modeling is preferred.
   // If truly unknown elements need to be captured, a specific 'any' or 'unknown'
   // type could be added to the union, or passthrough could be re-enabled with caution.
