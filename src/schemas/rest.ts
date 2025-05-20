@@ -11,10 +11,9 @@ export const RestSchema = z.object({
    * refers to a full measure rest. It is not typically used for <note> rests.
    * For now, we'll keep it simple and can extend later if needed for <forward>/<backup>.
    */
-  // measure: z.boolean().optional(), // Example: if it were a boolean attribute 'measure="yes"'
-  /** Specifies the visual placement of the rest. Not parsed for now. */
-  // 'display-step': z.string().optional(),
-  // 'display-octave': z.number().int().optional(),
+  measure: z.boolean().optional(),
+  displayStep: z.string().optional(),
+  displayOctave: z.number().int().optional(),
 });
 
 export type Rest = z.infer<typeof RestSchema>;
