@@ -50,7 +50,7 @@ export const MetronomeSchema = z.object({
   "per-minute": MetronomePerMinuteSchema.optional(),
   "metronome-note": z.array(MetronomeNoteSchema).optional(),
   "metronome-relation": z.string().optional(),
-  // parentheses: z.boolean().optional(), // Example attribute
+  parentheses: YesNoEnum.optional(),
 });
 export type Metronome = z.infer<typeof MetronomeSchema>;
 

@@ -80,6 +80,14 @@ describe("Direction parsing", () => {
     expect(met["metronome-note"]?.[1]["metronome-type"]).toBe("eighth");
   });
 
+  it("parses metronome parentheses attribute", () => {
+    const xml = `<direction><direction-type><metronome parentheses="yes"><beat-unit>quarter</beat-unit><per-minute>120</per-minute></metronome></direction-type></direction>`;
+    const el = createElement(xml);
+    const direction = mapDirectionElement(el);
+    const met = direction.direction_type[0].metronome!;
+    expect(met.parentheses).toBe("yes");
+  });
+
   it("parses directive attribute", () => {
     const xml = `<direction directive="yes"><direction-type><words>Tempo</words></direction-type></direction>`;
     const el = createElement(xml);
