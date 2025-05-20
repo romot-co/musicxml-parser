@@ -124,6 +124,16 @@ describe("Note Schema Tests (note.mod)", () => {
       expect(beam.color).toBe("red");
     });
 
+    it("parses beam repeater and fan attributes", () => {
+      const xml =
+        '<note><pitch><step>A</step><octave>4</octave></pitch><duration>1</duration><type>16th</type><beam number="1" repeater="yes" fan="accel">begin</beam></note>';
+      const element = createElement(xml);
+      const note = mapNoteElement(element);
+      const beam = note.beams?.[0] as Beam;
+      expect(beam.repeater).toBe("yes");
+      expect(beam.fan).toBe("accel");
+    });
+
     it("should parse a <note> with <notations> and <slur>", () => {
       const xml =
         '<note><pitch><step>D</step><octave>5</octave></pitch><duration>2</duration><notations><slur type="start" number="1" placement="above"/></notations></note>';
@@ -378,6 +388,19 @@ describe("Note Schema Tests (note.mod)", () => {
       expect(orn?.wavyLines?.[0].type).toBe("start");
       expect(orn?.otherOrnaments?.[0].smufl).toBe("ornamentHaydn");
       expect(orn?.accidentalMarks?.[0].value).toBe("sharp");
+    });
+
+    it("parses wavy-line attributes", () => {
+      const xml =
+        '<note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration><notations><ornaments><wavy-line type="start" accelerate="yes" beats="3" second-beats="1" last-beat="2" smufl="wiggleSawtooth"/></ornaments></notations></note>';
+      const element = createElement(xml);
+      const note = mapNoteElement(element);
+      const wavy = note.notations?.ornaments?.[0]?.wavyLines?.[0];
+      expect(wavy?.accelerate).toBe("yes");
+      expect(wavy?.beats).toBe(3);
+      expect(wavy?.secondBeats).toBe(1);
+      expect(wavy?.lastBeat).toBe(2);
+      expect(wavy?.smufl).toBe("wiggleSawtooth");
     });
 
     it("parses technical notation details", () => {
