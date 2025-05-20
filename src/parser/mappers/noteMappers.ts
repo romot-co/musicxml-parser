@@ -88,6 +88,7 @@ import type {
   Grace,
   Cue,
   Unpitched,
+  Rest,
   TimeModification,
   Font,
   Scaling,
@@ -241,6 +242,7 @@ import {
   GraceSchema,
   CueSchema,
   UnpitchedSchema,
+  RestSchema,
   TimeModificationSchema,
   FontSchema,
   ScalingSchema,
@@ -613,9 +615,14 @@ export const mapNoteElement = (element: Element): Note => {
   } else if (unpitchedElement) {
     noteData.unpitched = mapUnpitchedElement(unpitchedElement);
   } else if (restElement) {
-    noteData.rest = {
-      // measure: getAttribute(restElement, 'measure') === 'yes' ? true : undefined,
+    const measureAttr = getAttribute(restElement, "measure");
+    const restData: Partial<Rest> = {
+      measure:
+        measureAttr === "yes" ? true : measureAttr === "no" ? false : undefined,
+      displayStep: getTextContent(restElement, "display-step"),
+      displayOctave: parseNumberContent(restElement, "display-octave"),
     };
+    noteData.rest = RestSchema.parse(restData);
   }
 
   // Duration is handled based on grace/cue presence by NoteSchema.refine
