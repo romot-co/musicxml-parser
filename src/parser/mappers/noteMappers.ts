@@ -1786,6 +1786,10 @@ export const mapMetronomeElement = (element: Element): Metronome => {
     element.querySelectorAll("metronome-note"),
   );
   const relationElement = element.querySelector("metronome-relation");
+  const parenthesesAttr = getAttribute(element, "parentheses") as
+    | "yes"
+    | "no"
+    | undefined;
   const metronomeData: Partial<Metronome> = {};
   if (beatUnitElement) {
     metronomeData["beat-unit"] = mapMetronomeBeatUnitElement(beatUnitElement);
@@ -1802,6 +1806,9 @@ export const mapMetronomeElement = (element: Element): Metronome => {
   if (relationElement) {
     metronomeData["metronome-relation"] =
       relationElement.textContent?.trim() ?? "";
+  }
+  if (parenthesesAttr) {
+    metronomeData.parentheses = parenthesesAttr;
   }
   return MetronomeSchema.parse(metronomeData);
 };
