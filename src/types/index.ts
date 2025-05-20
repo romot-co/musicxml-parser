@@ -79,6 +79,8 @@ export type {
   Spiccato,
   Staccatissimo,
   StrongAccent,
+  SoftAccent,
+  OtherArticulation,
   Tuplet,
   Ornaments,
   TrillMark,
