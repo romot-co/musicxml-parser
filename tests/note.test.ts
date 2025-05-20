@@ -238,6 +238,27 @@ describe("Note Schema Tests (note.mod)", () => {
       expect(arts?.placement).toBe("above");
     });
 
+    it("parses <soft-accent> articulation", () => {
+      const xml =
+        '<note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration><notations><articulations><soft-accent placement="below"/></articulations></notations></note>';
+      const el = createElement(xml);
+      const note = mapNoteElement(el);
+      const art = note.notations?.articulations?.[0];
+      expect(art?.softAccent).toHaveLength(1);
+      expect(art?.softAccent?.[0].placement).toBe("below");
+    });
+
+    it("parses <other-articulation> with smufl attribute", () => {
+      const xml =
+        '<note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration><notations><articulations><other-articulation smufl="accDoitAbove">doit</other-articulation></articulations></notations></note>';
+      const el = createElement(xml);
+      const note = mapNoteElement(el);
+      const art = note.notations?.articulations?.[0];
+      expect(art?.otherArticulations).toHaveLength(1);
+      expect(art?.otherArticulations?.[0].smufl).toBe("accDoitAbove");
+      expect(art?.otherArticulations?.[0].value).toBe("doit");
+    });
+
     it("maps tied, tuplet, ornaments and technical elements", () => {
       const xml =
         '<note><pitch><step>D</step><octave>4</octave></pitch><duration>2</duration><notations><tied type="start"/><tuplet type="start" number="3"/><ornaments/><technical/></notations></note>';
@@ -446,6 +467,18 @@ describe("Note Schema Tests (note.mod)", () => {
       const note = mapNoteElement(element);
       expect(note.instrument).toBe("P1-I1");
       expect(note.printObject).toBe("no");
+    });
+
+    it("parses notehead-text with display and accidental text", () => {
+      const xml =
+        "<note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration><notehead-text><display-text>do</display-text><accidental-text>flat</accidental-text></notehead-text></note>";
+      const element = createElement(xml);
+      const note = mapNoteElement(element);
+      expect(note.noteheadText).toBeDefined();
+      expect(note.noteheadText?.length).toBe(1);
+      const nt = note.noteheadText?.[0]!;
+      expect(nt.displayTexts?.[0].text).toBe("do");
+      expect(nt.accidentalTexts?.[0].value).toBe("flat");
     });
   });
 });

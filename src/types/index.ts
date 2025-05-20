@@ -79,6 +79,8 @@ export type {
   Spiccato,
   Staccatissimo,
   StrongAccent,
+  SoftAccent,
+  OtherArticulation,
   Tuplet,
   Ornaments,
   TrillMark,
@@ -178,6 +180,14 @@ export type {
 } from "../schemas/notations";
 export type { MidiDevice } from "../schemas/midiDevice";
 export type { TimeModification } from "../schemas/timeModification";
+export type {
+  NoteheadText,
+  DisplayText,
+  AccidentalText,
+} from "../schemas/noteheadText";
 // Add other inferred types from Zod schemas here as they are created.
 
 export type ParsedMusicXml = Record<string, unknown>;
+export type { DisplayText, AccidentalText } from "../schemas/displayText";
+export type { PartNameDisplay } from "../schemas/partNameDisplay";
+export type { PartAbbreviationDisplay } from "../schemas/partAbbreviationDisplay";

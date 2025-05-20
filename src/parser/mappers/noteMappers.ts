@@ -39,6 +39,7 @@ import type {
   Slash,
   Accidental,
   AccidentalValue,
+  NoteheadText,
   Notations,
   Slur,
   Articulations,
@@ -55,6 +56,8 @@ import type {
   Mordent, // Add
   Schleifer, // Add
   OtherOrnament, // Add
+  SoftAccent,
+  OtherArticulation,
   Technical,
   Glissando,
   Slide,
@@ -182,6 +185,9 @@ import {
   BeatRepeatSchema,
   SlashSchema,
   AccidentalSchema,
+  NoteheadTextSchema,
+  DisplayTextSchema,
+  AccidentalTextSchema,
   NotationsSchema,
   SlurSchema,
   ArticulationsSchema,
@@ -197,6 +203,8 @@ import {
   MordentSchema,
   SchleiferSchema,
   OtherOrnamentSchema,
+  SoftAccentSchema,
+  OtherArticulationSchema,
   FingeringSchema,
   StringSchema,
   FretSchema,
@@ -406,6 +414,31 @@ export const mapUnpitchedElement = (element: Element): Unpitched => {
   return UnpitchedSchema.parse(unpitchedData);
 };
 
+export const mapNoteheadTextElement = (element: Element): NoteheadText => {
+  const displayTextEls = Array.from(element.querySelectorAll("display-text"));
+  const accidentalTextEls = Array.from(
+    element.querySelectorAll("accidental-text"),
+  );
+
+  const displayTexts = displayTextEls.map((el) =>
+    DisplayTextSchema.parse({ text: el.textContent?.trim() ?? "" }),
+  );
+
+  const accidentalTexts = accidentalTextEls.map((el) => {
+    const value = el.textContent?.trim() as AccidentalValue | undefined;
+    if (!value) {
+      throw new Error("<accidental-text> requires content");
+    }
+    const smufl = getAttribute(el, "smufl") || undefined;
+    return AccidentalTextSchema.parse({ value, smufl });
+  });
+
+  const data: Partial<NoteheadText> = {};
+  if (displayTexts.length) data.displayTexts = displayTexts;
+  if (accidentalTexts.length) data.accidentalTexts = accidentalTexts;
+  return NoteheadTextSchema.parse(data);
+};
+
 // Helper function to map a <lyric> element
 export const mapLyricElement = (element: Element): Lyric => {
   const textElement = element.querySelector("text");
@@ -531,6 +564,9 @@ export const mapNoteElement = (element: Element): Note => {
   const stemContent = getTextContent(element, "stem");
   const beamElements = Array.from(element.querySelectorAll("beam"));
   const notationsElement = element.querySelector("notations");
+  const noteheadTextElements = Array.from(
+    element.querySelectorAll("notehead-text"),
+  );
   const lyricElements = Array.from(element.querySelectorAll("lyric"));
   const tieElements = Array.from(element.querySelectorAll("tie"));
   const timeModElement = element.querySelector("time-modification");
@@ -608,6 +644,9 @@ export const mapNoteElement = (element: Element): Note => {
   }
   if (beamElements.length > 0) {
     noteData.beams = beamElements.map(mapBeamElement).filter(Boolean) as Beam[];
+  }
+  if (noteheadTextElements.length > 0) {
+    noteData.noteheadText = noteheadTextElements.map(mapNoteheadTextElement);
   }
   if (notationsElement) {
     noteData.notations = mapNotationsElement(notationsElement);
@@ -793,6 +832,12 @@ export const mapArticulationsElement = (element: Element): Articulations => {
   const spiccatoElement = element.querySelector("spiccato");
   const staccatissimoElement = element.querySelector("staccatissimo");
   const strongAccentElement = element.querySelector("strong-accent");
+  const softAccentElements = Array.from(
+    element.querySelectorAll("soft-accent"),
+  );
+  const otherArticulationElements = Array.from(
+    element.querySelectorAll("other-articulation"),
+  );
 
   const articulationsData: Partial<Articulations> = {
     placement: getAttribute(element, "placement") as
@@ -818,6 +863,14 @@ export const mapArticulationsElement = (element: Element): Articulations => {
   }
   if (strongAccentElement) {
     articulationsData.strongAccent = {};
+  }
+  if (softAccentElements.length) {
+    articulationsData.softAccent = softAccentElements.map(mapSoftAccentElement);
+  }
+  if (otherArticulationElements.length) {
+    articulationsData.otherArticulations = otherArticulationElements.map(
+      mapOtherArticulationElement,
+    );
   }
 
   return ArticulationsSchema.parse(articulationsData);
@@ -906,6 +959,22 @@ export const mapOtherOrnamentElement = (el: Element): OtherOrnament => {
     smufl: getAttribute(el, "smufl") || undefined,
   };
   return OtherOrnamentSchema.parse(data);
+};
+
+export const mapSoftAccentElement = (el: Element): SoftAccent => {
+  const data: Partial<SoftAccent> = {
+    placement: getAttribute(el, "placement") as "above" | "below" | undefined,
+  };
+  return SoftAccentSchema.parse(data);
+};
+
+export const mapOtherArticulationElement = (el: Element): OtherArticulation => {
+  const data: Partial<OtherArticulation> = {
+    value: el.textContent?.trim() || undefined,
+    placement: getAttribute(el, "placement") as "above" | "below" | undefined,
+    smufl: getAttribute(el, "smufl") || undefined,
+  };
+  return OtherArticulationSchema.parse(data);
 };
 
 export const mapAccidentalMarkElement = (el: Element): Accidental => {
