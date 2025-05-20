@@ -175,6 +175,16 @@ export const OtherOrnamentSchema = z.object({
 });
 export type OtherOrnament = z.infer<typeof OtherOrnamentSchema>;
 
+export const SoftAccentSchema = EmptyPlacementSchema;
+export type SoftAccent = z.infer<typeof SoftAccentSchema>;
+
+export const OtherArticulationSchema = z.object({
+  value: z.string().optional(),
+  placement: z.enum(["above", "below"]).optional(),
+  smufl: z.string().optional(),
+});
+export type OtherArticulation = z.infer<typeof OtherArticulationSchema>;
+
 export const OrnamentsSchema = z.object({
   trillMarks: z.array(TrillMarkSchema).optional(),
   turns: z.array(TurnSchema).optional(),
@@ -309,6 +319,8 @@ export const ArticulationsSchema = z.object({
   spiccato: SpiccatoSchema.optional(),
   staccatissimo: StaccatissimoSchema.optional(),
   strongAccent: StrongAccentSchema.optional(),
+  softAccent: z.array(SoftAccentSchema).optional(),
+  otherArticulations: z.array(OtherArticulationSchema).optional(),
   placement: z.enum(["above", "below"]).optional(), // placement for the group
 });
 export type Articulations = z.infer<typeof ArticulationsSchema>;

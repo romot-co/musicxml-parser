@@ -55,6 +55,8 @@ import type {
   Mordent, // Add
   Schleifer, // Add
   OtherOrnament, // Add
+  SoftAccent,
+  OtherArticulation,
   Technical,
   Glissando,
   Slide,
@@ -197,6 +199,8 @@ import {
   MordentSchema,
   SchleiferSchema,
   OtherOrnamentSchema,
+  SoftAccentSchema,
+  OtherArticulationSchema,
   FingeringSchema,
   StringSchema,
   FretSchema,
@@ -793,6 +797,12 @@ export const mapArticulationsElement = (element: Element): Articulations => {
   const spiccatoElement = element.querySelector("spiccato");
   const staccatissimoElement = element.querySelector("staccatissimo");
   const strongAccentElement = element.querySelector("strong-accent");
+  const softAccentElements = Array.from(
+    element.querySelectorAll("soft-accent"),
+  );
+  const otherArticulationElements = Array.from(
+    element.querySelectorAll("other-articulation"),
+  );
 
   const articulationsData: Partial<Articulations> = {
     placement: getAttribute(element, "placement") as
@@ -818,6 +828,14 @@ export const mapArticulationsElement = (element: Element): Articulations => {
   }
   if (strongAccentElement) {
     articulationsData.strongAccent = {};
+  }
+  if (softAccentElements.length) {
+    articulationsData.softAccent = softAccentElements.map(mapSoftAccentElement);
+  }
+  if (otherArticulationElements.length) {
+    articulationsData.otherArticulations = otherArticulationElements.map(
+      mapOtherArticulationElement,
+    );
   }
 
   return ArticulationsSchema.parse(articulationsData);
@@ -906,6 +924,22 @@ export const mapOtherOrnamentElement = (el: Element): OtherOrnament => {
     smufl: getAttribute(el, "smufl") || undefined,
   };
   return OtherOrnamentSchema.parse(data);
+};
+
+export const mapSoftAccentElement = (el: Element): SoftAccent => {
+  const data: Partial<SoftAccent> = {
+    placement: getAttribute(el, "placement") as "above" | "below" | undefined,
+  };
+  return SoftAccentSchema.parse(data);
+};
+
+export const mapOtherArticulationElement = (el: Element): OtherArticulation => {
+  const data: Partial<OtherArticulation> = {
+    value: el.textContent?.trim() || undefined,
+    placement: getAttribute(el, "placement") as "above" | "below" | undefined,
+    smufl: getAttribute(el, "smufl") || undefined,
+  };
+  return OtherArticulationSchema.parse(data);
 };
 
 export const mapAccidentalMarkElement = (el: Element): Accidental => {
