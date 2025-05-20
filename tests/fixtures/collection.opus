@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<opus version="1.0" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Test Collection</title>
+  <score xlink:href="op1.xml" xlink:type="simple"/>
+  <score xlink:href="op2.xml" xlink:type="simple"/>
+</opus>

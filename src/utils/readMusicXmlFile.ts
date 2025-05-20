@@ -7,6 +7,7 @@ async function extractMusicXmlEntry(filePath: string): Promise<Buffer> {
   if (eocd === -1) throw new Error("Invalid zip archive");
   const cdOffset = buf.readUInt32LE(eocd + 16);
   let ptr = cdOffset;
+  const entries: Record<string, { cm: number; cs: number; off: number }> = {};
   while (ptr < eocd) {
     if (buf.readUInt32LE(ptr) !== 0x02014b50) break;
     const compMethod = buf.readUInt16LE(ptr + 10);
@@ -17,20 +18,43 @@ async function extractMusicXmlEntry(filePath: string): Promise<Buffer> {
     const localOffset = buf.readUInt32LE(ptr + 42);
     const name = buf.slice(ptr + 46, ptr + 46 + fileNameLen).toString("utf8");
     ptr += 46 + fileNameLen + extraLen + commentLen;
-    if (name.toLowerCase().endsWith(".musicxml")) {
-      if (buf.readUInt32LE(localOffset) !== 0x04034b50) {
-        throw new Error("Invalid local header");
-      }
-      const lhNameLen = buf.readUInt16LE(localOffset + 26);
-      const lhExtraLen = buf.readUInt16LE(localOffset + 28);
-      const dataStart = localOffset + 30 + lhNameLen + lhExtraLen;
-      const compressed = buf.slice(dataStart, dataStart + compSize);
-      if (compMethod === 0) return compressed;
-      if (compMethod === 8) return zlib.inflateRawSync(compressed);
-      throw new Error("Unsupported compression method");
-    }
+    entries[name] = { cm: compMethod, cs: compSize, off: localOffset };
   }
-  throw new Error(`No .musicxml entry found in ${filePath}`);
+
+  const target = Object.keys(entries).find(
+    (n) => n.toLowerCase() === "meta-inf/container.xml",
+  );
+  let musicPath: string | undefined;
+  if (target) {
+    const entry = entries[target];
+    const data = readEntry(buf, entry);
+    const text = data.toString("utf8");
+    const match = text.match(/full-path=\"([^\"]+)\"/);
+    if (match) musicPath = match[1];
+  }
+  if (!musicPath) {
+    musicPath = Object.keys(entries).find((n) =>
+      n.toLowerCase().endsWith(".musicxml"),
+    );
+  }
+  if (!musicPath) throw new Error(`No .musicxml entry found in ${filePath}`);
+  const entry = entries[musicPath];
+  return readEntry(buf, entry);
+
+  function readEntry(
+    buffer: Buffer,
+    info: { cm: number; cs: number; off: number },
+  ): Buffer {
+    if (buffer.readUInt32LE(info.off) !== 0x04034b50)
+      throw new Error("Invalid local header");
+    const lhNameLen = buffer.readUInt16LE(info.off + 26);
+    const lhExtraLen = buffer.readUInt16LE(info.off + 28);
+    const dataStart = info.off + 30 + lhNameLen + lhExtraLen;
+    const compressed = buffer.slice(dataStart, dataStart + info.cs);
+    if (info.cm === 0) return compressed;
+    if (info.cm === 8) return zlib.inflateRawSync(compressed);
+    throw new Error("Unsupported compression method");
+  }
 }
 
 /**

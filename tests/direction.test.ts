@@ -80,6 +80,23 @@ describe("Direction parsing", () => {
     expect(met["metronome-note"]?.[1]["metronome-type"]).toBe("eighth");
   });
 
+  it("parses metronome with parentheses", () => {
+    const xml = `<direction><direction-type><metronome parentheses="yes"><beat-unit>quarter</beat-unit><per-minute>100</per-minute></metronome></direction-type></direction>`;
+    const el = createElement(xml);
+    const dir = mapDirectionElement(el);
+    expect(dir.direction_type[0].metronome?.parentheses).toBe("yes");
+  });
+
+  it("parses segno and coda position attributes", () => {
+    const xml = `<direction><direction-type><segno default-x="3" default-y="-2"/><coda relative-x="1" relative-y="2"/></direction-type></direction>`;
+    const el = createElement(xml);
+    const dir = mapDirectionElement(el);
+    expect(dir.direction_type[0].segno?.defaultX).toBe(3);
+    expect(dir.direction_type[0].segno?.defaultY).toBe(-2);
+    expect(dir.direction_type[0].coda?.relativeX).toBe(1);
+    expect(dir.direction_type[0].coda?.relativeY).toBe(2);
+  });
+
   it("parses directive attribute", () => {
     const xml = `<direction directive="yes"><direction-type><words>Tempo</words></direction-type></direction>`;
     const el = createElement(xml);

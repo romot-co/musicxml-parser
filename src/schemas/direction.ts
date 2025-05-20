@@ -50,7 +50,7 @@ export const MetronomeSchema = z.object({
   "per-minute": MetronomePerMinuteSchema.optional(),
   "metronome-note": z.array(MetronomeNoteSchema).optional(),
   "metronome-relation": z.string().optional(),
-  // parentheses: z.boolean().optional(), // Example attribute
+  parentheses: YesNoEnum.optional(),
 });
 export type Metronome = z.infer<typeof MetronomeSchema>;
 
@@ -85,10 +85,20 @@ export const WedgeSchema = z.object({
 });
 export type Wedge = z.infer<typeof WedgeSchema>;
 
-export const SegnoSchema = z.object({});
+export const SegnoSchema = z.object({
+  defaultX: z.number().optional(),
+  defaultY: z.number().optional(),
+  relativeX: z.number().optional(),
+  relativeY: z.number().optional(),
+});
 export type Segno = z.infer<typeof SegnoSchema>;
 
-export const CodaSchema = z.object({});
+export const CodaSchema = z.object({
+  defaultX: z.number().optional(),
+  defaultY: z.number().optional(),
+  relativeX: z.number().optional(),
+  relativeY: z.number().optional(),
+});
 export type Coda = z.infer<typeof CodaSchema>;
 
 export const OctaveShiftSchema = z.object({

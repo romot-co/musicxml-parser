@@ -22,8 +22,8 @@ import type {
   MetronomeRelation,
   // Dynamics,
   Wedge,
-  // Segno,
-  //Coda,
+  Segno,
+  Coda,
   Transpose,
   // Diatonic,
   // Chromatic,
@@ -34,6 +34,7 @@ import type {
   LineDetail,
   MeasureStyle,
   MultipleRest,
+  Rest,
   MeasureRepeat,
   BeatRepeat,
   Slash,
@@ -181,6 +182,7 @@ import {
   LineDetailSchema,
   MeasureStyleSchema,
   MultipleRestSchema,
+  RestSchema,
   MeasureRepeatSchema,
   BeatRepeatSchema,
   SlashSchema,
@@ -613,9 +615,14 @@ export const mapNoteElement = (element: Element): Note => {
   } else if (unpitchedElement) {
     noteData.unpitched = mapUnpitchedElement(unpitchedElement);
   } else if (restElement) {
-    noteData.rest = {
-      // measure: getAttribute(restElement, 'measure') === 'yes' ? true : undefined,
-    };
+    const restData: Partial<Rest> = {};
+    const measureAttr = getAttribute(restElement, "measure");
+    if (measureAttr === "yes") restData.measure = true;
+    const ds = getTextContent(restElement, "display-step");
+    if (ds) restData.displayStep = ds;
+    const doOct = parseNumberContent(restElement, "display-octave");
+    if (doOct !== undefined) restData.displayOctave = doOct;
+    noteData.rest = RestSchema.parse(restData);
   }
 
   // Duration is handled based on grace/cue presence by NoteSchema.refine
@@ -1796,6 +1803,9 @@ export const mapMetronomeElement = (element: Element): Metronome => {
     metronomeData["metronome-relation"] =
       relationElement.textContent?.trim() ?? "";
   }
+  const parAttr = getAttribute(element, "parentheses");
+  if (parAttr === "yes" || parAttr === "no")
+    metronomeData.parentheses = parAttr;
   return MetronomeSchema.parse(metronomeData);
 };
 
@@ -1968,10 +1978,28 @@ export const mapDirectionTypeElement = (element: Element): DirectionType => {
     if (img) directionTypeData.image = img;
   }
   if (segnoElement) {
-    directionTypeData.segno = SegnoSchema.parse({});
+    const data: Partial<Segno> = {};
+    const dx = getAttribute(segnoElement, "default-x");
+    if (dx) data.defaultX = parseOptionalFloat(dx);
+    const dy = getAttribute(segnoElement, "default-y");
+    if (dy) data.defaultY = parseOptionalFloat(dy);
+    const rx = getAttribute(segnoElement, "relative-x");
+    if (rx) data.relativeX = parseOptionalFloat(rx);
+    const ry = getAttribute(segnoElement, "relative-y");
+    if (ry) data.relativeY = parseOptionalFloat(ry);
+    directionTypeData.segno = SegnoSchema.parse(data);
   }
   if (codaElement) {
-    directionTypeData.coda = CodaSchema.parse({});
+    const data: Partial<Coda> = {};
+    const dx = getAttribute(codaElement, "default-x");
+    if (dx) data.defaultX = parseOptionalFloat(dx);
+    const dy = getAttribute(codaElement, "default-y");
+    if (dy) data.defaultY = parseOptionalFloat(dy);
+    const rx = getAttribute(codaElement, "relative-x");
+    if (rx) data.relativeX = parseOptionalFloat(rx);
+    const ry = getAttribute(codaElement, "relative-y");
+    if (ry) data.relativeY = parseOptionalFloat(ry);
+    directionTypeData.coda = CodaSchema.parse(data);
   }
   return DirectionTypeSchema.parse(directionTypeData);
 };
