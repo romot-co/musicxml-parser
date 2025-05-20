@@ -112,6 +112,22 @@ const toneSeq = toToneJsSequence(score);
 const midi = toMidi(score);
 ```
 
+### Editing Helpers
+
+Basic utilities are provided for modifying a parsed `ScorePartwise` object.
+
+```typescript
+import { addNote, transposePart } from 'your-musicxml-parser-package-name';
+
+// Add a note to measure 1 of part P1
+addNote('P1', '1', { _type: 'note', pitch: { step: 'E', octave: 4 }, duration: 1 }, score);
+
+// Transpose all notes in part P1 up a whole tone
+transposePart('P1', 2, score);
+```
+
+Each helper mutates the given score and validates it with `ScorePartwiseSchema.parse`.
+
 ## Project Structure
 
 *   `src/`: Source code
