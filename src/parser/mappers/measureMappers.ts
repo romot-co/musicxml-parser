@@ -1439,8 +1439,11 @@ export const mapDisplayTextElement = (element: Element): DisplayText => {
 };
 
 export const mapAccidentalTextElement = (element: Element): AccidentalText => {
+  const valueFromTextContent = element.textContent?.trim();
   const data: Partial<AccidentalText> = {
-    text: element.textContent?.trim() ?? undefined,
+    value: (valueFromTextContent === "" ? undefined : valueFromTextContent) as
+      | AccidentalValue
+      | undefined,
     smufl: getAttribute(element, "smufl"),
   };
   return AccidentalTextSchema.parse(data);
