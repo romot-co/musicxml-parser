@@ -192,6 +192,30 @@ describe("Direction parsing", () => {
     expect(sc.accord[0].string).toBe("1");
   });
 
+  it("parses segno attributes", () => {
+    const xml = `<direction><direction-type><segno default-x="3.5" default-y="-2" relative-x="1" relative-y="2" placement="below"/></direction-type></direction>`;
+    const el = createElement(xml);
+    const direction = mapDirectionElement(el);
+    const seg = direction.direction_type[0].segno!;
+    expect(seg.defaultX).toBe(3.5);
+    expect(seg.defaultY).toBe(-2);
+    expect(seg.relativeX).toBe(1);
+    expect(seg.relativeY).toBe(2);
+    expect(seg.placement).toBe("below");
+  });
+
+  it("parses coda attributes", () => {
+    const xml = `<direction><direction-type><coda default-x="1" default-y="2" relative-x="-1" relative-y="-2" placement="above"/></direction-type></direction>`;
+    const el = createElement(xml);
+    const direction = mapDirectionElement(el);
+    const coda = direction.direction_type[0].coda!;
+    expect(coda.defaultX).toBe(1);
+    expect(coda.defaultY).toBe(2);
+    expect(coda.relativeX).toBe(-1);
+    expect(coda.relativeY).toBe(-2);
+    expect(coda.placement).toBe("above");
+  });
+
   it("parses other-direction element", () => {
     const xml = `<direction><direction-type><other-direction>custom</other-direction></direction-type></direction>`;
     const el = createElement(xml);

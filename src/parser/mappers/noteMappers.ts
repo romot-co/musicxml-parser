@@ -22,8 +22,8 @@ import type {
   MetronomeRelation,
   // Dynamics,
   Wedge,
-  // Segno,
-  //Coda,
+  Segno,
+  Coda,
   Transpose,
   // Diatonic,
   // Chromatic,
@@ -1712,6 +1712,62 @@ export const mapOtherDirectionElement = (element: Element): OtherDirection => {
   return OtherDirectionSchema.parse({ text });
 };
 
+export const mapSegnoElement = (element: Element): Segno => {
+  const data: Partial<Segno> = {};
+  const dxAttr = getAttribute(element, "default-x");
+  if (dxAttr) {
+    const val = parseOptionalFloat(dxAttr);
+    if (val !== undefined) data.defaultX = val;
+  }
+  const dyAttr = getAttribute(element, "default-y");
+  if (dyAttr) {
+    const val = parseOptionalFloat(dyAttr);
+    if (val !== undefined) data.defaultY = val;
+  }
+  const rxAttr = getAttribute(element, "relative-x");
+  if (rxAttr) {
+    const val = parseOptionalFloat(rxAttr);
+    if (val !== undefined) data.relativeX = val;
+  }
+  const ryAttr = getAttribute(element, "relative-y");
+  if (ryAttr) {
+    const val = parseOptionalFloat(ryAttr);
+    if (val !== undefined) data.relativeY = val;
+  }
+  const placementAttr = getAttribute(element, "placement");
+  if (placementAttr === "above" || placementAttr === "below")
+    data.placement = placementAttr as "above" | "below";
+  return SegnoSchema.parse(data);
+};
+
+export const mapCodaElement = (element: Element): Coda => {
+  const data: Partial<Coda> = {};
+  const dxAttr = getAttribute(element, "default-x");
+  if (dxAttr) {
+    const val = parseOptionalFloat(dxAttr);
+    if (val !== undefined) data.defaultX = val;
+  }
+  const dyAttr = getAttribute(element, "default-y");
+  if (dyAttr) {
+    const val = parseOptionalFloat(dyAttr);
+    if (val !== undefined) data.defaultY = val;
+  }
+  const rxAttr = getAttribute(element, "relative-x");
+  if (rxAttr) {
+    const val = parseOptionalFloat(rxAttr);
+    if (val !== undefined) data.relativeX = val;
+  }
+  const ryAttr = getAttribute(element, "relative-y");
+  if (ryAttr) {
+    const val = parseOptionalFloat(ryAttr);
+    if (val !== undefined) data.relativeY = val;
+  }
+  const placementAttr = getAttribute(element, "placement");
+  if (placementAttr === "above" || placementAttr === "below")
+    data.placement = placementAttr as "above" | "below";
+  return CodaSchema.parse(data);
+};
+
 // Helper function to map a <beat-unit> element (within <metronome>)
 export const mapMetronomeBeatUnitElement = (
   element: Element,
@@ -1968,10 +2024,10 @@ export const mapDirectionTypeElement = (element: Element): DirectionType => {
     if (img) directionTypeData.image = img;
   }
   if (segnoElement) {
-    directionTypeData.segno = SegnoSchema.parse({});
+    directionTypeData.segno = mapSegnoElement(segnoElement);
   }
   if (codaElement) {
-    directionTypeData.coda = CodaSchema.parse({});
+    directionTypeData.coda = mapCodaElement(codaElement);
   }
   return DirectionTypeSchema.parse(directionTypeData);
 };
