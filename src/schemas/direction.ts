@@ -90,7 +90,6 @@ export const SegnoSchema = z.object({
   defaultY: z.number().optional(),
   relativeX: z.number().optional(),
   relativeY: z.number().optional(),
-  placement: z.enum(["above", "below"]).optional(),
 });
 export type Segno = z.infer<typeof SegnoSchema>;
 
@@ -99,7 +98,6 @@ export const CodaSchema = z.object({
   defaultY: z.number().optional(),
   relativeX: z.number().optional(),
   relativeY: z.number().optional(),
-  placement: z.enum(["above", "below"]).optional(),
 });
 export type Coda = z.infer<typeof CodaSchema>;
 
