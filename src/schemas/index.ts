@@ -31,6 +31,7 @@ export * from "./beam";
 export * from "./partSymbol";
 export * from "./partGroup";
 export * from "./scoreInstrument";
+export * from "./instrumentChange";
 export * from "./midiInstrument";
 export * from "./grace";
 export * from "./cue";
