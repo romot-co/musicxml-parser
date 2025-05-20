@@ -535,6 +535,7 @@ export const mapNoteElement = (element: Element): Note => {
   const tieElements = Array.from(element.querySelectorAll("tie"));
   const timeModElement = element.querySelector("time-modification");
   const voiceContent = getTextContent(element, "voice");
+  const instrumentElement = element.querySelector("instrument");
 
   const noteData: Partial<Note> = {
     _type: "note",
@@ -546,6 +547,8 @@ export const mapNoteElement = (element: Element): Note => {
     | "yes"
     | "no"
     | undefined;
+  const printObjectAttr = getAttribute(element, "print-object");
+  if (printObjectAttr) noteData.printObject = printObjectAttr as "yes" | "no";
   const dynamicsAttr = getAttribute(element, "dynamics");
   if (dynamicsAttr) noteData.dynamics = parseFloat(dynamicsAttr);
   const endDynamicsAttr = getAttribute(element, "end-dynamics");
@@ -614,6 +617,11 @@ export const mapNoteElement = (element: Element): Note => {
   }
   if (voiceContent) {
     noteData.voice = voiceContent;
+  }
+  if (instrumentElement) {
+    const id = getAttribute(instrumentElement, "id");
+    const text = instrumentElement.textContent?.trim();
+    noteData.instrument = id || text || undefined;
   }
 
   try {

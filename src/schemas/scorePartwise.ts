@@ -31,6 +31,8 @@ export const ScorePartwiseSchema: z.ZodType<any> = z
     work: WorkSchema.optional(),
     /** Movement title. */
     movementTitle: z.string().optional(),
+    /** Movement number. */
+    movementNumber: z.string().optional(),
     /** Identification of creators, encoding, etc. */
     identification: IdentificationSchema.optional(),
     /** Score-wide defaults for layout, appearance, and MIDI. */

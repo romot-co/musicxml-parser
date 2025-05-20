@@ -11,6 +11,7 @@ export const ScoreTimewiseMetadataSchema = z.object({
   version: z.string().optional().default("1.0"),
   work: WorkSchema.optional(),
   movementTitle: z.string().optional(),
+  movementNumber: z.string().optional(),
   identification: IdentificationSchema.optional(),
   defaults: DefaultsSchema.optional(),
   credit: z.array(CreditSchema).optional(),
