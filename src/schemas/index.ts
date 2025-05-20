@@ -56,3 +56,6 @@ export * from "./bookmark";
 export * from "./scoreInstrument";
 export * from "./midiDevice";
 export * from "./midiInstrument";
+export * from "./displayText";
+export * from "./partNameDisplay";
+export * from "./partAbbreviationDisplay";

@@ -119,6 +119,10 @@ import type {
   Dashes,
   Bracket,
   Image,
+  DisplayText,
+  AccidentalText,
+  PartNameDisplay,
+  PartAbbreviationDisplay,
 } from "../../types";
 import {
   PitchSchema,
@@ -255,6 +259,10 @@ import {
   FirstFretSchema,
   MidiDeviceSchema,
   MidiInstrumentSchema,
+  DisplayTextSchema,
+  AccidentalTextSchema,
+  PartNameDisplaySchema,
+  PartAbbreviationDisplaySchema,
 } from "../../schemas";
 import {
   mapDefaultsElement,
@@ -1387,6 +1395,63 @@ export const mapMidiInstrumentElement = (element: Element): MidiInstrument => {
   return MidiInstrumentSchema.parse(data);
 };
 
+export const mapDisplayTextElement = (element: Element): DisplayText => {
+  const data: Partial<DisplayText> = {
+    text: element.textContent?.trim() ?? undefined,
+  };
+  return DisplayTextSchema.parse(data);
+};
+
+export const mapAccidentalTextElement = (element: Element): AccidentalText => {
+  const data: Partial<AccidentalText> = {
+    text: element.textContent?.trim() ?? undefined,
+    smufl: getAttribute(element, "smufl"),
+  };
+  return AccidentalTextSchema.parse(data);
+};
+
+export const mapPartNameDisplayElement = (
+  element: Element,
+): PartNameDisplay => {
+  const items: (DisplayText | AccidentalText)[] = [];
+  element.childNodes.forEach((n) => {
+    if (n.nodeType === 1) {
+      const child = n as Element;
+      if (child.tagName === "display-text") {
+        items.push(mapDisplayTextElement(child));
+      } else if (child.tagName === "accidental-text") {
+        items.push(mapAccidentalTextElement(child));
+      }
+    }
+  });
+  const data: Partial<PartNameDisplay> = {};
+  if (items.length > 0) data.items = items;
+  const po = getAttribute(element, "print-object");
+  if (po === "yes" || po === "no") data.printObject = po;
+  return PartNameDisplaySchema.parse(data);
+};
+
+export const mapPartAbbreviationDisplayElement = (
+  element: Element,
+): PartAbbreviationDisplay => {
+  const items: (DisplayText | AccidentalText)[] = [];
+  element.childNodes.forEach((n) => {
+    if (n.nodeType === 1) {
+      const child = n as Element;
+      if (child.tagName === "display-text") {
+        items.push(mapDisplayTextElement(child));
+      } else if (child.tagName === "accidental-text") {
+        items.push(mapAccidentalTextElement(child));
+      }
+    }
+  });
+  const data: Partial<PartAbbreviationDisplay> = {};
+  if (items.length > 0) data.items = items;
+  const po = getAttribute(element, "print-object");
+  if (po === "yes" || po === "no") data.printObject = po;
+  return PartAbbreviationDisplaySchema.parse(data);
+};
+
 // Mapper for <score-part> element (from <part-list>)
 export const mapScorePartElement = (element: Element): ScorePart => {
   const scoreInstrumentElements = Array.from(
@@ -1399,6 +1464,11 @@ export const mapScorePartElement = (element: Element): ScorePart => {
     element.querySelectorAll("midi-instrument"),
   );
 
+  const partNameDisplayElement = element.querySelector("part-name-display");
+  const partAbbrevDisplayElement = element.querySelector(
+    "part-abbreviation-display",
+  );
+
   const scorePartData: Partial<ScorePart> = {
     id: getAttribute(element, "id") ?? "",
     partName: getTextContent(element, "part-name") ?? undefined,
@@ -1406,6 +1476,16 @@ export const mapScorePartElement = (element: Element): ScorePart => {
 
   const partAbbrev = getTextContent(element, "part-abbreviation");
   if (partAbbrev) scorePartData.partAbbreviation = partAbbrev;
+  if (partNameDisplayElement) {
+    scorePartData.partNameDisplay = mapPartNameDisplayElement(
+      partNameDisplayElement,
+    );
+  }
+  if (partAbbrevDisplayElement) {
+    scorePartData.partAbbreviationDisplay = mapPartAbbreviationDisplayElement(
+      partAbbrevDisplayElement,
+    );
+  }
   if (scoreInstrumentElements.length > 0) {
     scorePartData.scoreInstruments = scoreInstrumentElements.map(
       mapScoreInstrumentElement,

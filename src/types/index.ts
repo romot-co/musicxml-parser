@@ -180,3 +180,6 @@ export type { TimeModification } from "../schemas/timeModification";
 // Add other inferred types from Zod schemas here as they are created.
 
 export type ParsedMusicXml = Record<string, unknown>;
+export type { DisplayText, AccidentalText } from "../schemas/displayText";
+export type { PartNameDisplay } from "../schemas/partNameDisplay";
+export type { PartAbbreviationDisplay } from "../schemas/partAbbreviationDisplay";
