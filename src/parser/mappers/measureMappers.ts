@@ -286,6 +286,7 @@ import {
   parseOptionalInt,
   parseOptionalFloat,
 } from "./utils";
+import { getStandardInstrumentId } from "../../utils/loadSoundsXml";
 import {
   mapNoteElement,
   mapKeyElement,
@@ -1360,14 +1361,20 @@ export const mapTimewiseMeasureElement = (
 export const mapScoreInstrumentElement = (
   element: Element,
 ): ScoreInstrument => {
+  const instrumentName = getTextContent(element, "instrument-name") ?? "";
   const data: Partial<ScoreInstrument> = {
     id: getAttribute(element, "id") ?? "",
-    instrumentName: getTextContent(element, "instrument-name") ?? "",
+    instrumentName,
   };
   const abbr = getTextContent(element, "instrument-abbreviation");
   if (abbr) data.instrumentAbbreviation = abbr;
   const sound = getTextContent(element, "instrument-sound");
   if (sound) data.instrumentSound = sound;
+  let stdId = sound ? getStandardInstrumentId(sound) : undefined;
+  if (!stdId && instrumentName) {
+    stdId = getStandardInstrumentId(instrumentName);
+  }
+  if (stdId) data.standardInstrumentId = stdId;
   if (element.querySelector("solo")) data.solo = true;
   const ensemble = element.querySelector("ensemble");
   if (ensemble) {

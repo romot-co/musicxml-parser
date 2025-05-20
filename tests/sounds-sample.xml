@@ -1,0 +1,10 @@
+<sounds>
+  <sound id="keyboard.piano">Piano</sound>
+  <sound id="brass.trumpet">
+    <any>Trumpet</any>
+  </sound>
+  <sound id="strings.violin">
+    <solo>Violin Solo</solo>
+    <ensemble>Violin Ensemble</ensemble>
+  </sound>
+</sounds>

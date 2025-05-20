@@ -15,6 +15,8 @@ export const ScoreInstrumentSchema = z
     instrumentAbbreviation: z.string().optional(),
     /** Default timbre or sound description */
     instrumentSound: z.string().optional(),
+    /** Standard instrument sound identifier from sounds.xml */
+    standardInstrumentId: z.string().optional(),
     /** True if performance is intended as solo */
     solo: z.boolean().optional(),
     /** Size of an ensemble if specified */
