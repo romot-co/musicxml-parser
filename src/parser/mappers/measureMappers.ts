@@ -286,6 +286,7 @@ import {
   parseOptionalInt,
   parseOptionalFloat,
 } from "./utils";
+import { mapToStandardInstrumentId } from "../../utils/instrumentMapping";
 import {
   mapNoteElement,
   mapKeyElement,
@@ -1368,6 +1369,11 @@ export const mapScoreInstrumentElement = (
   if (abbr) data.instrumentAbbreviation = abbr;
   const sound = getTextContent(element, "instrument-sound");
   if (sound) data.instrumentSound = sound;
+  const standardId = mapToStandardInstrumentId(
+    data.instrumentName,
+    sound ?? undefined,
+  );
+  if (standardId) data.standardId = standardId;
   if (element.querySelector("solo")) data.solo = true;
   const ensemble = element.querySelector("ensemble");
   if (ensemble) {
