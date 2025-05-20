@@ -1,5 +1,10 @@
 import { z } from "zod";
-import { FontSchema, MarginsSchema, LineWidthSchema } from "./common";
+import {
+  FontStyleEnum,
+  FontWeightEnum,
+  MarginsSchema,
+  LineWidthSchema,
+} from "./common";
 
 /**
  * Defines the scaling from global tenths to physical units.
@@ -68,10 +73,15 @@ export const AppearanceSchema = z.object({
 
 export const ConcertScoreSchema = z.object({}); // Empty element
 
-export const MusicFontSchema = FontSchema;
-export const WordFontSchema = FontSchema;
+export const MusicFontSchema = z.object({
+  fontFamily: z.string().optional(),
+  fontStyle: FontStyleEnum.optional(),
+  fontSize: z.string().optional(),
+  fontWeight: FontWeightEnum.optional(),
+});
+export const WordFontSchema = MusicFontSchema;
 
-export const LyricFontSchema = FontSchema.extend({
+export const LyricFontSchema = MusicFontSchema.extend({
   number: z.string().optional(), // NMTOKEN
   name: z.string().optional(), // CDATA
 });

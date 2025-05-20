@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { FontSchema } from "./common";
+import { FontStyleEnum, FontWeightEnum } from "./common";
 
 export const ExtendSchema = z.object({
   type: z.enum(["start", "stop", "continue"]).optional(),
@@ -11,7 +11,11 @@ export const ElisionSchema = z.object({
 });
 export type Elision = z.infer<typeof ElisionSchema>;
 
-export const LyricFormattingSchema = FontSchema.extend({
+export const LyricFormattingSchema = z.object({
+  fontFamily: z.string().optional(),
+  fontStyle: FontStyleEnum.optional(),
+  fontSize: z.string().optional(),
+  fontWeight: FontWeightEnum.optional(),
   justify: z.enum(["left", "center", "right"]).optional(),
   underline: z.number().optional(),
   overline: z.number().optional(),
