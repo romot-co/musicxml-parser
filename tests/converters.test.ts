@@ -49,7 +49,44 @@ describe("Conversion utilities", () => {
     expect(seq.notes[0].midi).toBe(60);
     const midi = toMidi(score);
     expect(midi.tracks.length).toBe(1);
-    expect(midi.tracks[0].midi).toBe(60);
+    expect(midi.tracks[0][0].midi).toBe(60);
+  });
+
+  it("creates multiple MIDI tracks for multiple parts", async () => {
+    const multiXml = `
+<score-partwise version="3.1">
+  <part-list>
+    <score-part id="P1">
+      <part-name>First</part-name>
+    </score-part>
+    <score-part id="P2">
+      <part-name>Second</part-name>
+    </score-part>
+  </part-list>
+  <part id="P1">
+    <measure number="1">
+      <note>
+        <pitch><step>C</step><octave>4</octave></pitch>
+        <duration>1</duration>
+      </note>
+    </measure>
+  </part>
+  <part id="P2">
+    <measure number="1">
+      <note>
+        <pitch><step>E</step><octave>4</octave></pitch>
+        <duration>1</duration>
+      </note>
+    </measure>
+  </part>
+</score-partwise>`;
+    const doc2 = await parseMusicXmlString(multiXml);
+    if (!doc2) throw new Error("parse failed");
+    const score2 = mapDocumentToScorePartwise(doc2);
+    const midi2 = toMidi(score2);
+    expect(midi2.tracks.length).toBe(2);
+    expect(midi2.tracks[0][0].midi).toBe(60);
+    expect(midi2.tracks[1][0].midi).toBe(64);
   });
 
   it("serializes back to MusicXML", async () => {
