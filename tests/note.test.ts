@@ -415,5 +415,14 @@ describe("Note Schema Tests (note.mod)", () => {
       expect(bend?.firstBeat).toBe(30);
       expect(bend?.lastBeat).toBe(70);
     });
+
+    it("maps instrument and print-object on note", () => {
+      const xml =
+        '<note print-object="no"><instrument id="P1-I1"/>\n<pitch><step>C</step><octave>4</octave></pitch><duration>1</duration></note>';
+      const element = createElement(xml);
+      const note = mapNoteElement(element);
+      expect(note.instrument).toBe("P1-I1");
+      expect(note.printObject).toBe("no");
+    });
   });
 });

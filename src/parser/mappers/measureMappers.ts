@@ -1477,6 +1477,7 @@ export const mapDocumentToScorePartwise = (doc: XMLDocument): ScorePartwise => {
 
   const workElement = rootElement.querySelector("work");
   const movementTitleElement = rootElement.querySelector("movement-title");
+  const movementNumberElement = rootElement.querySelector("movement-number");
   const identificationElement = rootElement.querySelector("identification");
   const defaultsElement = rootElement.querySelector("defaults");
   const creditElements = Array.from(rootElement.querySelectorAll("credit"));
@@ -1498,6 +1499,10 @@ export const mapDocumentToScorePartwise = (doc: XMLDocument): ScorePartwise => {
   }
   if (movementTitleElement) {
     scorePartwiseData.movementTitle = movementTitleElement.textContent?.trim();
+  }
+  if (movementNumberElement) {
+    scorePartwiseData.movementNumber =
+      movementNumberElement.textContent?.trim();
   }
   if (identificationElement) {
     scorePartwiseData.identification = mapIdentificationElement(
@@ -1537,6 +1542,7 @@ export const mapDocumentToScoreTimewise = (doc: XMLDocument): ScoreTimewise => {
 
   const workElement = rootElement.querySelector("work");
   const movementTitleElement = rootElement.querySelector("movement-title");
+  const movementNumberElement = rootElement.querySelector("movement-number");
   const identificationElement = rootElement.querySelector("identification");
   const defaultsElement = rootElement.querySelector("defaults");
   const creditElements = Array.from(rootElement.querySelectorAll("credit"));
@@ -1558,6 +1564,10 @@ export const mapDocumentToScoreTimewise = (doc: XMLDocument): ScoreTimewise => {
   }
   if (movementTitleElement) {
     scoreTimewiseData.movementTitle = movementTitleElement.textContent?.trim();
+  }
+  if (movementNumberElement) {
+    scoreTimewiseData.movementNumber =
+      movementNumberElement.textContent?.trim();
   }
   if (identificationElement) {
     scoreTimewiseData.identification = mapIdentificationElement(

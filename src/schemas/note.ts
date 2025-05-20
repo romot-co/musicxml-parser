@@ -37,6 +37,8 @@ export const NoteSchema = z
     beams: z.array(BeamSchema).optional(),
     notations: NotationsSchema.optional(),
     lyrics: z.array(LyricSchema).optional(),
+    instrument: z.string().optional(),
+    printObject: z.enum(["yes", "no"]).optional(),
     printLeger: z.enum(["yes", "no"]).optional(),
     dynamics: z.number().optional(),
     endDynamics: z.number().optional(),
