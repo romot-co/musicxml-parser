@@ -4,3 +4,4 @@ export * from "./types"; // Zodから推論される型などをエクスポー�
 export * from "./converters";
 export { toMusicXML } from "./converters";
 export * from "./utils/readMusicXmlFile";
+export * from "./utils/loadSoundsXml";
