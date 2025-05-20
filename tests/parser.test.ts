@@ -119,6 +119,7 @@ describe("MusicXML Parser", () => {
     expect(attributesArray).toBeDefined();
     expect(attributesArray).toHaveLength(1);
     const attributes = attributesArray[0];
+    expect(measure.attributesElements?.length).toBe(attributesArray.length);
     expect(attributes).toBeDefined();
     if (!attributes) return;
 
@@ -139,6 +140,7 @@ describe("MusicXML Parser", () => {
     // Check notes using helper
     const notesArray = getNotesFromContent(measure.content);
     expect(notesArray).toHaveLength(4);
+    expect(measure.notes?.length).toBe(notesArray.length);
 
     const note1 = notesArray[0];
     expect(note1.pitch?.step).toBe("C");

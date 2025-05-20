@@ -5,8 +5,7 @@ import {
   mapForwardElement,
   mapMeasureElement,
 } from "../src/parser/mappers";
-import type { Backup, Forward, Note } from "../src/types";
-import { NoteSchema } from "../src/schemas";
+import type { Backup, Forward } from "../src/types";
 
 function createElement(xml: string): Element {
   const dom = new JSDOM(xml, { contentType: "application/xml" });
@@ -50,28 +49,9 @@ describe("Backup and Forward mapping", () => {
     const el = createElement(measureXml);
     const measure = mapMeasureElement(el);
     expect(measure.content).toBeDefined();
-    const notes = measure.content?.filter((c): c is Note => {
-      if (typeof c === "object" && c !== null && "_type" in c) {
-        const currentType = (c as { _type: string })._type;
-        return currentType === "note" && NoteSchema.safeParse(c).success;
-      }
-      return false;
-    });
-    const backups = measure.content?.filter((c): c is Backup => {
-      if (typeof c === "object" && c !== null && "_type" in c) {
-        return (c as { _type: string })._type === "backup";
-      }
-      return false;
-    });
-    const forwards = measure.content?.filter((c): c is Forward => {
-      if (typeof c === "object" && c !== null && "_type" in c) {
-        return (c as { _type: string })._type === "forward";
-      }
-      return false;
-    });
-    expect(notes?.length).toBe(3);
-    expect(backups?.length).toBe(1);
-    expect(forwards?.length).toBe(1);
+    expect(measure.notes?.length).toBe(3);
+    expect(measure.backups?.length).toBe(1);
+    expect(measure.forwards?.length).toBe(1);
   });
 
   it("maintains order for multiple voices with backups and forwards", () => {
@@ -93,28 +73,12 @@ describe("Backup and Forward mapping", () => {
     expect((content[4] as Backup)._type).toBe("backup");
     expect((content[6] as Forward)._type).toBe("forward");
 
-    const backups = content.filter((c): c is Backup => {
-      if (typeof c === "object" && c !== null && "_type" in c) {
-        return (c as { _type: string })._type === "backup";
-      }
-      return false;
-    });
-    const forwards = content.filter((c): c is Forward => {
-      if (typeof c === "object" && c !== null && "_type" in c) {
-        return (c as { _type: string })._type === "forward";
-      }
-      return false;
-    });
+    const backups = measure.backups ?? [];
+    const forwards = measure.forwards ?? [];
     expect(backups.length).toBe(1);
     expect(forwards.length).toBe(1);
 
-    const notes = content.filter((c): c is Note => {
-      if (typeof c === "object" && c !== null && "_type" in c) {
-        const currentType = (c as { _type: string })._type;
-        return currentType === "note" && NoteSchema.safeParse(c).success;
-      }
-      return false;
-    });
+    const notes = measure.notes ?? [];
     const voice1 = notes.filter((n) => n.voice === "1");
     const voice2 = notes.filter((n) => n.voice === "2");
     expect(voice1).toHaveLength(4);

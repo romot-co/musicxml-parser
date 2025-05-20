@@ -43,6 +43,7 @@ import type {
   Print,
   Sound,
   MeasureContent,
+  Note,
   StaffLayout,
   TimewisePart,
   TimewiseMeasure,
@@ -56,6 +57,8 @@ import type {
   MidiDevice,
   FiguredBass,
   Figure,
+  Link,
+  Bookmark,
   InstrumentChange,
   Grouping,
   Feature,
@@ -1112,6 +1115,47 @@ export function mapMeasureElement(measureElement: Element): Measure {
     width: widthAttr ? parseOptionalFloat(widthAttr) : undefined,
     content: content.length > 0 ? content : undefined,
   };
+
+  // Derive convenience lists from content
+  if (measureData.content) {
+    const filterByType = <T extends MeasureContent>(type: string): T[] =>
+      measureData
+        .content!.filter(
+          (c): c is T =>
+            typeof c === "object" &&
+            c !== null &&
+            "_type" in c &&
+            (c as { _type: string })._type === type,
+        )
+        .map((c) => c as T);
+
+    const notes = filterByType<Note>("note");
+    if (notes.length) measureData.notes = notes;
+    const attrs = filterByType<Attributes>("attributes");
+    if (attrs.length) measureData.attributesElements = attrs;
+    const dirs = filterByType<Direction>("direction");
+    if (dirs.length) measureData.directions = dirs;
+    const barlines = filterByType<Barline>("barline");
+    if (barlines.length) measureData.barlines = barlines;
+    const harmonies = filterByType<Harmony>("harmony");
+    if (harmonies.length) measureData.harmonies = harmonies;
+    const prints = filterByType<Print>("print");
+    if (prints.length) measureData.prints = prints;
+    const sounds = filterByType<Sound>("sound");
+    if (sounds.length) measureData.sounds = sounds;
+    const figured = filterByType<FiguredBass>("figured-bass");
+    if (figured.length) measureData.figuredBasses = figured;
+    const groupings = filterByType<Grouping>("grouping");
+    if (groupings.length) measureData.groupings = groupings;
+    const links = filterByType<Link>("link");
+    if (links.length) measureData.links = links;
+    const bookmarks = filterByType<Bookmark>("bookmark");
+    if (bookmarks.length) measureData.bookmarks = bookmarks;
+    const backups = filterByType<Backup>("backup");
+    if (backups.length) measureData.backups = backups;
+    const forwards = filterByType<Forward>("forward");
+    if (forwards.length) measureData.forwards = forwards;
+  }
 
   // Remove undefined properties from measureData before parsing
   const cleanedMeasureData = Object.fromEntries(
