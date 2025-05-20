@@ -24,6 +24,8 @@ export const ScoreInstrumentSchema = z
     virtualName: z.string().optional(),
     /** Initial MIDI instrument assignment */
     midiInstrument: MidiInstrumentSchema.optional(),
+    /** Mapped standard instrument identifier */
+    standardId: z.string().optional(),
   })
   .passthrough();
 

@@ -37,6 +37,7 @@ describe("Score-part MIDI parsing", () => {
     const instr = part.scoreInstruments?.[0];
     expect(instr?.instrumentName).toBe("Piano");
     expect(instr?.instrumentSound).toBe("keyboard.piano");
+    expect(instr?.standardId).toBe("keyboard.piano");
     expect(part.midiDevices?.[0].value).toBe("Device");
     expect(part.midiDevices?.[0].port).toBe(1);
     expect(part.midiInstruments?.[0].midiChannel).toBe(1);
