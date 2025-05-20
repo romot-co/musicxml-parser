@@ -1,0 +1,6 @@
+<score-partwise version="3.1">
+  <part-list>
+    <score-part id="P1"><part-name>Music</part-name></score-part>
+  </part-list>
+  <part id="P1"><measure number="1"/></part>
+</score-partwise>
