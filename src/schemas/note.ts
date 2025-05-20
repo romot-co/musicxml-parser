@@ -11,6 +11,7 @@ import { GraceSchema } from "./grace";
 import { CueSchema } from "./cue";
 import { UnpitchedSchema } from "./unpitched";
 import { TimeModificationSchema } from "./timeModification";
+import { NoteheadTextSchema } from "./noteheadText";
 
 /**
  * Represents a single musical note or rest.
@@ -35,6 +36,7 @@ export const NoteSchema = z
     accidental: AccidentalSchema.optional(),
     stem: StemSchema.optional(),
     beams: z.array(BeamSchema).optional(),
+    noteheadText: z.array(NoteheadTextSchema).optional(),
     notations: NotationsSchema.optional(),
     lyrics: z.array(LyricSchema).optional(),
     instrument: z.string().optional(),

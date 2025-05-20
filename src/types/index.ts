@@ -177,6 +177,11 @@ export type {
 } from "../schemas/notations";
 export type { MidiDevice } from "../schemas/midiDevice";
 export type { TimeModification } from "../schemas/timeModification";
+export type {
+  NoteheadText,
+  DisplayText,
+  AccidentalText,
+} from "../schemas/noteheadText";
 // Add other inferred types from Zod schemas here as they are created.
 
 export type ParsedMusicXml = Record<string, unknown>;

@@ -59,3 +59,4 @@ export * from "./midiInstrument";
 export * from "./displayText";
 export * from "./partNameDisplay";
 export * from "./partAbbreviationDisplay";
+export * from "./noteheadText";

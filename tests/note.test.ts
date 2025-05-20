@@ -447,5 +447,17 @@ describe("Note Schema Tests (note.mod)", () => {
       expect(note.instrument).toBe("P1-I1");
       expect(note.printObject).toBe("no");
     });
+
+    it("parses notehead-text with display and accidental text", () => {
+      const xml =
+        "<note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration><notehead-text><display-text>do</display-text><accidental-text>flat</accidental-text></notehead-text></note>";
+      const element = createElement(xml);
+      const note = mapNoteElement(element);
+      expect(note.noteheadText).toBeDefined();
+      expect(note.noteheadText?.length).toBe(1);
+      const nt = note.noteheadText?.[0]!;
+      expect(nt.displayTexts?.[0].text).toBe("do");
+      expect(nt.accidentalTexts?.[0].value).toBe("flat");
+    });
   });
 });
