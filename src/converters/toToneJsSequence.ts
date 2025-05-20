@@ -1,9 +1,17 @@
-import type { ScorePartwise, Note, MeasureContent } from "../types";
+import type {
+  ScorePartwise,
+  Note,
+  MeasureContent,
+  Backup,
+  Forward,
+} from "../types";
 
 export interface ToneJsNote {
   time: number;
   duration: number;
   midi: number;
+  partId: string;
+  voice?: string;
 }
 
 export interface ToneJsSequence {
@@ -26,12 +34,20 @@ export function toToneJsSequence(score: ScorePartwise): ToneJsSequence {
     B: 11,
   };
 
-  let time = 0;
   const isNote = (mc: MeasureContent): mc is Note =>
     (mc as Note)._type === "note";
+  const isBackup = (mc: MeasureContent): mc is Backup =>
+    (mc as Backup)._type === "backup";
+  const isForward = (mc: MeasureContent): mc is Forward =>
+    (mc as Forward)._type === "forward";
 
   for (const part of score.parts) {
+    let partTime = 0; // absolute time at start of measure
+
     for (const measure of part.measures) {
+      let cursor = 0; // time position within measure
+      let maxTime = 0; // track measure length
+
       for (const item of measure.content ?? []) {
         if (isNote(item)) {
           if (item.pitch) {
@@ -40,14 +56,34 @@ export function toToneJsSequence(score: ScorePartwise): ToneJsSequence {
             const alter = item.pitch.alter ?? 0;
             const midi = (octave + 1) * 12 + stepToSemitone[step] + alter;
             const duration = item.duration ?? 1;
-            notes.push({ time, duration, midi });
-            time += duration;
+            notes.push({
+              time: partTime + cursor,
+              duration,
+              midi,
+              partId: part.id,
+              voice: item.voice,
+            });
+            if (!item.isChord) {
+              cursor += duration;
+              if (cursor > maxTime) maxTime = cursor;
+            }
           } else if (item.rest) {
             const restDuration = item.duration ?? 1;
-            time += restDuration;
+            if (!item.isChord) {
+              cursor += restDuration;
+              if (cursor > maxTime) maxTime = cursor;
+            }
           }
+        } else if (isBackup(item)) {
+          cursor -= item.duration;
+          if (cursor < 0) cursor = 0;
+        } else if (isForward(item)) {
+          cursor += item.duration;
+          if (cursor > maxTime) maxTime = cursor;
         }
       }
+
+      partTime += maxTime;
     }
   }
 

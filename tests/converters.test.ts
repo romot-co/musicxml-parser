@@ -47,6 +47,8 @@ describe("Conversion utilities", () => {
     const seq = toToneJsSequence(score);
     expect(seq.notes.length).toBe(1);
     expect(seq.notes[0].midi).toBe(60);
+    expect(seq.notes[0].time).toBe(0);
+    expect(seq.notes[0].partId).toBe("P1");
     const midi = toMidi(score);
     expect(midi.tracks.length).toBe(1);
     expect(midi.tracks[0].midi).toBe(60);

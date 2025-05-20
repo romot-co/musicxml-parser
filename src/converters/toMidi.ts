@@ -25,12 +25,17 @@ export interface MidiData {
  */
 export function toMidi(score: ScorePartwise): MidiData {
   const sequence = toToneJsSequence(score);
+  const midiNotes: MidiNote[] = sequence.notes.map((n) => ({
+    time: n.time,
+    duration: n.duration,
+    midi: n.midi,
+  }));
   return {
     header: {
       format: 1,
       numTracks: 1,
       ticksPerBeat: 480,
     },
-    tracks: sequence.notes,
+    tracks: midiNotes,
   };
 }
